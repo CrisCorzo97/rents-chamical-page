@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { createSupabaseServerClient } from '@/utils/supabase/server';
-import { logout } from '../login/actions';
+import { logout } from '../../lib/auth/actions';
 
 export default async function PrivatePage() {
   const cookieStore = cookies();

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import StyledComponentsRegistry from '@/lib/AntdRegistry';
+import StyledComponentsRegistry from '@/lib/ant-design/AntdRegistry';
 import theme from '@/theme/themeConfig';
 import { ConfigProvider } from 'antd';
 
