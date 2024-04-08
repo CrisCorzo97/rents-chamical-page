@@ -77,18 +77,7 @@ export default function SignupPage() {
           por la Municipalidad.'
           type='info'
           showIcon
-        />
-        <Alert
-          message='El acceso a una cuenta solo está permitido para personal autorizado
-          por la Municipalidad.'
-          type='warning'
-          showIcon
-        />
-        <Alert
-          message='El acceso a una cuenta solo está permitido para personal autorizado
-          por la Municipalidad.'
-          type='error'
-          showIcon
+          style={{ fontSize: '14px', lineHeight: '1.25', marginBottom: '1em' }}
         />
 
         <Form layout='vertical'>

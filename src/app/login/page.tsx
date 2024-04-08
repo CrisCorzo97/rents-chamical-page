@@ -1,5 +1,5 @@
 'use client';
-import { Button, Card, Form, Input, Space, Typography } from 'antd';
+import { Alert, Button, Card, Form, Input, Space, Typography } from 'antd';
 import { login } from '@/lib/auth/actions';
 import { useRouter } from 'next/navigation';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
@@ -36,9 +36,13 @@ export default function LoginPage() {
         >
           Ingresar a tu cuenta
         </Typography.Paragraph>
-        {/* <Typography.Paragraph type='danger' style={{ marginBottom: '2em' }}>
-          Solo se permite el ingreso a personal autorizado por la Municipalidad.
-        </Typography.Paragraph> */}
+
+        <Alert
+          message='El acceso es solo para usuarios autorizados.'
+          type='info'
+          showIcon
+          style={{ fontSize: '14px', lineHeight: '1.25', marginBottom: '1em' }}
+        />
 
         <Form layout='vertical' size='large'>
           <Form.Item<FieldType>
