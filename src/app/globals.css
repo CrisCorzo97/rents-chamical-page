@@ -3,3 +3,7 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
+
+.ant-menu-overflow-item.ant-menu-item:hover.ant-menu-item-active.ant-menu-item-only-child {
+  background-color: #ffa1c6;
+}

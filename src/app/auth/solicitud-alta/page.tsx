@@ -161,7 +161,7 @@ export default function SignupPage() {
           >
             Ya tengo una cuenta.{' '}
             <Typography.Text
-              onClick={() => replace('/login')}
+              onClick={() => replace('/auth/login')}
               style={{
                 fontSize: '14px',
                 color: theme.token?.colorPrimary,

@@ -38,6 +38,9 @@ const theme: ThemeConfig = {
       colorError: 'rgb(245, 34, 45)',
     },
     Menu: {
+      itemBg: '#f02389',
+      horizontalItemSelectedBg: '#fff',
+      colorText: '#fff',
       colorError: 'rgb(245, 34, 45)',
     },
     Pagination: {
