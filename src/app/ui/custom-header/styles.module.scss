@@ -1,0 +1,13 @@
+.nav {
+  display: flex;
+  align-items: center;
+
+  .item {
+    list-style: none;
+
+    .itemSelected {
+      background-color: #fff;
+      color: #f02389;
+    }
+  }
+}

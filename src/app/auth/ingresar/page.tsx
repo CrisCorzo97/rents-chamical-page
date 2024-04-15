@@ -1,20 +1,26 @@
 'use client';
 import { Alert, Button, Card, Form, Input, Space, Typography } from 'antd';
-import { useRouter } from 'next/navigation';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import theme from '@/theme/themeConfig';
-import { login } from '@/lib/auth/actions';
-import { useForm } from 'antd/es/form/Form';
+import Link from 'next/link';
+import axios from 'axios';
 
 type FieldType = {
-  email?: string;
-  password?: string;
+  email: string;
+  password: string;
 };
 
 export default function LoginPage() {
-  const { replace } = useRouter();
+  const handleSubmit = (values: FieldType) => {
+    console.log('Received values:', values);
 
-  const [form] = useForm();
+    const formData = new FormData();
+
+    formData.append('email', values.email);
+    formData.append('password', values.password);
+
+    axios.post('/api/auth', formData);
+  };
 
   return (
     <Card
@@ -47,7 +53,7 @@ export default function LoginPage() {
           style={{ fontSize: '14px', lineHeight: '1.25', marginBottom: '1em' }}
         />
 
-        <Form layout='vertical' size='large' form={form} id='login-form'>
+        <Form layout='vertical' size='large' onFinish={handleSubmit}>
           <Form.Item<FieldType>
             label='Email'
             name='email'
@@ -87,12 +93,10 @@ export default function LoginPage() {
           </Typography.Paragraph>
 
           <Button
-            form='login-form'
             style={{ marginTop: '1em', marginBottom: '0.75em' }}
             type='primary'
             htmlType='submit'
             block
-            formAction={login}
           >
             Iniciar sesión
           </Button>
@@ -103,16 +107,17 @@ export default function LoginPage() {
             }}
           >
             ¿No tienes cuenta?{' '}
-            <Typography.Text
-              onClick={() => replace('/auth/signup')}
-              style={{
-                fontSize: '14px',
-                color: theme.token?.colorPrimary,
-                cursor: 'pointer',
-              }}
-            >
-              Solicitar alta
-            </Typography.Text>
+            <Link href='/auth/solicitar-alta'>
+              <Typography.Text
+                style={{
+                  fontSize: '14px',
+                  color: theme.token?.colorPrimary,
+                  cursor: 'pointer',
+                }}
+              >
+                Solicitar alta
+              </Typography.Text>
+            </Link>
           </Typography.Paragraph>
         </Form>
       </Space>

@@ -4,11 +4,20 @@ import { login, signup } from './actions';
 import { NextApiResponse } from 'next';
 
 const derivador: Record<string, (val: FormData) => void> = {
-  '/api/auth/login': login,
-  '/api/auth/register': signup,
+  '/auth/ingresar': login,
+  '/auth/solicitar-alta': signup,
 };
 
 export async function POST(request: NextRequest, response: NextApiResponse) {
+  const urlReferer = request.headers.get('referer');
+  const urlOrigin = request.nextUrl.origin;
+
+  const urlPathname = urlReferer?.split(urlOrigin)[1];
+
+  if (!urlPathname) {
+    return response.redirect('/error');
+  }
+
   const validUrls = Object.keys(derivador);
   if (!validUrls.includes(request.nextUrl.pathname)) {
     return response.redirect('/error');
@@ -18,9 +27,9 @@ export async function POST(request: NextRequest, response: NextApiResponse) {
   const action = derivador[request.nextUrl.pathname];
 
   switch (request.nextUrl.pathname) {
-    case '/api/auth/login':
+    case '/auth/ingresar':
       return action(formData);
-    case '/api/auth/register':
+    case '/auth/solicitar-alta':
       return action(formData);
     default:
       return response.redirect('/error');

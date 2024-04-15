@@ -9,12 +9,13 @@ import {
   Space,
   Typography,
 } from 'antd';
-import { signup } from '@/lib/auth/actions';
 import { useRouter } from 'next/navigation';
 import { Rule } from 'antd/es/form';
 import { formatCuilInput } from '@/utils/formatters';
 import theme from '@/theme/themeConfig';
 import { cuilValidator } from '@/utils/validators';
+import Link from 'next/link';
+import axios from 'axios';
 
 const roleOptions = [
   { value: 'admin', label: 'Administrador' },
@@ -32,6 +33,19 @@ type FieldType = {
 
 export default function SignupPage() {
   const { replace } = useRouter();
+
+  const handleSubmit = (values: FieldType) => {
+    console.log('Received values:', values);
+    const formData = new FormData();
+
+    for (const key in values) {
+      if (values.hasOwnProperty(key)) {
+        formData.append(key, values[key as keyof FieldType]);
+      }
+    }
+
+    axios.post('/api/auth', formData);
+  };
 
   const addNameValidations = (type: 'first_name' | 'last_name'): Rule[] => {
     const inputMessage = type === 'first_name' ? 'nombre' : 'apellido';
@@ -80,7 +94,7 @@ export default function SignupPage() {
           style={{ fontSize: '14px', lineHeight: '1.25', marginBottom: '1em' }}
         />
 
-        <Form layout='vertical'>
+        <Form layout='vertical' onFinish={handleSubmit}>
           <Form.Item<FieldType>
             label='Nombre'
             name='first_name'
@@ -102,7 +116,7 @@ export default function SignupPage() {
               { required: true, message: 'Por favor ingresa un apellido.' },
               ...addNameValidations('last_name'),
             ]}
-            htmlFor='email'
+            htmlFor='last_name'
           >
             <Input placeholder='Cabrera' />
           </Form.Item>
@@ -111,7 +125,6 @@ export default function SignupPage() {
             name='email'
             rules={[{ required: true, message: 'Por favor ingresa un email.' }]}
             htmlFor='email'
-            normalize={(value) => formatCuilInput(value)}
           >
             <Input type='email' placeholder='tuemail@aqui.com' />
           </Form.Item>
@@ -148,7 +161,6 @@ export default function SignupPage() {
             type='primary'
             size='large'
             htmlType='submit'
-            formAction={signup}
             block
           >
             Enviar
@@ -160,16 +172,18 @@ export default function SignupPage() {
             }}
           >
             Ya tengo una cuenta.{' '}
-            <Typography.Text
-              onClick={() => replace('/auth/login')}
-              style={{
-                fontSize: '14px',
-                color: theme.token?.colorPrimary,
-                cursor: 'pointer',
-              }}
-            >
-              Ingresar
-            </Typography.Text>
+            <Link href='/auth/ingresar'>
+              <Typography.Text
+                onClick={() => replace('/auth/login')}
+                style={{
+                  fontSize: '14px',
+                  color: theme.token?.colorPrimary,
+                  cursor: 'pointer',
+                }}
+              >
+                Ingresar
+              </Typography.Text>
+            </Link>
           </Typography.Paragraph>
         </Form>
       </Space>

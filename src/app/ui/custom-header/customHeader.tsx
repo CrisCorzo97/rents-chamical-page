@@ -1,7 +1,16 @@
-import { Avatar, Flex, Layout, Menu, MenuProps } from 'antd';
-import { useRouter } from 'next/navigation';
+'use client';
+import { Avatar, Button, Flex, Layout } from 'antd';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import styles from './styles.module.scss';
+import { useMemo } from 'react';
 
-const items: MenuProps['items'] = [
+type MenuItem = {
+  label: string;
+  key: string;
+};
+
+const items: MenuItem[] = [
   {
     label: 'Inicio',
     key: '/',
@@ -11,8 +20,8 @@ const items: MenuProps['items'] = [
     key: '/municipio',
   },
   {
-    label: 'Rentas',
-    key: '/rentas',
+    label: 'Recaudación',
+    key: '/recaudacion-municipal',
   },
   {
     label: 'Portal de comunicación',
@@ -20,18 +29,26 @@ const items: MenuProps['items'] = [
   },
   {
     label: 'Ingresar',
-    key: '/ingresar',
+    key: '/auth/ingresar',
   },
 ];
 
 const { Header } = Layout;
 
 export const CustomHeader = () => {
-  const router = useRouter();
+  const pathname = usePathname();
 
-  const handleNavigation: MenuProps['onSelect'] = ({ key }) => {
-    router.push(`/${key}`);
-  };
+  const currentPath = useMemo(() => {
+    if (pathname === '/') return '/';
+
+    const filtered = items.filter((item) => item.key !== '/');
+
+    const pathFounded = filtered.find((item) =>
+      pathname.includes(item.key)
+    )?.key;
+
+    return pathFounded ?? '/';
+  }, [pathname]);
 
   return (
     <Header
@@ -51,21 +68,24 @@ export const CustomHeader = () => {
         style={{ maxWidth: '1024px', width: '100%' }}
       >
         <Avatar shape='square' size='large' />
-        <div
-          style={{
-            minWidth: '538px',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Menu
-            mode='horizontal'
-            items={items}
-            style={{ width: '100%' }}
-            onSelect={handleNavigation}
-          />
-        </div>
+
+        <ul className={styles.nav}>
+          {items.map((item) => (
+            <li key={item.key} className={styles.item}>
+              <Link href={item.key} prefetch>
+                <Button
+                  type='primary'
+                  size='large'
+                  className={
+                    currentPath === item.key ? styles.itemSelected : undefined
+                  }
+                >
+                  {item.label}
+                </Button>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </Flex>
     </Header>
   );
