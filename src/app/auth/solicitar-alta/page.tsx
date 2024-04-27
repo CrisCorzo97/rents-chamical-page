@@ -11,7 +11,6 @@ import {
   Typography,
   message,
 } from 'antd';
-import { useRouter } from 'next/navigation';
 import { Rule } from 'antd/es/form';
 import { formatCuilInput } from '@/utils/formatters';
 import theme from '@/theme/themeConfig';
@@ -19,6 +18,8 @@ import { cuilValidator } from '@/utils/validators';
 import Link from 'next/link';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { SuccessRegistrationRequestModal } from './success-modal';
 
 const roleOptions = [
   { value: 'admin', label: 'Administrador' },
@@ -26,7 +27,7 @@ const roleOptions = [
   { value: 'rent', label: 'Renta' },
 ];
 
-export type FieldType = {
+type RegistrationRequestType = {
   first_name: string;
   last_name: string;
   email: string;
@@ -34,17 +35,22 @@ export type FieldType = {
   role: 'adimin' | 'press' | 'rent';
 };
 
-export default function SignupPage() {
-  const { replace } = useRouter();
+export default function RegistrationRequestPage() {
   const [messageApi, contextHolder] = message.useMessage();
+  const [isSending, setIsSending] = useState<boolean>(false);
+  const [isSuccessfulRequest, setIsSuccessfulRequest] =
+    useState<boolean>(false);
 
-  const handleSubmit = async (values: FieldType) => {
+  const [form] = Form.useForm<RegistrationRequestType>();
+
+  const handleSubmit = async (values: RegistrationRequestType) => {
+    setIsSending(true);
     try {
       const formData = new FormData();
 
       for (const key in values) {
         if (values.hasOwnProperty(key)) {
-          formData.append(key, values[key as keyof FieldType]);
+          formData.append(key, values[key as keyof RegistrationRequestType]);
         }
       }
 
@@ -53,19 +59,21 @@ export default function SignupPage() {
         formData
       );
 
-      console.log({ data });
-
       if (!data.success) {
-        return messageApi.error(data.message, 4);
+        setIsSending(false);
+        return messageApi.error(data.message, 5);
       }
 
-      return messageApi.success('Solicitud enviada con éxito.', 4);
+      setIsSuccessfulRequest(true);
     } catch (error) {
-      console.log({ error });
+      console.error({ error });
       return messageApi.error(
         'Error al enviar la solicitud. Por favor intente nuevamente.',
         4
       );
+    } finally {
+      setIsSending(false);
+      form.resetFields();
     }
   };
 
@@ -106,10 +114,7 @@ export default function SignupPage() {
             padding: '1em',
           }}
         >
-          <Space
-            direction='vertical'
-            style={{ marginBottom: '1em', width: '100%' }}
-          >
+          <Space direction='vertical' style={{ width: '100%' }}>
             <Typography.Paragraph
               style={{
                 fontWeight: '600',
@@ -133,8 +138,8 @@ export default function SignupPage() {
               }}
             />
 
-            <Form layout='vertical' onFinish={handleSubmit}>
-              <Form.Item<FieldType>
+            <Form layout='vertical' onFinish={handleSubmit} form={form}>
+              <Form.Item<RegistrationRequestType>
                 label='Nombre'
                 name='first_name'
                 rules={[
@@ -148,7 +153,7 @@ export default function SignupPage() {
               >
                 <Input placeholder='Carlos' />
               </Form.Item>
-              <Form.Item<FieldType>
+              <Form.Item<RegistrationRequestType>
                 label='Apellido'
                 name='last_name'
                 rules={[
@@ -159,7 +164,7 @@ export default function SignupPage() {
               >
                 <Input placeholder='Cabrera' />
               </Form.Item>
-              <Form.Item<FieldType>
+              <Form.Item<RegistrationRequestType>
                 label='Email'
                 name='email'
                 rules={[
@@ -170,7 +175,7 @@ export default function SignupPage() {
                 <Input type='email' placeholder='tuemail@aqui.com' />
               </Form.Item>
 
-              <Form.Item<FieldType>
+              <Form.Item<RegistrationRequestType>
                 label='CUIL'
                 name='cuil'
                 rules={[
@@ -186,7 +191,7 @@ export default function SignupPage() {
               >
                 <Input placeholder='20-24757105-2' maxLength={13} />
               </Form.Item>
-              <Form.Item<FieldType>
+              <Form.Item<RegistrationRequestType>
                 label='Rol'
                 name='role'
                 rules={[
@@ -203,6 +208,7 @@ export default function SignupPage() {
                 size='large'
                 htmlType='submit'
                 block
+                loading={isSending}
               >
                 Enviar
               </Button>
@@ -229,6 +235,10 @@ export default function SignupPage() {
           </Space>
         </Card>
       </Flex>
+      <SuccessRegistrationRequestModal
+        open={isSuccessfulRequest}
+        onClose={() => setIsSuccessfulRequest(false)}
+      />
     </Space>
   );
 }

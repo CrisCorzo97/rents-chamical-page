@@ -36,10 +36,10 @@ export async function POST(request: NextRequest) {
       message: 'Email sent',
     });
   } catch (error) {
-    console.log({ error });
+    console.error({ error });
     return NextResponse.json({
       success: false,
-      message: 'Error sending email',
+      message: 'Error not handled',
     });
   }
 }

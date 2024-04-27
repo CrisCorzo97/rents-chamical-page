@@ -70,10 +70,7 @@ export default function LoginPage() {
             padding: '1em',
           }}
         >
-          <Space
-            direction='vertical'
-            style={{ marginBottom: '1em', width: '100%' }}
-          >
+          <Space direction='vertical' style={{ width: '100%' }}>
             <Typography.Paragraph
               style={{
                 fontWeight: '600',
