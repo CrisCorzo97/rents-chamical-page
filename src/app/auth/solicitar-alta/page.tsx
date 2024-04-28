@@ -20,11 +20,12 @@ import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { SuccessRegistrationRequestModal } from './success-modal';
+import { RoleOption } from '@/types/user';
 
-const roleOptions = [
-  { value: 'admin', label: 'Administrador' },
-  { value: 'press', label: 'Prensa' },
-  { value: 'rent', label: 'Renta' },
+const roleOptions: RoleOption[] = [
+  { value: '1', label: 'Administrador' },
+  { value: '2', label: 'Prensa' },
+  { value: '3', label: 'Renta' },
 ];
 
 type RegistrationRequestType = {
@@ -68,8 +69,8 @@ export default function RegistrationRequestPage() {
     } catch (error) {
       console.error({ error });
       return messageApi.error(
-        'Error al enviar la solicitud. Por favor intente nuevamente.',
-        4
+        'Hubo un error al enviar la solicitud. Por favor, intente nuevamente.',
+        5
       );
     } finally {
       setIsSending(false);

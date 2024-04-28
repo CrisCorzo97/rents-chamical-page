@@ -1,6 +1,6 @@
 'use client';
 import { UserOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 import Link from 'next/link';
 
 export default function Home() {
@@ -17,6 +17,8 @@ export default function Home() {
           Municipio
         </Button>
       </Link>
+
+      <Typography.Title level={2}>Secretarías</Typography.Title>
 
       <Button
         icon={<UserOutlined />}
