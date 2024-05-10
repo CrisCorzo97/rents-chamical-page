@@ -17,9 +17,9 @@ import theme from '@/theme/themeConfig';
 import { cuilValidator } from '@/utils/validators';
 import Link from 'next/link';
 import axios from 'axios';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import { useState } from 'react';
-import { SuccessRegistrationRequestModal } from './success-modal';
+import { ArrowLeftOutlined, CheckCircleFilled } from '@ant-design/icons';
+import { useState, useTransition } from 'react';
+import { SuccessModal } from '@/app/ui';
 import { RoleOption } from '@/types/user';
 
 const roleOptions: RoleOption[] = [
@@ -38,34 +38,34 @@ type RegistrationRequestType = {
 
 export default function RegistrationRequestPage() {
   const [messageApi, contextHolder] = message.useMessage();
-  const [isSending, setIsSending] = useState<boolean>(false);
+  const [isPending, startTransition] = useTransition();
   const [isSuccessfulRequest, setIsSuccessfulRequest] =
     useState<boolean>(false);
 
   const [form] = Form.useForm<RegistrationRequestType>();
 
   const handleSubmit = async (values: RegistrationRequestType) => {
-    setIsSending(true);
     try {
-      const formData = new FormData();
+      startTransition(async () => {
+        const formData = new FormData();
 
-      for (const key in values) {
-        if (values.hasOwnProperty(key)) {
-          formData.append(key, values[key as keyof RegistrationRequestType]);
+        for (const key in values) {
+          if (values.hasOwnProperty(key)) {
+            formData.append(key, values[key as keyof RegistrationRequestType]);
+          }
         }
-      }
 
-      const { data } = await axios.post<{ success: boolean; message: string }>(
-        '/api/auth/registration-request',
-        formData
-      );
+        const { data } = await axios.post<{
+          success: boolean;
+          message: string;
+        }>('/api/auth/registration-request', formData);
 
-      if (!data.success) {
-        setIsSending(false);
-        return messageApi.error(data.message, 5);
-      }
-
-      setIsSuccessfulRequest(true);
+        if (!data.success) {
+          messageApi.error(data.message, 5);
+        } else {
+          setIsSuccessfulRequest(true);
+        }
+      });
     } catch (error) {
       console.error({ error });
       return messageApi.error(
@@ -73,7 +73,6 @@ export default function RegistrationRequestPage() {
         5
       );
     } finally {
-      setIsSending(false);
       form.resetFields();
     }
   };
@@ -209,7 +208,7 @@ export default function RegistrationRequestPage() {
                 size='large'
                 htmlType='submit'
                 block
-                loading={isSending}
+                loading={isPending}
               >
                 Enviar
               </Button>
@@ -236,9 +235,27 @@ export default function RegistrationRequestPage() {
           </Space>
         </Card>
       </Flex>
-      <SuccessRegistrationRequestModal
+      <SuccessModal
         open={isSuccessfulRequest}
-        onClose={() => setIsSuccessfulRequest(false)}
+        title='¡Solicitud enviada con éxito!'
+        subtitle='En las próximas 48 horas hábiles, recibirás un correo electrónico informando el estado de la misma.'
+        icon={<CheckCircleFilled style={{ color: '#5ba02e' }} />}
+        extra={[
+          [
+            <Button
+              key='try-again'
+              size='large'
+              onClick={() => setIsSuccessfulRequest(false)}
+            >
+              Realizar otra solicitud
+            </Button>,
+            <Link href='/' replace key='return-home'>
+              <Button type='primary' size='large'>
+                Volver al inicio
+              </Button>
+            </Link>,
+          ],
+        ]}
       />
     </Space>
   );

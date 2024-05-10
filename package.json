@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
-    "db:pull": "prisma db pull"
+    "db:pull": "prisma db pull",
+    "postinstall": "pnpm run db:generate"
   },
   "dependencies": {
     "@ant-design/cssinjs": "1.18.4",
@@ -21,12 +22,16 @@
     "@supabase/supabase-js": "^2.39.7",
     "antd": "^5.14.2",
     "axios": "^1.6.8",
+    "bcryptjs": "^2.4.3",
+    "dayjs": "^1.11.11",
     "next": "14.1.0",
     "nodemailer": "^6.9.13",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.2.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.11.20",
     "@types/nodemailer": "^6.4.14",
     "@types/react": "^18.2.58",

@@ -10,46 +10,44 @@ import {
   Typography,
   message,
 } from 'antd';
-import {
-  ArrowLeftOutlined,
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { ArrowLeftOutlined, UserOutlined } from '@ant-design/icons';
 import theme from '@/theme/themeConfig';
-import Link from 'next/link';
 import axios, { AxiosError } from 'axios';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { SuccessModal } from '@/app/ui';
+import Link from 'next/link';
+import { MailSentIllustration } from '@/assets/illustrations';
 
 type FieldType = {
   email: string;
-  password: string;
 };
 
-export default function LoginPage() {
+export default function ResetPasswordRequestPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const [isPending, startTransition] = useTransition();
+  const [isSuccessfulRequest, setIsSuccessfulRequest] =
+    useState<boolean>(false);
 
-  const { replace } = useRouter();
+  const { back } = useRouter();
 
   const handleSubmit = async (values: FieldType) => {
-    const { email, password } = values;
+    const { email } = values;
     try {
       startTransition(async () => {
         const formData = new FormData();
 
         formData.append('email', email);
-        formData.append('password', password);
 
         const { data } = await axios.post<{
           success: boolean;
           message?: string;
-        }>('/api/auth/signin', formData);
+        }>('/api/auth/reset-password-request', formData);
 
         if (!data.success) {
           messageApi.error(data.message, 5);
         } else {
-          replace('/private/dashboard');
+          setIsSuccessfulRequest(true);
         }
       });
     } catch (error) {
@@ -58,7 +56,7 @@ export default function LoginPage() {
         messageApi.error(error.message, 5);
       } else {
         messageApi.error(
-          'Error al iniciar sesión. Por favor intente nuevamente.',
+          'Ocurrió un error al intentar recuperar tu contraseña. Por favor, intenta nuevamente.',
           5
         );
       }
@@ -68,16 +66,15 @@ export default function LoginPage() {
   return (
     <Space direction='vertical' style={{ width: '100%', minHeight: '100vh' }}>
       {contextHolder}
-      <Link href='/' replace prefetch>
-        <Button
-          type='default'
-          icon={<ArrowLeftOutlined />}
-          size='large'
-          style={{ justifySelf: 'flex-start', margin: '1em' }}
-        >
-          Volver al inicio
-        </Button>
-      </Link>
+      <Button
+        type='default'
+        icon={<ArrowLeftOutlined />}
+        size='large'
+        style={{ justifySelf: 'flex-start', margin: '1em' }}
+        onClick={back}
+      >
+        Volver
+      </Button>
       <Flex style={{ minHeight: 'calc(100vh - 84px)' }} align='center'>
         <Card
           style={{
@@ -96,11 +93,11 @@ export default function LoginPage() {
                 color: theme.token?.colorPrimary,
               }}
             >
-              Ingresar a tu cuenta
+              ¿Olvidaste tu contraseña?
             </Typography.Paragraph>
 
             <Alert
-              message='El acceso es solo para usuarios autorizados.'
+              message='Ingresa el email asociado a tu cuenta para recuperar tu contraseña.'
               type='info'
               showIcon
               style={{
@@ -112,7 +109,7 @@ export default function LoginPage() {
 
             <Form layout='vertical' size='large' onFinish={handleSubmit}>
               <Form.Item<FieldType>
-                label='Email'
+                label='Tu email'
                 name='email'
                 rules={[
                   { required: true, message: 'Por favor ingresa un email!' },
@@ -125,35 +122,6 @@ export default function LoginPage() {
                   placeholder='tuemail@aqui.com'
                 />
               </Form.Item>
-              <Form.Item<FieldType>
-                label='Contraseña'
-                name='password'
-                rules={[
-                  {
-                    required: true,
-                    message: 'Por favor ingresa tu contraseña!',
-                  },
-                ]}
-                htmlFor='password'
-                style={{ marginBottom: '0.75em' }}
-              >
-                <Input.Password
-                  prefix={<LockOutlined style={{ color: '#b3b3b3' }} />}
-                  placeholder='********'
-                />
-              </Form.Item>
-
-              <Link href='/auth/solicitar-recupero-clave' prefetch>
-                <Typography.Paragraph
-                  style={{
-                    color: theme.token?.colorPrimary,
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  ¿Olvidaste tu contraseña?
-                </Typography.Paragraph>
-              </Link>
 
               <Button
                 style={{ marginTop: '1em', marginBottom: '0.75em' }}
@@ -162,31 +130,27 @@ export default function LoginPage() {
                 block
                 loading={isPending}
               >
-                Iniciar sesión
+                Enviar mail de recuperación
               </Button>
-
-              <Typography.Paragraph
-                style={{
-                  fontSize: '14px',
-                }}
-              >
-                ¿No tienes cuenta?{' '}
-                <Link href='/auth/solicitar-alta' replace prefetch>
-                  <Typography.Text
-                    style={{
-                      fontSize: '14px',
-                      color: theme.token?.colorPrimary,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Solicitar alta
-                  </Typography.Text>
-                </Link>
-              </Typography.Paragraph>
             </Form>
           </Space>
         </Card>
       </Flex>
+      <SuccessModal
+        open={isSuccessfulRequest}
+        title='¡Listo!'
+        subtitle='Te enviamos un email con instrucciones para recuperar tu contraseña.'
+        icon={<MailSentIllustration width='50%' height='auto' />}
+        extra={[
+          [
+            <Link href='/' replace key='return-home' prefetch>
+              <Button type='primary' size='large'>
+                Volver al inicio
+              </Button>
+            </Link>,
+          ],
+        ]}
+      />
     </Space>
   );
 }

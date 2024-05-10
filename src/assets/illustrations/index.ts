@@ -1,0 +1,1 @@
+export { MailSentIllustration } from './MailSent';

@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { createSupabaseServerClient } from '@/utils/supabase/server';
-import { logout } from '../../server/auth';
+import { revalidatePath } from 'next/cache';
 
 export default async function PrivatePage() {
   const cookieStore = cookies();
@@ -10,6 +10,13 @@ export default async function PrivatePage() {
 
   const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) {
+    redirect('/');
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+
+    revalidatePath('/', 'layout');
     redirect('/');
   }
 
