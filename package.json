@@ -5,6 +5,7 @@
   "engines": {
     "pnpm": "^8.6.11"
   },
+  "type": "module",
   "scripts": {
     "dev": "next dev -p 3005",
     "build": "next build",
@@ -12,7 +13,8 @@
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:pull": "prisma db pull",
-    "postinstall": "pnpm run db:generate"
+    "postinstall": "pnpm run db:generate",
+    "rents:migrate": "node ./prisma/scripts/rents/index.js"
   },
   "dependencies": {
     "@ant-design/cssinjs": "1.18.4",
