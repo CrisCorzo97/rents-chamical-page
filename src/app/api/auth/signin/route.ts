@@ -19,7 +19,7 @@ export async function POST(
       return NextResponse.json({ success: false, message: 'Faltan datos.' });
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -31,8 +31,6 @@ export async function POST(
         message: 'Error al iniciar sesión.',
       });
     }
-
-    console.log({ access_token: data?.session.access_token });
 
     return NextResponse.json({ success: true });
   } catch (error) {
