@@ -5,7 +5,7 @@ import {
 } from './actions';
 import { DashboardClientPage } from './page.client';
 
-const DashboardPage = async () => {
+export default async function DashboardPage() {
   const registrationRequest = await getAllRegistrationRequests();
 
   return (
@@ -16,5 +16,4 @@ const DashboardPage = async () => {
       onReject={rejectRequest}
     />
   );
-};
-export default DashboardPage;
+}
