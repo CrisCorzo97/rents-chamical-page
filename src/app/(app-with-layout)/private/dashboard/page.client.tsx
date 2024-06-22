@@ -2,7 +2,7 @@
 import { registration_request } from '@prisma/client';
 import { Button, Popconfirm, Space, Table, Tag, message } from 'antd';
 import { ColumnType } from 'antd/es/table';
-import { FC, use, useEffect, useState, useTransition } from 'react';
+import { FC, useState, useTransition } from 'react';
 import dayjs from 'dayjs';
 import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import { CustomContent } from '@/app/ui';

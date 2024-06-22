@@ -1,22 +1,19 @@
-import { cookies } from 'next/headers';
-import { CustomLayout, CustomHeader, CustomContent } from '../ui';
-import { createSupabaseServerClient } from '@/utils/supabase/server';
+'use client';
+import { ContextProvider } from '@/context/contextProvider';
+import { CustomHeader, CustomContent } from '@/app/ui';
+import { Layout } from 'antd';
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
-  const { data } = await supabase.auth.getUser();
-
-  const isLogged = !!data?.user;
-
   return (
-    <CustomLayout>
-      <CustomHeader isLogged={isLogged} />
-      <CustomContent>{children}</CustomContent>
-    </CustomLayout>
+    <ContextProvider>
+      <Layout>
+        <CustomHeader />
+        <CustomContent>{children}</CustomContent>
+      </Layout>
+    </ContextProvider>
   );
 }
