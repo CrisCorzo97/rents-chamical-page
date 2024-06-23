@@ -2,17 +2,74 @@
 
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/utils/supabase/server';
-import { registration_request } from '@prisma/client';
+import {
+  city_section,
+  neighborhood,
+  registration_request,
+} from '@prisma/client';
 import dayjs from 'dayjs';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 import bcrypt from 'bcryptjs';
+import { Envelope } from '@/types/envelope';
+
+const cookieStore = cookies();
+const supabase = createSupabaseServerClient(cookieStore);
 
 const role_dictionary: Record<string, string> = {
   '1': 'administrador',
   '2': 'prensa',
-  '3': 'rentas',
+  '3': 'gerente-rentas',
+  '4': 'operador-rentas',
+};
+
+export const getUserRole = async (): Promise<number> => {
+  const { data, error } = await supabase.auth.getUser();
+
+  return data?.user?.user_metadata.role_id;
+};
+
+export const getCitySections = async (): Promise<Envelope<city_section[]>> => {
+  const response: Envelope<city_section[]> = {
+    success: true,
+    data: null,
+  };
+  try {
+    const citySections = await dbSupabase.city_section.findMany();
+
+    response.data = citySections;
+
+    return response;
+  } catch (error) {
+    console.error({ error });
+
+    response.success = false;
+    response.error = 'Hubo un error al obtener las secciones de la ciudad.';
+
+    return response;
+  }
+};
+
+export const getNeighborhoods = async (): Promise<Envelope<neighborhood[]>> => {
+  const response: Envelope<neighborhood[]> = {
+    success: true,
+    data: null,
+  };
+  try {
+    const neighborhoods = await dbSupabase.neighborhood.findMany();
+
+    response.data = neighborhoods;
+
+    return response;
+  } catch (error) {
+    console.error({ error });
+
+    response.success = false;
+    response.error = 'Hubo un error al obtener los barrios.';
+
+    return response;
+  }
 };
 
 export const getAllRegistrationRequests = async (): Promise<
@@ -32,10 +89,6 @@ export const confirmRequest = async (
   registration_request: registration_request
 ): Promise<{ success: boolean; message?: string }> => {
   try {
-    // crear el usuario en supabase
-    const cookieStore = cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
-
     const { id, first_name, last_name, email, cuil, role_id } =
       registration_request;
     const automaticPasword = `${first_name.toLowerCase()}-${

@@ -1,19 +1,30 @@
 import {
   confirmRequest,
   getAllRegistrationRequests,
+  getUserRole,
   rejectRequest,
 } from './actions';
 import { DashboardClientPage } from './page.client';
+import { AdminDashboard } from './pages';
 
 export default async function DashboardPage() {
-  const registrationRequest = await getAllRegistrationRequests();
+  const dashboardDictionary: Record<string, React.FC> = {
+    1: AdminDashboard,
+  };
+
+  const userRole = await getUserRole();
+
+  const Page = dashboardDictionary[userRole];
 
   return (
-    <DashboardClientPage
-      registrationRequest={registrationRequest}
-      refetch={getAllRegistrationRequests}
-      onConfirm={confirmRequest}
-      onReject={rejectRequest}
-    />
+    <Page />
+
+    // <DashboardClientPage
+    //   userRole={userRole}
+    // registrationRequest={registrationRequest}
+    // refetch={getAllRegistrationRequests}
+    // onConfirm={confirmRequest}
+    // onReject={rejectRequest}
+    // />
   );
 }
