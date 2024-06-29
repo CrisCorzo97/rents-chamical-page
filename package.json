@@ -19,6 +19,8 @@
     "@ant-design/cssinjs": "1.18.4",
     "@ant-design/icons": "^4.6.2",
     "@prisma/client": "^5.13.0",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-slot": "^1.1.0",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.39.7",
     "antd": "^5.14.2",
