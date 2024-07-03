@@ -1,19 +1,39 @@
-import { getCitySections, getNeighborhoods } from '../actions';
-import { CitySectionTable } from '../components/city-section-table/citySectionTable';
-import { NeighborhoodTable } from '../components/neighborhood-table/neighborhoodTable';
+import { Button } from '@/components/ui';
+import { getCementeryRecords, getProperties } from '../actions';
+import { PropertiesTable } from '../components/properties-table/propertiesTable';
+import { CementeryRecordsTable } from '../components/cementery-records-table/cementeryRecordsTable';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const AdminDashboard = async () => {
-  const citySections = await getCitySections();
-  const neighborhoods = await getNeighborhoods();
+  const properties = await getProperties({});
+  const cementeryRecords = await getCementeryRecords({});
 
   return (
-    <main>
-      <h1>Admin Dashboard</h1>
-      <div>
-        <CitySectionTable data={citySections} />
+    <main className='max-w-6xl mx-auto py-4 flex flex-col gap-4'>
+      {/* ACÁ IRÍAN LOS BOTONES PARA OTRAS ACCIONES */}
+      <div className='space-x-2 p-2'>
+        <Button variant='outline' size='default'>
+          Editar Secciones de la Ciudad
+        </Button>
+        <Button variant='outline' size='default'>
+          Editar Barrios
+        </Button>
       </div>
-      <div>
-        <NeighborhoodTable data={neighborhoods} />
+
+      {/* ACÁ METER LAS TABLAS PRINCIPALES */}
+      <div className='p-2'>
+        <Tabs defaultValue='propertyTable'>
+          <TabsList>
+            <TabsTrigger value='propertyTable'>Inmueble</TabsTrigger>
+            <TabsTrigger value='comenteryRecordsTable'>Cementerio</TabsTrigger>
+          </TabsList>
+          <TabsContent value='propertyTable'>
+            <PropertiesTable data={properties} />
+          </TabsContent>
+          <TabsContent value='comenteryRecordsTable'>
+            <CementeryRecordsTable data={cementeryRecords} />
+          </TabsContent>
+        </Tabs>
       </div>
     </main>
   );
