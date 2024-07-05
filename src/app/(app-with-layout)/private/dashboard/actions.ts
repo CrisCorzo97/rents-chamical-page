@@ -70,6 +70,8 @@ export const getProperties = async (input: {
 
     const properties = await dbSupabase.property.findMany(inputQuery);
 
+    console.log({ properties });
+
     const propertiesCounted = await dbSupabase.property.count();
 
     response.data = properties;

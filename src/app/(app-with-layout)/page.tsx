@@ -1,15 +1,18 @@
 'use client';
-import { UserOutlined } from '@ant-design/icons';
-import { Button, Typography } from 'antd';
+import { Button } from '@/components/ui';
 import Link from 'next/link';
 
 export default function Home() {
   return (
-    <Typography.Title level={1}>
-      <UserOutlined /> Welcome to the app!
-      <Link href='/private/dashboard'>
-        <Button type='primary'>Go to dashboard</Button>
-      </Link>
-    </Typography.Title>
+    <main className=' w-full px-2'>
+      <section className='flex gap-1 max-w-6xl mx-auto py-2 items-center'>
+        <Link href='/private/dashboard'>
+          <Button>Ir al Dashboard</Button>
+        </Link>
+        <Link href='/pruebas-ui'>
+          <Button>Pruebas UI</Button>
+        </Link>
+      </section>
+    </main>
   );
 }
