@@ -10,7 +10,7 @@ import {
   SubMenuType,
 } from 'antd/es/menu/hooks/useItems';
 import { useContextInit } from '@/context/contextInit';
-import { createSupabaseClient } from '@/utils/supabase/client';
+import { createSupabaseClient } from '@/lib/supabase/client';
 
 const { Header } = Layout;
 

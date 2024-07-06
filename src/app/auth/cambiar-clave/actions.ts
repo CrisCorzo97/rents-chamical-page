@@ -1,5 +1,5 @@
 import dbSupabase from '@/lib/prisma/prisma';
-import { createSupabaseServerClient } from '@/utils/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 

@@ -1,7 +1,7 @@
 'use server';
 
 import dbSupabase from '@/lib/prisma/prisma';
-import { createSupabaseServerClient } from '@/utils/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import {
   Prisma,
   burial_type,

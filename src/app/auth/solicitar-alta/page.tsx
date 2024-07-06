@@ -12,9 +12,9 @@ import {
   message,
 } from 'antd';
 import { Rule } from 'antd/es/form';
-import { formatCuilInput } from '@/utils/formatters';
+import { formatCuilInput } from '@/lib/formatters';
 import theme from '@/theme/themeConfig';
-import { cuilValidator } from '@/utils/validators';
+import { cuilValidator } from '@/lib/validators';
 import Link from 'next/link';
 import axios from 'axios';
 import { ArrowLeftOutlined, CheckCircleFilled } from '@ant-design/icons';
