@@ -12,6 +12,9 @@ export default function Home() {
         <Link href='/pruebas-ui'>
           <Button>Pruebas UI</Button>
         </Link>
+        <Link href='/pruebas-filter'>
+          <Button>Pruebas Filter</Button>
+        </Link>
       </section>
     </main>
   );

@@ -1,6 +1,6 @@
 import { property } from '@prisma/client';
 import { getProperties } from '../private/dashboard/actions';
-import PruebasUiClient from './page.client';
+import PruebasUiClient, { FilterField } from './page.client';
 
 type Column<T> = {
   title: string;
@@ -51,12 +51,29 @@ async function PruebasUi({
     },
   ];
 
+  const filterFields: FilterField<property>[] = [
+    {
+      label: 'Contribuyente',
+      value: 'taxpayer',
+    },
+    {
+      label: 'Dirección',
+      value: 'address',
+    },
+    {
+      label: 'ID',
+      value: 'id',
+    },
+  ];
+
   return (
     <main className='max-w-6xl mx-auto py-4'>
       <PruebasUiClient<property>
         dataSource={!!data ? data : []}
         columns={columns}
         rowKey='id'
+        filterTableKey='property'
+        filterFields={filterFields}
         error={error}
         pagination={!!pagination ? pagination : undefined}
       />
