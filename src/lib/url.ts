@@ -1,18 +1,44 @@
 // Crear y exportar una función para convertir un objeto en queryParams de una URL eliminando los valores vacíos, nulos o undefined.
 
 export function objectToQueryString(obj: Record<string, string>) {
-  const queries = Object.entries(obj)
-    .filter(([, value]) => !!value && value !== '')
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&');
+  const queriesEntries = Object.entries(getQueryParams());
 
-  return `?${queries}`;
+  Object.entries(obj).forEach(([key, value]) => {
+    const alreadyExists = queriesEntries.find(([queryKey]) => queryKey === key);
+
+    if (alreadyExists && (!value || value === '')) {
+      alreadyExists[1] = '';
+      return delete obj[key];
+    }
+
+    queriesEntries.push([key, value]);
+  });
+
+  console.log({ queriesEntries });
+
+  // const revisedQueries = Object.entries(obj).map(([key, value]) => {
+  //   const alreadyExists = Object.keys(currentQueries).includes(key);
+
+  //   if (alreadyExists && (!value || value === '')) {
+  //     return null;
+  //   }
+  //   return [key, value];
+  // });
+
+  // console.log({ revisedQueries });
+
+  // const queries = revisedQueries
+  //   .filter((query) => !!query)
+  //   .map(([key, value]) => `${key}=${value}`)
+  //   .join('&');
+
+  return '?';
 }
 
-// Crear función para obtener la url + el pathname de la página actual.
+// Crear función para obtener la url + el pathname de la página actual sin las queryParams.
 
 export function getCurrentUrl() {
-  return window.location.href;
+  return globalThis.location?.origin + globalThis.location?.pathname;
 }
 
 // Crear función que unifica la url de la página actual con los queryParams de un objeto.
