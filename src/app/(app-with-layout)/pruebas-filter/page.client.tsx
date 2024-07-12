@@ -8,9 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCallbackDebouncing, useQueryParams } from '@/hooks';
-import { buildUrlQuery } from '@/lib/url';
-import { useRouter } from 'next/navigation';
-import { Key, useCallback, useEffect, useState } from 'react';
+import { Key, useEffect, useState } from 'react';
 
 type FieldToFilter<RecordType> = {
   label: string;
@@ -37,6 +35,30 @@ export function FilterComponent<RecordType>(
   const [selectValue, setSelectValue] = useState<keyof RecordType>(
     filterFields?.[0]?.value as keyof RecordType
   );
+
+  useEffect(() => {
+    if (currentFilter) {
+      let currentFilterValues: Record<'key' | 'value', string> | null = null;
+
+      for (const key in currentFilter) {
+        if (currentFilter[key as keyof RecordType]) {
+          currentFilterValues = {
+            key,
+            value: currentFilter[key as keyof RecordType],
+          };
+          break;
+        }
+      }
+
+      setFilters(currentFilter);
+      setInputValue(currentFilterValues ? currentFilterValues.value : '');
+      setSelectValue(
+        currentFilterValues
+          ? (currentFilterValues.key as keyof RecordType)
+          : (filterFields?.[0]?.value as keyof RecordType)
+      );
+    }
+  }, [currentFilter, filterFields]);
 
   const { updateURLQuery } = useQueryParams();
 

@@ -2,7 +2,15 @@ import { FilterField } from '../pruebas-ui/page.client';
 import { FilterComponent } from './page.client';
 import { property } from '@prisma/client';
 
-function FilterPage() {
+function FilterPage({
+  searchParams,
+}: {
+  searchParams: {
+    taxpayer: string;
+    address: string;
+    id: string;
+  };
+}) {
   const filterFields: FilterField<property>[] = [
     {
       label: 'Contribuyente',
@@ -20,7 +28,11 @@ function FilterPage() {
 
   return (
     <div className='max-w-6xl mx-auto py-4'>
-      <FilterComponent<property> filterFields={filterFields} key='property' />
+      <FilterComponent<property>
+        filterFields={filterFields}
+        key='property'
+        currentFilter={searchParams as Record<keyof property, string>}
+      />
     </div>
   );
 }
