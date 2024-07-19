@@ -486,11 +486,11 @@ model cementery {
   address_taxpayer   String?         @db.VarChar
   id_burial_type     BigInt
   section            String?         @db.VarChar
-  row                Decimal?        @db.Decimal
-  location_number    Decimal?        @db.Decimal
+  row                BigInt?
+  location_number    BigInt?
   id_cementery_place BigInt
   deceased_name      String?         @db.VarChar
-  last_year_paid     Decimal?        @db.Decimal
+  last_year_paid     BigInt?
   created_at         DateTime        @default(now()) @db.Timestamptz(6)
   updated_at         DateTime?       @db.Timestamptz(6)
   missing_fields     String?
@@ -539,8 +539,8 @@ model property {
   id_city_section BigInt?
   id_neighborhood BigInt?
   address         String?       @db.VarChar
-  front_length    Decimal?      @db.Decimal
-  last_year_paid  Decimal?      @db.Decimal
+  front_length    Float?        @db.Real
+  last_year_paid  BigInt?
   created_at      DateTime      @default(now()) @db.Timestamptz(6)
   updated_at      DateTime?     @db.Timestamptz(6)
   missing_fields  String?

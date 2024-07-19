@@ -15,6 +15,9 @@ export default function Home() {
         <Link href='/pruebas-filter'>
           <Button>Pruebas Filter</Button>
         </Link>
+        <Link href='/pruebas-table'>
+          <Button>Pruebas Tabla</Button>
+        </Link>
       </section>
     </main>
   );

@@ -64,12 +64,6 @@ function PruebasUiClient<RecordType extends object>(
 
   const { updateFilter } = useFilter<RecordType>(filterTableKey ?? '*');
 
-  // const handleFilter = useCallback(() => {
-  //   updateFilter(filterValue);
-  // }, [filterValue, updateFilter]);
-
-  console.log({ filterValue });
-
   const Filter = useMemo(() => {
     let Component = () => <></>;
 
