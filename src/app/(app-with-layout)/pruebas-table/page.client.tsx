@@ -1,11 +1,22 @@
 'use client';
 
 import * as React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { property } from '@prisma/client';
 import { Envelope } from '@/types/envelope';
-import { CustomColumnDef } from './page';
 import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
+import { DataTableColumnHeader } from '@/components/ui/data-table';
+import { Input } from '@/components/ui';
+import { useQueryParams } from '@/hooks';
 
 export type Payment = {
   id: string;
@@ -24,6 +35,7 @@ export const columns: ColumnDef<property>[] = [
     id: 'taxpayer',
     header: 'CONTRIBUYENTE',
     accessorKey: 'taxpayer',
+    enableColumnFilter: true,
   },
   {
     id: 'address',
@@ -65,19 +77,26 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
   const columns: ColumnDef<DataType>[] = [
     {
       id: 'id',
-      header: 'ID',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='ID' />
+      ),
       accessorKey: 'id',
       enableSorting: false,
     },
     {
       id: 'taxpayer',
-      header: 'CONTRIBUYENTE',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='CONTRIBUYENTE' />
+      ),
       accessorKey: 'taxpayer',
+      enableColumnFilter: true,
     },
     {
       id: 'address',
       accessorKey: 'address',
-      header: 'DIRECCIÓN',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='DIRECCIÓN' />
+      ),
       cell: ({ row }) => {
         const address = row.getValue('address');
 
@@ -87,7 +106,9 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
     {
       id: 'enrollment',
       accessorKey: 'enrollment',
-      header: 'MATRÍCULA',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='MATRÍCULA' />
+      ),
       cell: ({ row }) => {
         const enrollment = row.getValue('enrollment');
 
@@ -97,7 +118,9 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
     {
       id: 'is_part',
       accessorKey: 'is_part',
-      header: 'ES PARTE',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='ES PARTE' />
+      ),
       cell: ({ row }) => {
         const is_part = row.getValue('is_part');
 
@@ -107,9 +130,56 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
     {
       id: 'last_year_paid',
       accessorKey: 'last_year_paid',
-      header: 'ÚLTIMO PAGO',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='ÚLTIMO AÑO PAGO' />
+      ),
     },
   ];
 
-  return <CustomDataTable<DataType> data={props.data} columns={columns} />;
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [rowSelection, setRowSelection] = React.useState({});
+
+  const { updateURLQuery } = useQueryParams();
+
+  const table = useReactTable({
+    data: props.data.data ?? [],
+    columns: columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      rowSelection,
+    },
+  });
+
+  return (
+    <div className='w-full'>
+      <div className='flex items-center py-4'>
+        <Input
+          placeholder='Filtrar por contribuyente'
+          value={
+            (table.getColumn('taxpayer')?.getFilterValue() as string) ?? ''
+          }
+          onChange={(event) =>
+            table.getColumn('taxpayer')?.setFilterValue(event.target.value)
+          }
+          className='max-w-sm'
+        />
+      </div>
+      <CustomDataTable<DataType>
+        data={props.data}
+        columns={columns}
+        table={table}
+      />
+    </div>
+  );
 }

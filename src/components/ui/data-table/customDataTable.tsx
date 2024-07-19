@@ -5,6 +5,7 @@ import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
+  Table as TableType,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -29,69 +30,30 @@ import { DataTableColumnHeader } from './columnHeader';
 interface CustomDataTableProps<T> {
   data: Envelope<T[]>;
   columns: ColumnDef<T>[];
+  table: TableType<T>;
 }
 
 export function CustomDataTable<DataType>(
   props: CustomDataTableProps<DataType>
 ) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const table = useReactTable({
-    data: props.data.data ?? [],
-    columns: props.columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
+  const { table } = props;
 
   return (
-    <div className='w-full'>
-      <div className='flex items-center py-4'>
-        <Input
-          placeholder='Filtrar...'
-          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('email')?.setFilterValue(event.target.value)
-          }
-          className='max-w-sm'
-        />
-      </div>
+    <>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {props.table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      <DataTableColumnHeader
-                        title={header.column.columnDef.header as string}
-                        column={header.column}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </DataTableColumnHeader>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -152,6 +114,6 @@ export function CustomDataTable<DataType>(
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
