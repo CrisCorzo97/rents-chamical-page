@@ -1,97 +1,119 @@
-import { Table } from '@tanstack/react-table';
-
-import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-} from 'lucide-react';
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import { useQueryParams } from '@/hooks';
+import { useFPS } from '@/hooks/useFPS';
+import { Pagination as ResponsePagination } from '@/types/envelope';
+import { URL } from 'url';
 
-interface DataTablePaginationProps<TData> {
-  table: Table<TData>;
-}
+type TablePagination = {
+  query_id: string;
+  pagination: ResponsePagination;
+};
 
-export function DataTablePagination<TData>({
-  table,
-}: DataTablePaginationProps<TData>) {
+export function TablePagination(props: TablePagination) {
+  const { pagination, query_id } = props;
+
+  const { getUpdatedURL } = useQueryParams();
+
+  // const handlePrevious = () => {
+  //   const page = pagination.page - 1 > 0 ? pagination.page - 1 : 1;
+
+  //   const url = getUpdatedURL({
+  //     page,
+  //     items_per_page: pagination.limit_per_page,
+  //   });
+
+  //   return url;
+  // };
+
+  // const handleNext = () => {
+  //   const page =
+  //     pagination.page + 1 <= pagination.total_pages
+  //       ? pagination.page + 1
+  //       : pagination.total_pages;
+
+  //   handlePagination({
+  //     page,
+  //     items_per_page: pagination.limit_per_page,
+  //   });
+  // };
+
+  const pages = Array.from(
+    { length: pagination?.total_pages },
+    (_, i) => i + 1
+  );
+
+  const pagesRendered =
+    pages.length > 5
+      ? pages.slice(
+          pagination?.page - 3 < 0 ? 0 : pagination?.page - 3,
+          pagination?.page + 4 > pagination?.total_pages - 1
+            ? pagination?.total_pages
+            : pagination?.page + 4
+        )
+      : pages;
+
   return (
-    <div className='flex items-center justify-between px-2'>
-      <div className='flex-1 text-sm text-muted-foreground'>
-        {table.getFilteredSelectedRowModel().rows.length} of{' '}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
-      <div className='flex items-center space-x-6 lg:space-x-8'>
-        <div className='flex items-center space-x-2'>
-          <p className='text-sm font-medium'>Rows per page</p>
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
-          >
-            <SelectTrigger className='h-8 w-[70px]'>
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
-            </SelectTrigger>
-            <SelectContent side='top'>
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
-          Page {table.getState().pagination.pageIndex + 1} of{' '}
-          {table.getPageCount()}
-        </div>
-        <div className='flex items-center space-x-2'>
-          <Button
-            variant='outline'
-            className='hidden h-8 w-8 p-0 lg:flex'
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className='sr-only'>Go to first page</span>
-            <ChevronsLeftIcon className='h-4 w-4' />
-          </Button>
-          <Button
-            variant='outline'
-            className='h-8 w-8 p-0'
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className='sr-only'>Go to previous page</span>
-            <ChevronLeftIcon className='h-4 w-4' />
-          </Button>
-          <Button
-            variant='outline'
-            className='h-8 w-8 p-0'
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className='sr-only'>Go to next page</span>
-            <ChevronRightIcon className='h-4 w-4' />
-          </Button>
-          <Button
-            variant='outline'
-            className='hidden h-8 w-8 p-0 lg:flex'
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className='sr-only'>Go to last page</span>
-            <ChevronsRightIcon className='h-4 w-4' />
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            href={getUpdatedURL({
+              page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
+              limit: pagination?.limit_per_page,
+            })}
+            aria-disabled={pagination.page === 1}
+            replace
+          />
+        </PaginationItem>
+        {pagesRendered[0] > 1 && (
+          <PaginationItem>
+            <PaginationEllipsis />
+          </PaginationItem>
+        )}
+        <PaginationItem>
+          {pagesRendered.map((page) => {
+            const isCurrent = pagination?.page === page;
+
+            return (
+              <PaginationLink
+                key={page}
+                href={getUpdatedURL({
+                  page,
+                  limit: pagination?.limit_per_page,
+                })}
+                isActive={isCurrent ? true : undefined}
+              >
+                {page}
+              </PaginationLink>
+            );
+          })}
+        </PaginationItem>
+        {pagination?.total_pages > pagesRendered[pagesRendered.length - 1] && (
+          <PaginationItem>
+            <PaginationEllipsis />
+          </PaginationItem>
+        )}
+        <PaginationItem>
+          <PaginationNext
+            href={getUpdatedURL({
+              page:
+                pagination?.page + 1 <= pagination?.total_pages
+                  ? pagination?.page + 1
+                  : pagination?.total_pages,
+              limit: pagination?.limit_per_page,
+            })}
+            aria-disabled={pagination.page === pagination.total_pages}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 }

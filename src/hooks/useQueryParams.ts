@@ -40,9 +40,32 @@ export function useQueryParams() {
     [params, pathname, replace]
   );
 
+  const getUpdatedURL = useCallback(
+    (newParams: QueryParams): URL => {
+      const query = Object.entries(newParams);
+
+      query.map(([key, value]) => {
+        if (!value || value === '') {
+          params.delete(key);
+        } else {
+          params.set(key, `${value}`);
+        }
+      });
+
+      const url = new URL(
+        `${pathname}?${params.toString()}`,
+        globalThis.location?.origin
+      );
+
+      return url;
+    },
+    [params, pathname]
+  );
+
   return {
     getQueryValue,
     updateURLQuery,
     generateQuery,
+    getUpdatedURL,
   };
 }

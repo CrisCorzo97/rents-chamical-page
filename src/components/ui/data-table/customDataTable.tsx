@@ -24,26 +24,28 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Envelope } from '@/types/envelope';
+import { Pagination } from '@/types/envelope';
 import { DataTableColumnHeader } from './columnHeader';
+import { TablePagination } from './tablePagination';
 
 interface CustomDataTableProps<T> {
-  data: Envelope<T[]>;
   columns: ColumnDef<T>[];
   table: TableType<T>;
+  pagination: Pagination;
+  tableName: string;
 }
 
 export function CustomDataTable<DataType>(
   props: CustomDataTableProps<DataType>
 ) {
-  const { table } = props;
+  const { columns, table, pagination, tableName } = props;
 
   return (
     <>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
-            {props.table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
@@ -80,7 +82,7 @@ export function CustomDataTable<DataType>(
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={props.columns.length}
+                  colSpan={columns.length}
                   className='h-24 text-center'
                 >
                   No results.
@@ -90,30 +92,7 @@ export function CustomDataTable<DataType>(
           </TableBody>
         </Table>
       </div>
-      <div className='flex items-center justify-end space-x-2 py-4'>
-        <div className='flex-1 text-sm text-muted-foreground'>
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className='space-x-2'>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      <TablePagination query_id={tableName} pagination={pagination} />
     </>
   );
 }

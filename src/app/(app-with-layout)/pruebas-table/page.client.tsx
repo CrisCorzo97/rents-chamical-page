@@ -12,7 +12,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { property } from '@prisma/client';
-import { Envelope } from '@/types/envelope';
+import { Envelope, Pagination } from '@/types/envelope';
 import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { Input } from '@/components/ui';
@@ -176,9 +176,10 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
         />
       </div>
       <CustomDataTable<DataType>
-        data={props.data}
         columns={columns}
         table={table}
+        pagination={props.data.pagination as Pagination}
+        tableName='inmuebles'
       />
     </div>
   );
