@@ -136,28 +136,21 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
     },
   ];
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [rowSelection, setRowSelection] = React.useState({});
 
   const { updateURLQuery } = useQueryParams();
 
   const table = useReactTable({
     data: props.data.data ?? [],
     columns: columns,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onRowSelectionChange: setRowSelection,
     state: {
-      sorting,
       columnFilters,
-      rowSelection,
     },
   });
 
@@ -176,6 +169,7 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
         />
       </div>
       <CustomDataTable<DataType>
+        tableTitle='Registros de inmuebles'
         columns={columns}
         table={table}
         pagination={props.data.pagination as Pagination}

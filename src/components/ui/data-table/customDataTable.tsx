@@ -3,19 +3,9 @@
 import * as React from 'react';
 import {
   ColumnDef,
-  ColumnFiltersState,
-  SortingState,
   Table as TableType,
-  VisibilityState,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
 } from '@tanstack/react-table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -25,10 +15,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Pagination } from '@/types/envelope';
-import { DataTableColumnHeader } from './columnHeader';
 import { TablePagination } from './tablePagination';
+import { Card, CardHeader, CardTitle } from '../card';
 
 interface CustomDataTableProps<T> {
+  tableTitle: string;
   columns: ColumnDef<T>[];
   table: TableType<T>;
   pagination: Pagination;
@@ -38,10 +29,13 @@ interface CustomDataTableProps<T> {
 export function CustomDataTable<DataType>(
   props: CustomDataTableProps<DataType>
 ) {
-  const { columns, table, pagination, tableName } = props;
+  const { tableTitle, columns, table, pagination, tableName } = props;
 
   return (
-    <>
+    <Card>
+      <CardHeader className='p-4'>
+        <CardTitle className='text-lg'>{tableTitle}</CardTitle>
+      </CardHeader>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
@@ -93,6 +87,6 @@ export function CustomDataTable<DataType>(
         </Table>
       </div>
       <TablePagination query_id={tableName} pagination={pagination} />
-    </>
+    </Card>
   );
 }

@@ -8,9 +8,15 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { useQueryParams } from '@/hooks';
-import { useFPS } from '@/hooks/useFPS';
 import { Pagination as ResponsePagination } from '@/types/envelope';
-import { URL } from 'url';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../select';
 
 type TablePagination = {
   query_id: string;
@@ -18,32 +24,9 @@ type TablePagination = {
 };
 
 export function TablePagination(props: TablePagination) {
-  const { pagination, query_id } = props;
+  const { pagination } = props;
 
-  const { getUpdatedURL } = useQueryParams();
-
-  // const handlePrevious = () => {
-  //   const page = pagination.page - 1 > 0 ? pagination.page - 1 : 1;
-
-  //   const url = getUpdatedURL({
-  //     page,
-  //     items_per_page: pagination.limit_per_page,
-  //   });
-
-  //   return url;
-  // };
-
-  // const handleNext = () => {
-  //   const page =
-  //     pagination.page + 1 <= pagination.total_pages
-  //       ? pagination.page + 1
-  //       : pagination.total_pages;
-
-  //   handlePagination({
-  //     page,
-  //     items_per_page: pagination.limit_per_page,
-  //   });
-  // };
+  const { getUpdatedURL, updateURLQuery } = useQueryParams();
 
   const pages = Array.from(
     { length: pagination?.total_pages },
@@ -61,59 +44,85 @@ export function TablePagination(props: TablePagination) {
       : pages;
 
   return (
-    <Pagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious
-            href={getUpdatedURL({
-              page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
-              limit: pagination?.limit_per_page,
-            })}
-            aria-disabled={pagination.page === 1}
-            replace
-          />
-        </PaginationItem>
-        {pagesRendered[0] > 1 && (
+    <section className='flex items-center justify-between w-full'>
+      <Pagination className='justify-start p-2 flex-1'>
+        <PaginationContent>
           <PaginationItem>
-            <PaginationEllipsis />
+            <PaginationPrevious
+              href={getUpdatedURL({
+                page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
+              })}
+              aria-disabled={pagination.page === 1}
+              replace
+            />
           </PaginationItem>
-        )}
-        <PaginationItem>
-          {pagesRendered.map((page) => {
-            const isCurrent = pagination?.page === page;
+          {pagesRendered[0] > 1 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          <PaginationItem>
+            {pagesRendered.map((page) => {
+              const isCurrent = pagination?.page === page;
 
-            return (
-              <PaginationLink
-                key={page}
-                href={getUpdatedURL({
-                  page,
-                  limit: pagination?.limit_per_page,
-                })}
-                isActive={isCurrent ? true : undefined}
-              >
-                {page}
-              </PaginationLink>
-            );
-          })}
-        </PaginationItem>
-        {pagination?.total_pages > pagesRendered[pagesRendered.length - 1] && (
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-        )}
-        <PaginationItem>
-          <PaginationNext
-            href={getUpdatedURL({
-              page:
-                pagination?.page + 1 <= pagination?.total_pages
-                  ? pagination?.page + 1
-                  : pagination?.total_pages,
-              limit: pagination?.limit_per_page,
+              return (
+                <PaginationLink
+                  key={page}
+                  href={getUpdatedURL({
+                    page,
+                  })}
+                  isActive={isCurrent ? true : undefined}
+                >
+                  {page}
+                </PaginationLink>
+              );
             })}
-            aria-disabled={pagination.page === pagination.total_pages}
-          />
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
+          </PaginationItem>
+          {pagination?.total_pages >
+            pagesRendered[pagesRendered.length - 1] && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          <PaginationItem>
+            <PaginationNext
+              href={getUpdatedURL({
+                page:
+                  pagination?.page + 1 <= pagination?.total_pages
+                    ? pagination?.page + 1
+                    : pagination?.total_pages,
+              })}
+              aria-disabled={pagination.page === pagination.total_pages}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+      <div className='flex items-center justify-end gap-2 p-2 flex-1'>
+        <span className='text-sm'>
+          {`${pagination?.limit_per_page} de ${pagination?.total_items} registros.`}
+        </span>
+
+        <Select
+          defaultValue={`${pagination.limit_per_page}`}
+          onValueChange={(value) => {
+            updateURLQuery({
+              page: 1,
+              limit: value,
+            });
+          }}
+        >
+          <SelectTrigger className='w-[180px]'>
+            <SelectValue placeholder='' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value='5'>5</SelectItem>
+              <SelectItem value='10'>10</SelectItem>
+              <SelectItem value='20'>20</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+    </section>
   );
 }
