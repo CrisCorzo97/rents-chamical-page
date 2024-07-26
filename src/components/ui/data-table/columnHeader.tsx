@@ -27,34 +27,19 @@ export function DataTableColumnHeader<TData, TValue>({
 
   return (
     <div className={cn('flex items-center ', className)}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='ghost'
-            size='sm'
-            className='-ml-3 h-8 data-[state=open]:bg-accent'
-          >
-            <span>{title}</span>
-            {column.getIsSorted() === 'desc' ? (
-              <ChevronDown className='ml-2 h-4 w-4' />
-            ) : column.getIsSorted() === 'asc' ? (
-              <ChevronUp className='ml-2 h-4 w-4' />
-            ) : (
-              <ChevronsUpDown className='ml-2 h-4 w-4' />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='start'>
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ChevronUp className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ChevronDown className='mr-2 h-3.5 w-3.5 text-muted-foreground/70' />
-            Desc
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        variant='ghost'
+        size='sm'
+        className='-ml-3 h-8 data-[state=open]:bg-accent'
+        onClick={column.getToggleSortingHandler()}
+      >
+        <span>{title}</span>
+        {{
+          asc: <ChevronUp className='ml-2 h-4 w-4' />,
+          desc: <ChevronDown className='ml-2 h-4 w-4' />,
+          false: <ChevronsUpDown className='ml-2 h-4 w-4' />,
+        }[column.getIsSorted() as string] ?? null}
+      </Button>
     </div>
   );
 }

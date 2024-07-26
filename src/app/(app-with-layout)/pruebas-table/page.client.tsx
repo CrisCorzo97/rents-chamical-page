@@ -17,6 +17,7 @@ import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { Input } from '@/components/ui';
 import { useQueryParams } from '@/hooks';
+import { stateToSortBy } from '@/lib/tableSortMapper';
 
 export type Payment = {
   id: string;
@@ -71,9 +72,12 @@ export const columns: ColumnDef<property>[] = [
 
 interface DataTableDemoProps<T> {
   data: Envelope<T[]>;
+  sorting: SortingState;
 }
 
 export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
+  const { updateURLQuery } = useQueryParams();
+
   const columns: ColumnDef<DataType>[] = [
     {
       id: 'id',
@@ -102,6 +106,7 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
 
         return address ? `${address}` : '-';
       },
+      enableSorting: false,
     },
     {
       id: 'enrollment',
@@ -114,6 +119,7 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
 
         return enrollment ? `${enrollment}` : '-';
       },
+      enableSorting: false,
     },
     {
       id: 'is_part',
@@ -126,6 +132,7 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
 
         return is_part ? 'Sí' : 'No';
       },
+      enableSorting: false,
     },
     {
       id: 'last_year_paid',
@@ -136,21 +143,21 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
     },
   ];
 
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-
-  const { updateURLQuery } = useQueryParams();
-
   const table = useReactTable({
     data: props.data.data ?? [],
     columns: columns,
-    onColumnFiltersChange: setColumnFilters,
+    manualSorting: true,
+    onSortingChange: (updaterOrValue) => {
+      const newSortingState =
+        typeof updaterOrValue === 'function'
+          ? updaterOrValue(props.sorting)
+          : updaterOrValue;
+
+      return updateURLQuery(stateToSortBy(newSortingState) ?? {});
+    },
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     state: {
-      columnFilters,
+      sorting: props.sorting,
     },
   });
 

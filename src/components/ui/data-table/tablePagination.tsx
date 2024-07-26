@@ -24,9 +24,9 @@ type TablePagination = {
 };
 
 export function TablePagination(props: TablePagination) {
-  const { pagination } = props;
+  const { query_id, pagination } = props;
 
-  const { getUpdatedURL, updateURLQuery } = useQueryParams();
+  const { getUpdatedURLQuery, updateURLQuery } = useQueryParams();
 
   const pages = Array.from(
     { length: pagination?.total_pages },
@@ -49,7 +49,7 @@ export function TablePagination(props: TablePagination) {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              href={getUpdatedURL({
+              href={getUpdatedURLQuery({
                 page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
               })}
               aria-disabled={pagination.page === 1}
@@ -68,7 +68,7 @@ export function TablePagination(props: TablePagination) {
               return (
                 <PaginationLink
                   key={page}
-                  href={getUpdatedURL({
+                  href={getUpdatedURLQuery({
                     page,
                   })}
                   isActive={isCurrent ? true : undefined}
@@ -86,7 +86,7 @@ export function TablePagination(props: TablePagination) {
           )}
           <PaginationItem>
             <PaginationNext
-              href={getUpdatedURL({
+              href={getUpdatedURLQuery({
                 page:
                   pagination?.page + 1 <= pagination?.total_pages
                     ? pagination?.page + 1

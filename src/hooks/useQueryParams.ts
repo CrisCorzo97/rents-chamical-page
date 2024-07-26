@@ -40,7 +40,7 @@ export function useQueryParams() {
     [params, pathname, replace]
   );
 
-  const getUpdatedURL = useCallback(
+  const getUpdatedURLQuery = useCallback(
     (newParams: QueryParams): URL => {
       const query = Object.entries(newParams);
 
@@ -66,6 +66,6 @@ export function useQueryParams() {
     getQueryValue,
     updateURLQuery,
     generateQuery,
-    getUpdatedURL,
+    getUpdatedURLQuery,
   };
 }
