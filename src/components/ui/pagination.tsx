@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 import { cn } from '@/lib/cn';
-import { ButtonProps, buttonVariants } from '@/components/ui/button';
+import { Button, ButtonProps, buttonVariants } from '@/components/ui/button';
 import Link from 'next/link';
 
 const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
@@ -38,19 +38,19 @@ PaginationItem.displayName = 'PaginationItem';
 type PaginationLinkProps = {
   isActive?: boolean;
 } & Pick<ButtonProps, 'size'> &
-  React.ComponentProps<typeof Link>;
+  React.ComponentProps<typeof Button>;
 
 const PaginationLink = ({
   className,
   isActive,
-  size = 'icon',
+  size,
   ...props
 }: PaginationLinkProps) => (
-  <Link
+  <Button
     aria-current={isActive ? 'page' : undefined}
     className={cn(
       buttonVariants({
-        variant: isActive ? 'outline' : 'ghost',
+        variant: isActive ? 'default' : 'secondary',
         size,
       }),
       className
@@ -66,7 +66,7 @@ const PaginationPrevious = ({
 }: React.ComponentProps<typeof PaginationLink>) => (
   <PaginationLink
     aria-label='Go to previous page'
-    size='default'
+    size='sm'
     className={cn('gap-1 pl-2.5', className)}
     {...props}
   >
@@ -82,7 +82,7 @@ const PaginationNext = ({
 }: React.ComponentProps<typeof PaginationLink>) => (
   <PaginationLink
     aria-label='Go to next page'
-    size='default'
+    size='sm'
     className={cn('gap-1 pr-2.5', className)}
     {...props}
   >

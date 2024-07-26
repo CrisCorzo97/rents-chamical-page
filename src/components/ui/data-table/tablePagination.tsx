@@ -7,7 +7,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useQueryParams } from '@/hooks';
 import { Pagination as ResponsePagination } from '@/types/envelope';
 import {
   Select,
@@ -17,31 +16,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select';
+import { useMemo } from 'react';
 
 type TablePagination = {
-  query_id: string;
   pagination: ResponsePagination;
+  handlePagination: (
+    input: {
+      page: number;
+      limit: number;
+    },
+    options?: {
+      getUrl: boolean;
+    }
+  ) => void | URL;
 };
 
 export function TablePagination(props: TablePagination) {
-  const { query_id, pagination } = props;
+  const { pagination, handlePagination } = props;
 
-  const { getUpdatedURLQuery, updateURLQuery } = useQueryParams();
+  const pages = useMemo(() => {
+    return Array.from({ length: pagination?.total_pages }, (_, i) => i + 1);
+  }, [pagination]);
 
-  const pages = Array.from(
-    { length: pagination?.total_pages },
-    (_, i) => i + 1
-  );
+  const pagesRendered = useMemo(() => {
+    if (pages.length > 5) {
+      const init = pagination?.page - 3 < 0 ? 0 : pagination?.page - 3;
+      const end =
+        pagination?.page + 3 > pagination?.total_pages - 1
+          ? pagination?.total_pages
+          : pagination?.page + 3;
 
-  const pagesRendered =
-    pages.length > 5
-      ? pages.slice(
-          pagination?.page - 3 < 0 ? 0 : pagination?.page - 3,
-          pagination?.page + 4 > pagination?.total_pages - 1
-            ? pagination?.total_pages
-            : pagination?.page + 4
-        )
-      : pages;
+      return pages.slice(init, end);
+    } else {
+      return pages;
+    }
+  }, [pages, pagination]);
 
   return (
     <section className='flex items-center justify-between w-full'>
@@ -49,11 +58,13 @@ export function TablePagination(props: TablePagination) {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              href={getUpdatedURLQuery({
-                page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
-              })}
-              aria-disabled={pagination.page === 1}
-              replace
+              onClick={() =>
+                handlePagination({
+                  page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
+                  limit: pagination?.limit_per_page,
+                })
+              }
+              disabled={pagination.page === 1}
             />
           </PaginationItem>
           {pagesRendered[0] > 1 && (
@@ -68,9 +79,13 @@ export function TablePagination(props: TablePagination) {
               return (
                 <PaginationLink
                   key={page}
-                  href={getUpdatedURLQuery({
-                    page,
-                  })}
+                  size='sm'
+                  onClick={() =>
+                    handlePagination({
+                      page,
+                      limit: pagination?.limit_per_page,
+                    })
+                  }
                   isActive={isCurrent ? true : undefined}
                 >
                   {page}
@@ -86,13 +101,16 @@ export function TablePagination(props: TablePagination) {
           )}
           <PaginationItem>
             <PaginationNext
-              href={getUpdatedURLQuery({
-                page:
-                  pagination?.page + 1 <= pagination?.total_pages
-                    ? pagination?.page + 1
-                    : pagination?.total_pages,
-              })}
-              aria-disabled={pagination.page === pagination.total_pages}
+              onClick={() =>
+                handlePagination({
+                  page:
+                    pagination?.page + 1 <= pagination?.total_pages
+                      ? pagination?.page + 1
+                      : pagination?.total_pages,
+                  limit: pagination?.limit_per_page,
+                })
+              }
+              disabled={pagination.page === pagination.total_pages}
             />
           </PaginationItem>
         </PaginationContent>
@@ -105,9 +123,10 @@ export function TablePagination(props: TablePagination) {
         <Select
           defaultValue={`${pagination.limit_per_page}`}
           onValueChange={(value) => {
-            updateURLQuery({
+            console.log('Soy el select');
+            handlePagination({
               page: 1,
-              limit: value,
+              limit: Number(value),
             });
           }}
         >

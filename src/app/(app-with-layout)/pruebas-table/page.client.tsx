@@ -3,12 +3,8 @@
 import * as React from 'react';
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { property } from '@prisma/client';
@@ -16,8 +12,8 @@ import { Envelope, Pagination } from '@/types/envelope';
 import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { Input } from '@/components/ui';
-import { useQueryParams } from '@/hooks';
-import { stateToSortBy } from '@/lib/tableSortMapper';
+import { stateToSortBy } from '@/lib/table';
+import { useFPS } from '@/hooks/useFPS';
 
 export type Payment = {
   id: string;
@@ -76,7 +72,12 @@ interface DataTableDemoProps<T> {
 }
 
 export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
-  const { updateURLQuery } = useQueryParams();
+  const { data, sorting } = props;
+
+  const { handleSort, handlePagination } = useFPS({
+    query_id: 'property',
+    pagination: data.pagination as Pagination,
+  });
 
   const columns: ColumnDef<DataType>[] = [
     {
@@ -144,20 +145,21 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
   ];
 
   const table = useReactTable({
-    data: props.data.data ?? [],
-    columns: columns,
+    data: data.data ?? [],
+    columns,
     manualSorting: true,
+    manualPagination: true,
     onSortingChange: (updaterOrValue) => {
       const newSortingState =
         typeof updaterOrValue === 'function'
-          ? updaterOrValue(props.sorting)
+          ? updaterOrValue(sorting)
           : updaterOrValue;
 
-      return updateURLQuery(stateToSortBy(newSortingState) ?? {});
+      handleSort(stateToSortBy(newSortingState) ?? {});
     },
     getCoreRowModel: getCoreRowModel(),
     state: {
-      sorting: props.sorting,
+      sorting,
     },
   });
 
@@ -179,8 +181,8 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
         tableTitle='Registros de inmuebles'
         columns={columns}
         table={table}
-        pagination={props.data.pagination as Pagination}
-        tableName='inmuebles'
+        pagination={data.pagination as Pagination}
+        handlePagination={handlePagination}
       />
     </div>
   );

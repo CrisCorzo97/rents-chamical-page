@@ -1,33 +1,33 @@
-import { sortByToState } from '@/lib/tableSortMapper';
+import { sortByToState } from '@/lib/table';
 import { getProperties } from '../private/dashboard/actions';
 import { DataTableDemo } from './page.client';
 import { Prisma, property } from '@prisma/client';
 
 type PruebasTableProps = {
   searchParams: {
-    page: string;
-    limit: string;
-    sort_by: string;
-    sort_direction: string;
+    property_page: string;
+    property_limit: string;
+    property_sort_by: string;
+    property_sort_direction: string;
   };
 };
 
 async function PruebasTable({ searchParams }: PruebasTableProps) {
   let sorted_by: Prisma.propertyOrderByWithRelationInput = {};
   const sortingState = sortByToState({
-    sort_by: searchParams.sort_by,
-    sort_direction: searchParams.sort_direction,
+    sort_by: searchParams.property_sort_by,
+    sort_direction: searchParams.property_sort_direction,
   });
 
-  if (searchParams.sort_by && searchParams.sort_direction) {
+  if (searchParams.property_sort_by && searchParams.property_sort_direction) {
     sorted_by = {
-      [searchParams.sort_by]: searchParams.sort_direction,
+      [searchParams.property_sort_by]: searchParams.property_sort_direction,
     };
   }
 
   const propertyRecords = await getProperties({
-    page: Number(searchParams.page),
-    limit: Number(searchParams.limit),
+    page: Number(searchParams.property_page),
+    limit: Number(searchParams.property_limit),
     order_by: sorted_by,
   });
 

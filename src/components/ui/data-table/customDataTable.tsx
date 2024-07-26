@@ -23,13 +23,21 @@ interface CustomDataTableProps<T> {
   columns: ColumnDef<T>[];
   table: TableType<T>;
   pagination: Pagination;
-  tableName: string;
+  handlePagination: (
+    input: {
+      page: number;
+      limit: number;
+    },
+    options?: {
+      getUrl: boolean;
+    }
+  ) => void | URL;
 }
 
 export function CustomDataTable<DataType>(
   props: CustomDataTableProps<DataType>
 ) {
-  const { tableTitle, columns, table, pagination, tableName } = props;
+  const { tableTitle, columns, table, pagination, handlePagination } = props;
 
   return (
     <Card>
@@ -86,7 +94,10 @@ export function CustomDataTable<DataType>(
           </TableBody>
         </Table>
       </div>
-      <TablePagination query_id={tableName} pagination={pagination} />
+      <TablePagination
+        pagination={pagination}
+        handlePagination={handlePagination}
+      />
     </Card>
   );
 }
