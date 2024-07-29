@@ -117,13 +117,16 @@ export function TablePagination(props: TablePagination) {
       </Pagination>
       <div className='flex items-center justify-end gap-2 p-2 flex-1'>
         <span className='text-sm'>
-          {`${pagination?.limit_per_page} de ${pagination?.total_items} registros.`}
+          {`${
+            pagination?.limit_per_page < pagination?.total_items
+              ? pagination?.limit_per_page
+              : pagination?.total_items
+          } de ${pagination?.total_items} registros.`}
         </span>
 
         <Select
           defaultValue={`${pagination.limit_per_page}`}
           onValueChange={(value) => {
-            console.log('Soy el select');
             handlePagination({
               page: 1,
               limit: Number(value),

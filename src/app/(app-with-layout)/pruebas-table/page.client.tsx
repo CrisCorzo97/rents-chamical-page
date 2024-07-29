@@ -14,6 +14,7 @@ import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { Input } from '@/components/ui';
 import { stateToSortBy } from '@/lib/table';
 import { useFPS } from '@/hooks/useFPS';
+import { useCallbackDebouncing } from '@/hooks';
 
 export type Payment = {
   id: string;
@@ -69,12 +70,15 @@ export const columns: ColumnDef<property>[] = [
 interface DataTableDemoProps<T> {
   data: Envelope<T[]>;
   sorting: SortingState;
+  filter: string;
 }
 
 export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
-  const { data, sorting } = props;
+  const { data, sorting, filter } = props;
 
-  const { handleSort, handlePagination } = useFPS({
+  const [queryFilter, setQueryFilter] = React.useState<string>(filter);
+
+  const { handleSort, handlePagination, handleFilter } = useFPS({
     query_id: 'property',
     pagination: data.pagination as Pagination,
   });
@@ -144,11 +148,24 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
     },
   ];
 
+  useCallbackDebouncing({
+    value: queryFilter,
+    delay: 1500,
+    callback: () => {
+      if (queryFilter !== filter) {
+        handleFilter({
+          property_filter: queryFilter,
+        });
+      }
+    },
+  });
+
   const table = useReactTable({
     data: data.data ?? [],
     columns,
     manualSorting: true,
     manualPagination: true,
+    manualFiltering: true,
     onSortingChange: (updaterOrValue) => {
       const newSortingState =
         typeof updaterOrValue === 'function'
@@ -167,13 +184,9 @@ export function DataTableDemo<DataType>(props: DataTableDemoProps<DataType>) {
     <div className='w-full'>
       <div className='flex items-center py-4'>
         <Input
-          placeholder='Filtrar por contribuyente'
-          value={
-            (table.getColumn('taxpayer')?.getFilterValue() as string) ?? ''
-          }
-          onChange={(event) =>
-            table.getColumn('taxpayer')?.setFilterValue(event.target.value)
-          }
+          placeholder='Filtrar por contribuyente o dirección'
+          value={queryFilter}
+          onChange={(event) => setQueryFilter(event.target.value)}
           className='max-w-sm'
         />
       </div>

@@ -16,7 +16,7 @@ export function useFPS(input: { query_id?: string; pagination?: Pagination }) {
 
   const handleFilter = useCallback(
     (filter: QueryParams) => {
-      updateURLQuery({
+      return updateURLQuery({
         ...filter,
         [pageKey]: 1,
       });

@@ -70,7 +70,9 @@ export const getProperties = async (input: {
 
     const properties = await dbSupabase.property.findMany(inputQuery);
 
-    const propertiesCounted = await dbSupabase.property.count();
+    const propertiesCounted = await dbSupabase.property.count({
+      where: inputQuery.where,
+    });
 
     response.data = properties;
     response.pagination = {
