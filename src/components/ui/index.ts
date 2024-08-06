@@ -8,3 +8,4 @@ export { Pagination } from './pagination';
 export { Popover } from './popover';
 export { Select } from './select';
 export { Table } from './table';
+export { Avatar, AvatarFallback, AvatarImage } from './avatar';

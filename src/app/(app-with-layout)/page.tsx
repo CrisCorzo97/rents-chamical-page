@@ -9,12 +9,6 @@ export default function Home() {
         <Link href='/private/dashboard'>
           <Button>Ir al Dashboard</Button>
         </Link>
-        <Link href='/pruebas-ui'>
-          <Button>Pruebas UI</Button>
-        </Link>
-        <Link href='/pruebas-filter'>
-          <Button>Pruebas Filter</Button>
-        </Link>
         <Link href='/pruebas-table'>
           <Button>Pruebas Tabla</Button>
         </Link>

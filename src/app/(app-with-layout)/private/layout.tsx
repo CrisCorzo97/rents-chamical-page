@@ -2,7 +2,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export default async function RootLayout({
+export default async function PrivatePageLayout({
   children,
 }: {
   children: React.ReactNode;
