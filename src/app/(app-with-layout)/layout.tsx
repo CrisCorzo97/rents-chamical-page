@@ -1,19 +1,16 @@
-'use client';
-import { ContextProvider } from '@/context/contextProvider';
-import { CustomHeader, CustomContent } from '@/app/ui';
-import { Layout } from 'antd';
+import { MainHeader } from './components/ui';
+import React from 'react';
 
-export default function RootLayout({
+export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <ContextProvider>
-      <Layout>
-        <CustomHeader />
-        <CustomContent>{children}</CustomContent>
-      </Layout>
-    </ContextProvider>
+    <main className='min-h-screen flex flex-col'>
+      <MainHeader />
+      <section className='grow p-2'>{children}</section>
+      <footer className='w-full h-28 bg-primary grow-0' />
+    </main>
   );
 }
