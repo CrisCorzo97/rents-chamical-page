@@ -1,6 +1,4 @@
 import { NavbarMenuItems } from '@/app/(main)/components/ui/header';
-import { LogoRents } from '@/assets/icons';
-import { Button } from '@/components/ui';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -44,7 +42,7 @@ export default async function DashboardPageLayout({
         </section>
       </header>
       <section className='flex flex-1 gap-4 h-full'>
-        <aside className='max-w-64 py-4 flex flex-col items-center justify-between bg-gray-300'>
+        {/* <aside className='max-w-64 py-4 flex flex-col items-center justify-between bg-gray-300'>
           <div className='flex flex-col w-64'>
             <Button variant='outline' className='rounded-none w-full'>
               Cementerio
@@ -54,7 +52,7 @@ export default async function DashboardPageLayout({
             </Button>
           </div>
           <LogoRents height={60} fill='#212121' />
-        </aside>
+        </aside> */}
         {children}
       </section>
       <footer className='w-full h-28 bg-primary grow-0' />
