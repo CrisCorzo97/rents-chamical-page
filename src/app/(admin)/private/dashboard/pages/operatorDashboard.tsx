@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui';
 import {
   Tooltip,
@@ -5,41 +6,66 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { cn } from '@/lib/cn';
+import clsx from 'clsx';
 import {
   CircleChevronRight,
   Home,
   LineChart,
   Package,
-  Package2,
   Settings,
   ShoppingCart,
   Users2,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export const OperatorDashboard = () => {
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+
   return (
-    <aside className=' inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex'>
+    <aside
+      className={cn(
+        `inset-y-0 left-0 w-14 z-10 hidden transition-all flex-col border-r bg-background sm:flex`,
+        clsx({
+          'w-52': sidebarOpen,
+        })
+      )}
+    >
       <nav className='flex flex-col items-center gap-4 px-2 sm:py-5'>
-        <Link
-          href='#'
-          className='group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base'
-        >
-          <Package2 className='h-4 w-4 transition-all group-hover:scale-110' />
-          <span className='sr-only'>Acme Inc</span>
-        </Link>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
                 href='#'
-                className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground md:h-8 md:w-8',
+                  clsx({
+                    'gap-2 justify-start px-4 w-full md:w-full': sidebarOpen,
+                  })
+                )}
               >
                 <Home className='h-5 w-5' />
-                <span className='sr-only'>Dashboard</span>
+                <span
+                  className={cn(
+                    'sr-only transition',
+                    clsx({
+                      'not-sr-only': sidebarOpen,
+                    })
+                  )}
+                >
+                  Dashboard
+                </span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side='right'>Dashboard</TooltipContent>
+            {!sidebarOpen && (
+              <TooltipContent
+                side='right'
+                className='bg-slate-900 text-white opacity-80'
+              >
+                Dashboard
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
         <TooltipProvider>
@@ -47,13 +73,34 @@ export const OperatorDashboard = () => {
             <TooltipTrigger asChild>
               <Link
                 href='#'
-                className='flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground md:h-8 md:w-8',
+                  clsx({
+                    'gap-2 justify-start px-4 w-full md:w-full': sidebarOpen,
+                  })
+                )}
               >
                 <ShoppingCart className='h-5 w-5' />
-                <span className='sr-only'>Orders</span>
+                <span
+                  className={cn(
+                    'sr-only transition',
+                    clsx({
+                      'not-sr-only': sidebarOpen,
+                    })
+                  )}
+                >
+                  Orders
+                </span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side='right'>Orders</TooltipContent>
+            {!sidebarOpen && (
+              <TooltipContent
+                side='right'
+                className='bg-slate-900 text-white opacity-80'
+              >
+                Orders
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
         <TooltipProvider>
@@ -61,13 +108,34 @@ export const OperatorDashboard = () => {
             <TooltipTrigger asChild>
               <Link
                 href='#'
-                className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground md:h-8 md:w-8',
+                  clsx({
+                    'gap-2 justify-start px-4 w-full md:w-full': sidebarOpen,
+                  })
+                )}
               >
                 <Package className='h-5 w-5' />
-                <span className='sr-only'>Products</span>
+                <span
+                  className={cn(
+                    'sr-only transition',
+                    clsx({
+                      'not-sr-only': sidebarOpen,
+                    })
+                  )}
+                >
+                  Products
+                </span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side='right'>Products</TooltipContent>
+            {!sidebarOpen && (
+              <TooltipContent
+                side='right'
+                className='bg-slate-900 text-white opacity-80'
+              >
+                Products
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
         <TooltipProvider>
@@ -75,13 +143,34 @@ export const OperatorDashboard = () => {
             <TooltipTrigger asChild>
               <Link
                 href='#'
-                className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground md:h-8 md:w-8',
+                  clsx({
+                    'gap-2 justify-start px-4 w-full md:w-full': sidebarOpen,
+                  })
+                )}
               >
                 <Users2 className='h-5 w-5' />
-                <span className='sr-only'>Customers</span>
+                <span
+                  className={cn(
+                    'sr-only transition',
+                    clsx({
+                      'not-sr-only': sidebarOpen,
+                    })
+                  )}
+                >
+                  Customers
+                </span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side='right'>Customers</TooltipContent>
+            {!sidebarOpen && (
+              <TooltipContent
+                side='right'
+                className='bg-slate-900 text-white opacity-80'
+              >
+                Customers
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
         <TooltipProvider>
@@ -89,13 +178,34 @@ export const OperatorDashboard = () => {
             <TooltipTrigger asChild>
               <Link
                 href='#'
-                className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground md:h-8 md:w-8',
+                  clsx({
+                    'gap-2 justify-start px-4 w-full md:w-full': sidebarOpen,
+                  })
+                )}
               >
                 <LineChart className='h-5 w-5' />
-                <span className='sr-only'>Analytics</span>
+                <span
+                  className={cn(
+                    'sr-only transition',
+                    clsx({
+                      'not-sr-only': sidebarOpen,
+                    })
+                  )}
+                >
+                  Analytics
+                </span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side='right'>Analytics</TooltipContent>
+            {!sidebarOpen && (
+              <TooltipContent
+                side='right'
+                className='bg-slate-900 text-white opacity-80'
+              >
+                Analytics
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
       </nav>
@@ -105,24 +215,80 @@ export const OperatorDashboard = () => {
             <TooltipTrigger asChild>
               <Link
                 href='#'
-                className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8'
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:text-foreground md:h-8 md:w-8',
+                  clsx({
+                    'gap-2 justify-start px-4 w-full md:w-full': sidebarOpen,
+                  })
+                )}
               >
                 <Settings className='h-5 w-5' />
-                <span className='sr-only'>Settings</span>
+                <span
+                  className={cn(
+                    'sr-only transition',
+                    clsx({
+                      'not-sr-only': sidebarOpen,
+                    })
+                  )}
+                >
+                  Settings
+                </span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side='right'>Settings</TooltipContent>
+            {!sidebarOpen && (
+              <TooltipContent
+                side='right'
+                className='bg-slate-900 text-white opacity-80'
+              >
+                Settings
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button className='flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8'>
-                <CircleChevronRight className='h-5 w-5' />
-                <span className='sr-only'>Expandir</span>
+              <Button
+                variant='default'
+                size='lg'
+                className={cn(
+                  'flex p-0 h-9 w-9 items-center justify-center rounded-lg text-white font-normal transition md:h-8 md:w-8',
+                  clsx({
+                    'gap-2 justify-start px-4 w-full md:w-full': sidebarOpen,
+                  })
+                )}
+                onClick={() => {
+                  setSidebarOpen((prev) => !prev);
+                }}
+              >
+                <CircleChevronRight
+                  className={cn(
+                    'h-5 w-5',
+                    clsx({
+                      'transform rotate-180': sidebarOpen,
+                    })
+                  )}
+                />
+                <span
+                  className={cn(
+                    'sr-only text-base transition',
+                    clsx({
+                      'not-sr-only': sidebarOpen,
+                    })
+                  )}
+                >
+                  Acoplar
+                </span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side='right'>Expandir</TooltipContent>
+            {!sidebarOpen && (
+              <TooltipContent
+                side='right'
+                className='bg-slate-900 text-white opacity-80'
+              >
+                Expandir
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
       </nav>
