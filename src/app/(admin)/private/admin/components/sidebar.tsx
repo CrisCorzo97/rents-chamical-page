@@ -1,5 +1,6 @@
 import { LogoRD, LogoRents } from '@/assets/icons';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, LayoutDashboard } from 'lucide-react';
+import Link from 'next/link';
 
 export const Sidebar = () => {
   return (
@@ -19,6 +20,22 @@ export const Sidebar = () => {
           <ChevronRight className='w-5 h-5 text-primary-foreground' />
         </span>
       </header>
+
+      <section>
+        <div>
+          <ul>
+            <li className='list-none h-12 mt-2 flex items-center'>
+              <Link
+                href='#'
+                className='h-full w-full flex items-center rounded transition hover:bg-primary'
+              >
+                <LayoutDashboard className='text-xl min-w-14 flex items-center justify-center' />
+                <span>Tablero</span>
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </section>
     </nav>
   );
 };
