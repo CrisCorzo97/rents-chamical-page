@@ -2,6 +2,7 @@
 
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { Envelope } from '@/types/envelope';
 import {
   Prisma,
   burial_type,
@@ -12,12 +13,11 @@ import {
   property,
   registration_request,
 } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 import dayjs from 'dayjs';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
-import bcrypt from 'bcryptjs';
-import { Envelope } from '@/types/envelope';
 
 const cookieStore = cookies();
 const supabase = createSupabaseServerClient(cookieStore);
@@ -27,12 +27,6 @@ const role_dictionary: Record<string, string> = {
   '2': 'prensa',
   '3': 'gerente-rentas',
   '4': 'operador-rentas',
-};
-
-export const getUserRole = async (): Promise<number> => {
-  const { data, error } = await supabase.auth.getUser();
-
-  return data?.user?.user_metadata.role_id;
 };
 
 /* --- ACCIONES DE LOS REGISTROS DE INMUEBLES --- */

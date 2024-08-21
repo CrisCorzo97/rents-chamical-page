@@ -1,7 +1,7 @@
 import { sortByToState } from '@/lib/table';
-import { getProperties } from '../private/dashboard/actions';
-import { DataTableDemo } from './page.client';
 import { Prisma, property } from '@prisma/client';
+import { getProperties } from '../private/admin/[tab_id]/actions';
+import { DataTableDemo } from './page.client';
 
 type PruebasTableProps = {
   searchParams: {

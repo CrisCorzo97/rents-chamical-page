@@ -1,4 +1,10 @@
 'use client';
+import theme from '@/theme/themeConfig';
+import {
+  ArrowLeftOutlined,
+  LockOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -10,16 +16,10 @@ import {
   Typography,
   message,
 } from 'antd';
-import {
-  ArrowLeftOutlined,
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import theme from '@/theme/themeConfig';
-import Link from 'next/link';
 import axios, { AxiosError } from 'axios';
-import { useTransition } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 
 type FieldType = {
   email: string;
@@ -49,7 +49,7 @@ export default function LoginPage() {
         if (!data.success) {
           messageApi.error(data.message, 5);
         } else {
-          replace('/private/dashboard');
+          replace('/private/admin/dashboard');
         }
       });
     } catch (error) {

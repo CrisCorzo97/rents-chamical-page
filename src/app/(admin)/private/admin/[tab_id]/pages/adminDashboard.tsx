@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui';
-import { getCementeryRecords, getProperties } from '../actions';
-import { PropertiesTable } from '../components/properties-table/propertiesTable';
-import { CementeryRecordsTable } from '../components/cementery-records-table/cementeryRecordsTable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getCementeryRecords, getProperties } from '../actions';
+import { CementeryRecordsTable } from '../components/cementery-records-table/cementeryRecordsTable';
+import { PropertiesTable } from '../components/properties-table/propertiesTable';
 
 export const AdminDashboard = async () => {
   const properties = await getProperties({});

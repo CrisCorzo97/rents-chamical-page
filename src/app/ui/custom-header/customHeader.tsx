@@ -1,6 +1,3 @@
-import Link from 'next/link';
-import React, { useMemo } from 'react';
-import { useContextInit } from '@/context/contextInit';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
 import {
   NavigationMenu,
@@ -9,6 +6,9 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import { useContextInit } from '@/context/contextInit';
+import Link from 'next/link';
+import React, { useMemo } from 'react';
 
 export type NavbarMenuItems = {
   label: string | React.ReactNode;
@@ -29,7 +29,7 @@ export const CustomHeader = () => {
     const lastButton: NavbarMenuItems = isLogged
       ? {
           label: 'Panel Administrativo',
-          key: '/private/dashboard',
+          key: '/private/admin/dashboard',
         }
       : { label: 'Ingresar', key: '/auth/ingresar' };
 
