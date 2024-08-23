@@ -2,15 +2,10 @@
 import { LogoRD, LogoRents } from '@/assets/icons';
 import { cn } from '@/lib/cn';
 import clsx from 'clsx';
-import {
-  Building2,
-  ChevronLeft,
-  Church,
-  CircleUserRound,
-  LayoutDashboard,
-} from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { SIDEBAR_TABS_BY_ROLE } from '../constants';
 
 const sidebarListStyles = {
   li: {
@@ -19,78 +14,29 @@ const sidebarListStyles = {
       className:
         'h-full w-full flex items-center rounded transition hover:bg-primary hover:text-primary-foreground',
       icon: 'min-w-14 w-6 h-6 flex items-center justify-center',
-      label: '',
     },
   },
 };
 
-export const Sidebar = () => {
+export const Sidebar = ({ userRole }: { userRole: number }) => {
   const [isOpen, setIsOpen] = useState(true);
 
-  const topItems: {
-    icon: JSX.Element;
-    label: string;
-    href: string;
-  }[] = [
-    {
-      icon: <LayoutDashboard className={sidebarListStyles.li.a.icon} />,
-      label: 'Tablero',
-      href: '#',
-    },
-    {
-      icon: <Building2 className={sidebarListStyles.li.a.icon} />,
-      label: 'Inmueble',
-      href: '#',
-    },
-    {
-      icon: <Church className={sidebarListStyles.li.a.icon} />,
-      label: 'Cementerio',
-      href: '#',
-    },
-  ];
+  const { topItems, bottomItems } = useMemo(() => {
+    const topItems = SIDEBAR_TABS_BY_ROLE[userRole].top.map((item) => ({
+      ...item,
+      icon: <span className={sidebarListStyles.li.a.icon}>{item.icon}</span>,
+    }));
 
-  const bottomItems: {
-    icon: JSX.Element;
-    label: string;
-    href: string;
-  }[] = [
-    {
-      icon: <CircleUserRound className={sidebarListStyles.li.a.icon} />,
-      label: 'Cuenta',
-      href: '#',
-    },
-  ];
+    const bottomItems = SIDEBAR_TABS_BY_ROLE[userRole].bottom.map((item) => ({
+      ...item,
+      icon: <span className={sidebarListStyles.li.a.icon}>{item.icon}</span>,
+    }));
 
-  const SidebarTab = useCallback(
-    ({
-      icon,
-      label,
-      href,
-    }: {
-      icon: React.ReactNode;
-      label: string;
-      href: string;
-    }) => {
-      return (
-        <li key={href} className={sidebarListStyles.li.className}>
-          <Link href={href} className={sidebarListStyles.li.a.className}>
-            {icon}
-            <span
-              className={cn(
-                sidebarListStyles.li.a.label,
-                clsx({
-                  'transition-all duration-300 opacity-0': !isOpen,
-                })
-              )}
-            >
-              {label}
-            </span>
-          </Link>
-        </li>
-      );
-    },
-    [isOpen]
-  );
+    return {
+      topItems,
+      bottomItems,
+    };
+  }, [userRole]);
 
   return (
     <nav
@@ -111,9 +57,9 @@ export const Sidebar = () => {
           <div
             className={cn(
               'w-full flex items-center transition-all duration-300',
-              clsx({
-                'transition-all duration-300 opacity-0': !isOpen,
-              })
+              {
+                'opacity-0': !isOpen,
+              }
             )}
           >
             <LogoRents className='w-32' />
@@ -134,11 +80,25 @@ export const Sidebar = () => {
       </header>
 
       {/* Sidebar Section */}
-      <section className='flex flex-1 flex-col justify-between'>
+      <section className='flex flex-1 flex-col justify-between mb-4'>
         <div>
           <ul>
             {topItems.map((item) => (
-              <SidebarTab key={item.href} {...item} />
+              <li key={item.id} className={sidebarListStyles.li.className}>
+                <Link
+                  href={item.href}
+                  className={sidebarListStyles.li.a.className}
+                >
+                  {item.icon}
+                  <span
+                    className={`transition-opacity ${
+                      isOpen ? 'duration-500 opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
@@ -147,7 +107,21 @@ export const Sidebar = () => {
         <div>
           <ul>
             {bottomItems.map((item) => (
-              <SidebarTab key={item.href} {...item} />
+              <li key={item.id} className={sidebarListStyles.li.className}>
+                <Link
+                  href={item.href}
+                  className={sidebarListStyles.li.a.className}
+                >
+                  {item.icon}
+                  <span
+                    className={`transition-opacity ${
+                      isOpen ? 'duration-500 opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
             ))}
           </ul>
         </div>

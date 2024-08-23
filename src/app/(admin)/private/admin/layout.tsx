@@ -21,11 +21,11 @@ export default async function AdminPageLayout({
   // Consulto el rol del usuario
   const { data: userData } = await supabase.auth.getUser();
 
-  const userRole = userData?.user?.user_metadata.role_id;
+  const userRole = (userData?.user?.user_metadata.role_id as number) ?? 4;
 
   return (
     <main className='min-h-screen flex'>
-      <Sidebar />
+      <Sidebar userRole={userRole} />
       <section className='flex flex-col flex-1 gap-4 h-full'>
         <header className='w-full h-12 flex grow-0 items-center justify-center bg-primary'>
           <section className='w-full flex items-center justify-end'>
