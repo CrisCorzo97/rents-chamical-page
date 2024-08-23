@@ -10,7 +10,7 @@ import {
   LayoutDashboard,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 const sidebarListStyles = {
   li: {
@@ -18,7 +18,7 @@ const sidebarListStyles = {
     a: {
       className:
         'h-full w-full flex items-center rounded transition hover:bg-primary hover:text-primary-foreground',
-      icon: 'min-w-14 w-5 h-5 flex items-center justify-center',
+      icon: 'min-w-14 w-6 h-6 flex items-center justify-center',
       label: '',
     },
   },
@@ -26,6 +26,71 @@ const sidebarListStyles = {
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+
+  const topItems: {
+    icon: JSX.Element;
+    label: string;
+    href: string;
+  }[] = [
+    {
+      icon: <LayoutDashboard className={sidebarListStyles.li.a.icon} />,
+      label: 'Tablero',
+      href: '#',
+    },
+    {
+      icon: <Building2 className={sidebarListStyles.li.a.icon} />,
+      label: 'Inmueble',
+      href: '#',
+    },
+    {
+      icon: <Church className={sidebarListStyles.li.a.icon} />,
+      label: 'Cementerio',
+      href: '#',
+    },
+  ];
+
+  const bottomItems: {
+    icon: JSX.Element;
+    label: string;
+    href: string;
+  }[] = [
+    {
+      icon: <CircleUserRound className={sidebarListStyles.li.a.icon} />,
+      label: 'Cuenta',
+      href: '#',
+    },
+  ];
+
+  const SidebarTab = useCallback(
+    ({
+      icon,
+      label,
+      href,
+    }: {
+      icon: React.ReactNode;
+      label: string;
+      href: string;
+    }) => {
+      return (
+        <li key={href} className={sidebarListStyles.li.className}>
+          <Link href={href} className={sidebarListStyles.li.a.className}>
+            {icon}
+            <span
+              className={cn(
+                sidebarListStyles.li.a.label,
+                clsx({
+                  'transition-all duration-300 opacity-0': !isOpen,
+                })
+              )}
+            >
+              {label}
+            </span>
+          </Link>
+        </li>
+      );
+    },
+    [isOpen]
+  );
 
   return (
     <nav
@@ -72,72 +137,18 @@ export const Sidebar = () => {
       <section className='flex flex-1 flex-col justify-between'>
         <div>
           <ul>
-            <li className={sidebarListStyles.li.className}>
-              <Link href='#' className={sidebarListStyles.li.a.className}>
-                <LayoutDashboard className={sidebarListStyles.li.a.icon} />
-                <span
-                  className={cn(
-                    sidebarListStyles.li.a.label,
-                    clsx({
-                      'transition-all duration-300 opacity-0': !isOpen,
-                    })
-                  )}
-                >
-                  Tablero
-                </span>
-              </Link>
-            </li>
-            <li className={sidebarListStyles.li.className}>
-              <Link href='#' className={sidebarListStyles.li.a.className}>
-                <Building2 className={sidebarListStyles.li.a.icon} />
-                <span
-                  className={cn(
-                    sidebarListStyles.li.a.label,
-                    clsx({
-                      'transition-all duration-300 opacity-0': !isOpen,
-                    })
-                  )}
-                >
-                  Inmueble
-                </span>
-              </Link>
-            </li>
-            <li className={sidebarListStyles.li.className}>
-              <Link href='#' className={sidebarListStyles.li.a.className}>
-                <Church className={sidebarListStyles.li.a.icon} />
-                <span
-                  className={cn(
-                    sidebarListStyles.li.a.label,
-                    clsx({
-                      'transition-all duration-300 opacity-0': !isOpen,
-                    })
-                  )}
-                >
-                  Cementerio
-                </span>
-              </Link>
-            </li>
+            {topItems.map((item) => (
+              <SidebarTab key={item.href} {...item} />
+            ))}
           </ul>
         </div>
 
         {/* Sidebar Bottom Section */}
         <div>
           <ul>
-            <li className={sidebarListStyles.li.className}>
-              <Link href='#' className={sidebarListStyles.li.a.className}>
-                <CircleUserRound className={sidebarListStyles.li.a.icon} />
-                <span
-                  className={cn(
-                    sidebarListStyles.li.a.label,
-                    clsx({
-                      'transition-all duration-300 opacity-0': !isOpen,
-                    })
-                  )}
-                >
-                  Cuenta
-                </span>
-              </Link>
-            </li>
+            {bottomItems.map((item) => (
+              <SidebarTab key={item.href} {...item} />
+            ))}
           </ul>
         </div>
       </section>
