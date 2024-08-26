@@ -27,7 +27,7 @@ export default async function AdminPageLayout({
     <main className='min-h-screen flex'>
       <Sidebar userRole={userRole} />
       <section className='flex flex-col flex-1 gap-4 h-full'>
-        <header className='w-full h-12 flex grow-0 items-center justify-center bg-primary'>
+        <header className='w-full h-12 flex grow-0 items-center justify-center bg-muted-foreground'>
           <section className='w-full flex items-center justify-end'>
             <NavigationMenu>
               <NavigationMenuList>
