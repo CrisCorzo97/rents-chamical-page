@@ -19,9 +19,6 @@ import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 
-const cookieStore = cookies();
-const supabase = createSupabaseServerClient(cookieStore);
-
 const role_dictionary: Record<string, string> = {
   '1': 'administrador',
   '2': 'prensa',
@@ -482,6 +479,9 @@ export const confirmRequest = async (
   registration_request: registration_request
 ): Promise<{ success: boolean; message?: string }> => {
   try {
+    const cookieStore = cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
+
     const { id, first_name, last_name, email, cuil, role_id } =
       registration_request;
     const automaticPasword = `${first_name.toLowerCase()}-${
