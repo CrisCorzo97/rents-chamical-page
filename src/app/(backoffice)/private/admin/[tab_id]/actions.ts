@@ -40,7 +40,7 @@ export const getProperties = async (input: {
   };
   try {
     const inputQuery: Prisma.propertyFindManyArgs = {
-      take: 10,
+      take: 5,
       orderBy: {
         taxpayer: 'asc',
       },
@@ -49,11 +49,11 @@ export const getProperties = async (input: {
     if (input.filter) {
       inputQuery.where = input.filter;
     }
-    if (input.limit) {
-      inputQuery.take = input.limit;
-    }
     if (input.page) {
-      inputQuery.skip = input.page;
+      inputQuery.skip = +input.page - 1;
+    }
+    if (input.limit) {
+      inputQuery.take = +input.limit;
     }
     if (input.order_by) {
       inputQuery.orderBy = input.order_by;
@@ -67,10 +67,10 @@ export const getProperties = async (input: {
 
     response.data = properties;
     response.pagination = {
-      total_pages: Math.ceil(propertiesCounted / (input.limit || 10)),
+      total_pages: Math.ceil(propertiesCounted / (inputQuery.take ?? 5)),
       total_items: propertiesCounted,
-      page: input.page || 1,
-      limit_per_page: input.limit || 10,
+      page: input.page ? +input.page : 1,
+      limit_per_page: inputQuery.take ?? 5,
     };
 
     return response;
@@ -98,7 +98,7 @@ export const getCementeryRecords = async (input: {
   };
   try {
     const inputQuery: Prisma.cementeryFindManyArgs = {
-      take: 10,
+      take: 5,
       orderBy: {
         taxpayer: 'asc',
       },
@@ -107,11 +107,11 @@ export const getCementeryRecords = async (input: {
     if (input.filter) {
       inputQuery.where = input.filter;
     }
-    if (input.limit) {
-      inputQuery.take = input.limit;
-    }
     if (input.page) {
-      inputQuery.skip = input.page;
+      inputQuery.skip = +input.page - 1;
+    }
+    if (input.limit) {
+      inputQuery.take = +input.limit;
     }
     if (input.order_by) {
       inputQuery.orderBy = input.order_by;
@@ -123,10 +123,10 @@ export const getCementeryRecords = async (input: {
 
     response.data = cementeryRecords;
     response.pagination = {
-      total_pages: Math.ceil(cementeryRecordsCounted / (input.limit || 10)),
+      total_pages: Math.ceil(cementeryRecordsCounted / (inputQuery.take ?? 5)),
       total_items: cementeryRecordsCounted,
-      page: input.page || 1,
-      limit_per_page: input.limit || 10,
+      page: input.page ? +input.page : 1,
+      limit_per_page: inputQuery.take ?? 5,
     };
 
     return response;

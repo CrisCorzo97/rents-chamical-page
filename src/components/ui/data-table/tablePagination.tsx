@@ -8,6 +8,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Pagination as ResponsePagination } from '@/types/envelope';
+import { useMemo } from 'react';
 import {
   Select,
   SelectContent,
@@ -16,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select';
-import { useMemo } from 'react';
 
 type TablePagination = {
   pagination: ResponsePagination;
@@ -64,7 +64,7 @@ export function TablePagination(props: TablePagination) {
                   limit: pagination?.limit_per_page,
                 })
               }
-              disabled={pagination.page === 1}
+              disabled={pagination?.page === 1}
             />
           </PaginationItem>
           {pagesRendered[0] > 1 && (
@@ -110,22 +110,20 @@ export function TablePagination(props: TablePagination) {
                   limit: pagination?.limit_per_page,
                 })
               }
-              disabled={pagination.page === pagination.total_pages}
+              disabled={pagination?.page === pagination?.total_pages}
             />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
       <div className='flex items-center justify-end gap-2 p-2 flex-1'>
         <span className='text-sm'>
-          {`${
-            pagination?.limit_per_page < pagination?.total_items
-              ? pagination?.limit_per_page
-              : pagination?.total_items
+          {`${pagination?.limit_per_page * (pagination?.page - 1) + 1} - ${
+            pagination?.limit_per_page * pagination?.page
           } de ${pagination?.total_items} registros.`}
         </span>
 
         <Select
-          defaultValue={`${pagination.limit_per_page}`}
+          defaultValue={`${pagination?.limit_per_page}`}
           onValueChange={(value) => {
             handlePagination({
               page: 1,

@@ -46,7 +46,94 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
       },
     ],
   },
-  '2': { top: [], bottom: [] },
-  '3': { top: [], bottom: [] },
-  '4': { top: [], bottom: [] },
+  '2': {
+    top: [
+      {
+        id: 'dashboard',
+        icon: <LayoutDashboard />,
+        label: 'Tablero',
+        href: '/private/admin/dashboard',
+      },
+      {
+        id: 'property',
+        icon: <Building2 />,
+        label: 'Inmueble',
+        href: '/private/admin/property',
+      },
+      {
+        id: 'cementery',
+        icon: <Church />,
+        label: 'Cementerio',
+        href: '/private/admin/cementery',
+      },
+    ],
+    bottom: [
+      {
+        id: 'account',
+        icon: <CircleUserRound />,
+        label: 'Cuenta',
+        href: '/private/admin/account',
+      },
+    ],
+  },
+  '3': {
+    top: [
+      {
+        id: 'dashboard',
+        icon: <LayoutDashboard />,
+        label: 'Tablero',
+        href: '/private/admin/dashboard',
+      },
+      {
+        id: 'property',
+        icon: <Building2 />,
+        label: 'Inmueble',
+        href: '/private/admin/property',
+      },
+      {
+        id: 'cementery',
+        icon: <Church />,
+        label: 'Cementerio',
+        href: '/private/admin/cementery',
+      },
+    ],
+    bottom: [
+      {
+        id: 'account',
+        icon: <CircleUserRound />,
+        label: 'Cuenta',
+        href: '/private/admin/account',
+      },
+    ],
+  },
+  '4': {
+    top: [
+      {
+        id: 'dashboard',
+        icon: <LayoutDashboard />,
+        label: 'Tablero',
+        href: '/private/admin/dashboard',
+      },
+      {
+        id: 'property',
+        icon: <Building2 />,
+        label: 'Inmueble',
+        href: '/private/admin/property',
+      },
+      {
+        id: 'cementery',
+        icon: <Church />,
+        label: 'Cementerio',
+        href: '/private/admin/cementery',
+      },
+    ],
+    bottom: [
+      {
+        id: 'account',
+        icon: <CircleUserRound />,
+        label: 'Cuenta',
+        href: '/private/admin/account',
+      },
+    ],
+  },
 };
