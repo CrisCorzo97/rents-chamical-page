@@ -1,9 +1,19 @@
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { sortByToState } from '@/lib/table';
 import { Envelope } from '@/types/envelope';
-import { cementery, Prisma, property } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { SortingState } from '@tanstack/react-table';
+import Link from 'next/link';
 import { getCementeryRecords, getProperties } from './actions';
 import { CementeryRecordsTable } from './components/cementery-records-table/cementeryRecordsTable';
-import { PropertyRecordsTable } from './components/properties-table/propertiesTable';
+import { PropertyRecordsTable } from './components/property-records-table/propertyRecordsTable';
 
 interface AsyncFunctionDictionary {
   [key: string]: <T>(input: AsyncFunctionInput) => Promise<Envelope<T[]>>;
@@ -59,13 +69,25 @@ const asyncFunctionDictionary: AsyncFunctionDictionary = {
   },
 };
 
+export type ComponentProps<T> = {
+  data: Envelope<T[]>;
+  sorting: SortingState;
+  filter: string;
+};
+
 const ComponentDictionary: Record<
   string,
-  ({ data, sortingState, filter }: any) => JSX.Element
+  <T>(props: ComponentProps<T>) => JSX.Element
 > = {
-  dashboard: PropertyRecordsTable<property>,
-  property: PropertyRecordsTable<property>,
-  cementery: CementeryRecordsTable<cementery>,
+  dashboard: PropertyRecordsTable,
+  property: PropertyRecordsTable,
+  cementery: CementeryRecordsTable,
+};
+
+const TAB_LABELS: Record<string, string> = {
+  dashboard: 'Dashboard',
+  property: 'Propiedades',
+  cementery: 'Cementerio',
 };
 
 export default async function TabContentPage({
@@ -105,11 +127,26 @@ export default async function TabContentPage({
 
   return (
     <div className='mx-6'>
-      {params.tab_id}
+      <Breadcrumb className='h-12'>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href='/' prefetch>
+                Portal Administrativo
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{TAB_LABELS[params.tab_id]}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <Component
         data={data}
-        sortingState={sortingState}
-        filter={searchParams.filter}
+        sorting={sortingState ?? []}
+        filter={searchParams.filter ?? ''}
       />
     </div>
   );

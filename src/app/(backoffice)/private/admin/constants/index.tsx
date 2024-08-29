@@ -21,7 +21,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
       {
         id: 'dashboard',
         icon: <LayoutDashboard />,
-        label: 'Tablero',
+        label: 'Dashboard',
         href: '/private/admin/dashboard',
       },
       {
@@ -51,7 +51,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
       {
         id: 'dashboard',
         icon: <LayoutDashboard />,
-        label: 'Tablero',
+        label: 'Dashboard',
         href: '/private/admin/dashboard',
       },
       {
@@ -81,7 +81,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
       {
         id: 'dashboard',
         icon: <LayoutDashboard />,
-        label: 'Tablero',
+        label: 'Dashboard',
         href: '/private/admin/dashboard',
       },
       {
@@ -111,7 +111,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
       {
         id: 'dashboard',
         icon: <LayoutDashboard />,
-        label: 'Tablero',
+        label: 'Dashboard',
         href: '/private/admin/dashboard',
       },
       {

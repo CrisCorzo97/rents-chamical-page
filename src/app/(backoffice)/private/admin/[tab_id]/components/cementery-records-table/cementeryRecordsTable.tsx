@@ -6,71 +6,20 @@ import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { stateToSortBy } from '@/lib/table';
-import { Envelope, Pagination } from '@/types/envelope';
-import { cementery } from '@prisma/client';
+import { Pagination } from '@/types/envelope';
 import {
   ColumnDef,
-  SortingState,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import * as React from 'react';
+import { ComponentProps } from '../../page';
 
-export const columns: ColumnDef<cementery>[] = [
-  {
-    id: 'id',
-    header: 'ID',
-    accessorKey: 'id',
-  },
-  {
-    id: 'taxpayer',
-    header: 'CONTRIBUYENTE',
-    accessorKey: 'taxpayer',
-    enableColumnFilter: true,
-  },
-  {
-    id: 'address',
-    accessorKey: 'address',
-    header: 'DIRECCIÓN',
-  },
-  {
-    id: 'section',
-    accessorKey: 'section',
-    header: 'SECCIÓN',
-    // cell: ({ row }) => {
-    //   const enrollment = row.getValue('enrollment');
-
-    //   return enrollment ? `${enrollment}` : '-';
-    // },
-  },
-  {
-    id: 'location_number',
-    accessorKey: 'location_number',
-    header: 'NRO LOCALIZACIÓN',
-    // cell: ({ row }) => {
-    //   const is_part = row.getValue('is_part');
-
-    //   return is_part ? 'Sí' : 'No';
-    // },
-  },
-  {
-    id: 'last_year_paid',
-    accessorKey: 'last_year_paid',
-    header: 'ÚLTIMO PAGO',
-  },
-];
-
-interface CementeryRecordsTableProps<T> {
-  data: Envelope<T[]>;
-  sorting: SortingState;
-  filter: string;
-}
-
-export function CementeryRecordsTable<DataType>(
-  props: CementeryRecordsTableProps<DataType>
-) {
-  const { data, sorting, filter } = props;
-
+export function CementeryRecordsTable<DataType>({
+  data,
+  filter,
+  sorting,
+}: ComponentProps<DataType>) {
   const [queryFilter, setQueryFilter] = React.useState<string>(filter);
 
   const { handleSort, handlePagination, handleFilter } = useFPS({
@@ -108,29 +57,19 @@ export function CementeryRecordsTable<DataType>(
       enableSorting: false,
     },
     {
-      id: 'enrollment',
-      accessorKey: 'enrollment',
+      id: 'section',
+      accessorKey: 'section',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='MATRÍCULA' />
+        <DataTableColumnHeader column={column} title='SECCIÓN' />
       ),
-      cell: ({ row }) => {
-        const enrollment = row.getValue('enrollment');
-
-        return enrollment ? `${enrollment}` : '-';
-      },
       enableSorting: false,
     },
     {
-      id: 'is_part',
-      accessorKey: 'is_part',
+      id: 'location_number',
+      accessorKey: 'location_number',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='ES PARTE' />
+        <DataTableColumnHeader column={column} title='NRO LOCALIZACIÓN' />
       ),
-      cell: ({ row }) => {
-        const is_part = row.getValue('is_part');
-
-        return is_part ? 'Sí' : 'No';
-      },
       enableSorting: false,
     },
     {
@@ -139,6 +78,7 @@ export function CementeryRecordsTable<DataType>(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='ÚLTIMO AÑO PAGO' />
       ),
+      sortDescFirst: false,
     },
   ];
 

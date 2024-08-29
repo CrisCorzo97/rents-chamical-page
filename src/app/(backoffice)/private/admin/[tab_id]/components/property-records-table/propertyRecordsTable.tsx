@@ -6,72 +6,22 @@ import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { stateToSortBy } from '@/lib/table';
-import { Envelope, Pagination } from '@/types/envelope';
-import { property } from '@prisma/client';
+import { Pagination } from '@/types/envelope';
 import {
   ColumnDef,
-  SortingState,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import * as React from 'react';
+import { ComponentProps } from '../../page';
 
-export const columns: ColumnDef<property>[] = [
-  {
-    id: 'id',
-    header: 'ID',
-    accessorKey: 'id',
-  },
-  {
-    id: 'taxpayer',
-    header: 'CONTRIBUYENTE',
-    accessorKey: 'taxpayer',
-    enableColumnFilter: true,
-  },
-  {
-    id: 'address',
-    accessorKey: 'address',
-    header: 'DIRECCIÓN',
-  },
-  {
-    id: 'enrollment',
-    accessorKey: 'enrollment',
-    header: 'MATRÍCULA',
-    cell: ({ row }) => {
-      const enrollment = row.getValue('enrollment');
-
-      return enrollment ? `${enrollment}` : '-';
-    },
-  },
-  {
-    id: 'is_part',
-    accessorKey: 'is_part',
-    header: 'ES PARTE',
-    cell: ({ row }) => {
-      const is_part = row.getValue('is_part');
-
-      return is_part ? 'Sí' : 'No';
-    },
-  },
-  {
-    id: 'last_year_paid',
-    accessorKey: 'last_year_paid',
-    header: 'ÚLTIMO PAGO',
-  },
-];
-
-interface PropertyRecordsTableProps<T> {
-  data: Envelope<T[]>;
-  sorting: SortingState;
-  filter: string;
-}
-
-export function PropertyRecordsTable<DataType>(
-  props: PropertyRecordsTableProps<DataType>
-) {
-  const { data, sorting, filter } = props;
-
+export function PropertyRecordsTable<DataType>({
+  data,
+  filter,
+  sorting,
+}: ComponentProps<DataType>) {
   const [queryFilter, setQueryFilter] = React.useState<string>(filter);
+  console.log({ sorting, filter, data });
 
   const { handleSort, handlePagination, handleFilter } = useFPS({
     pagination: data.pagination as Pagination,
@@ -139,12 +89,13 @@ export function PropertyRecordsTable<DataType>(
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='ÚLTIMO AÑO PAGO' />
       ),
+      sortDescFirst: false,
     },
   ];
 
   useCallbackDebouncing({
     value: queryFilter,
-    delay: 1500,
+    delay: 1200,
     callback: () => {
       if (queryFilter !== filter) {
         handleFilter({
