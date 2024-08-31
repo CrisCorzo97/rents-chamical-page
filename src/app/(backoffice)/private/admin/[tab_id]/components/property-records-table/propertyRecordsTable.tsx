@@ -21,7 +21,6 @@ export function PropertyRecordsTable<DataType>({
   sorting,
 }: ComponentProps<DataType>) {
   const [queryFilter, setQueryFilter] = React.useState<string>(filter);
-  console.log({ sorting, filter, data });
 
   const { handleSort, handlePagination, handleFilter } = useFPS({
     pagination: data.pagination as Pagination,

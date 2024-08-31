@@ -132,10 +132,12 @@ export default async function TabContentPage({
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href='/' prefetch>
-                Portal Administrativo
+                Inicio
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>Portal Administrativo</BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>{TAB_LABELS[params.tab_id]}</BreadcrumbPage>

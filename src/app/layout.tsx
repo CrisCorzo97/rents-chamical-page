@@ -1,9 +1,9 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
 import StyledComponentsRegistry from '@/lib/ant-design/AntdRegistry';
 import theme from '@/theme/themeConfig';
 import { ConfigProvider } from 'antd';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
