@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      height: {
+        'admin-scroll-area': 'calc(100vh - 64px)',
+      },
       colors: {
         border: 'var(--border)',
         input: 'var(--input)',

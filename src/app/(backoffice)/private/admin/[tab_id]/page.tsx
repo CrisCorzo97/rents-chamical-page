@@ -6,6 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { sortByToState } from '@/lib/table';
 import { Envelope } from '@/types/envelope';
 import { Prisma } from '@prisma/client';
@@ -127,8 +128,8 @@ export default async function TabContentPage({
   const Component = ComponentDictionary[params.tab_id];
 
   return (
-    <div className='mx-6'>
-      <Breadcrumb className='h-12'>
+    <ScrollArea className='mx-6 h-admin-scroll-area'>
+      <Breadcrumb className='h-12 mt-6'>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -151,6 +152,6 @@ export default async function TabContentPage({
         sorting={sortingState ?? []}
         filter={searchParams.filter ?? ''}
       />
-    </div>
+    </ScrollArea>
   );
 }

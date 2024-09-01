@@ -178,7 +178,7 @@ export function PropertyRecordsTable<DataType>({
 
       <Card
         className={cn(
-          `w-full max-w-96 mt-[4.5rem] bg-rose-100 transition-all duration-300`,
+          `w-full max-w-96 mt-[4.5rem] h-full bg-rose-100 transition-all duration-300`,
           clsx({
             'w-0 border-none': !recordDetails,
           })

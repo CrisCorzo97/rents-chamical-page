@@ -21,7 +21,7 @@ export const MainHeader = () => {
 
   return (
     <header className='w-full h-20 flex grow-0 items-center justify-center bg-primary'>
-      <section className='max-w-screen-lg w-full flex items-center justify-between'>
+      <section className='max-w-6xl w-full flex items-center justify-between'>
         <LogoRents height={60} fill='#fff' />
 
         <NavigationMenu>

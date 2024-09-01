@@ -78,7 +78,7 @@ export default async function Home() {
           </Card>
         </section>
       </section>
-      <footer className='w-full h-28 bg-primary grow-0 mt-8' />
+      <footer className='w-full h-28 bg-slate-200 grow-0 mt-8' />
     </main>
   );
 }
