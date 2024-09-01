@@ -1,5 +1,5 @@
-import { MainHeader } from './portal-ciudadano/components/ui';
 import React from 'react';
+import { ClientHeader } from './components/ui';
 
 export default function MainLayout({
   children,
@@ -8,9 +8,9 @@ export default function MainLayout({
 }) {
   return (
     <main className='min-h-screen flex flex-col'>
-      <MainHeader />
+      <ClientHeader />
       <section className='grow p-4'>{children}</section>
-      <footer className='w-full h-28 bg-primary grow-0 mt-8' />
+      <footer className='w-full h-28 bg-slate-200 grow-0 mt-8' />
     </main>
   );
 }

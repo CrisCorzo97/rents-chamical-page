@@ -14,7 +14,7 @@ export type NavbarMenuItems = {
   key: string;
 };
 
-export const MainHeader = () => {
+export const ClientHeader = () => {
   const items: NavbarMenuItems[] = [
     { label: 'Salir de Rentas', key: '/' }, // cambiar esto por la url a redireccionar
   ];
