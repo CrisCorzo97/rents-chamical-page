@@ -1,11 +1,5 @@
 'use client';
 
-import * as React from 'react';
-import {
-  ColumnDef,
-  Table as TableType,
-  flexRender,
-} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -15,14 +9,20 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Pagination } from '@/types/envelope';
-import { TablePagination } from './tablePagination';
+import {
+  ColumnDef,
+  Table as TableType,
+  flexRender,
+} from '@tanstack/react-table';
 import { Card, CardHeader, CardTitle } from '../card';
+import { TablePagination } from './tablePagination';
 
 interface CustomDataTableProps<T> {
   tableTitle: string;
   columns: ColumnDef<T>[];
   table: TableType<T>;
   pagination: Pagination;
+  onRecordClick?: (record: T) => void;
   handlePagination: (
     input: {
       page: number;
@@ -37,7 +37,14 @@ interface CustomDataTableProps<T> {
 export function CustomDataTable<DataType>(
   props: CustomDataTableProps<DataType>
 ) {
-  const { tableTitle, columns, table, pagination, handlePagination } = props;
+  const {
+    tableTitle,
+    columns,
+    table,
+    pagination,
+    onRecordClick,
+    handlePagination,
+  } = props;
 
   return (
     <Card>
@@ -70,6 +77,8 @@ export function CustomDataTable<DataType>(
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  onClick={() => onRecordClick?.(row.original)}
+                  className='cursor-pointer hover:bg-gray-100'
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

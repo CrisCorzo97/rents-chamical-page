@@ -6,11 +6,9 @@ import { Envelope } from '@/types/envelope';
 import {
   Prisma,
   burial_type,
-  cementery,
   cementery_place,
   city_section,
   neighborhood,
-  property,
   registration_request,
 } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -18,6 +16,8 @@ import dayjs from 'dayjs';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
+import { CementeryRecordWithRelations } from './interfaces/cementery';
+import { PropertyRecordWithRelations } from './interfaces/property';
 
 const role_dictionary: Record<string, string> = {
   '1': 'administrador',
@@ -32,8 +32,8 @@ export const getProperties = async (input: {
   page?: number;
   order_by?: Prisma.propertyOrderByWithRelationInput;
   filter?: Prisma.propertyWhereInput;
-}): Promise<Envelope<property[]>> => {
-  const response: Envelope<property[]> = {
+}): Promise<Envelope<PropertyRecordWithRelations[]>> => {
+  const response: Envelope<PropertyRecordWithRelations[]> = {
     success: true,
     data: null,
     pagination: null,
@@ -59,7 +59,13 @@ export const getProperties = async (input: {
       inputQuery.orderBy = input.order_by;
     }
 
-    const properties = await dbSupabase.property.findMany(inputQuery);
+    const properties = await dbSupabase.property.findMany({
+      ...inputQuery,
+      include: {
+        city_section: true,
+        neighborhood: true,
+      },
+    });
 
     const propertiesCounted = await dbSupabase.property.count({
       where: inputQuery.where,
@@ -90,8 +96,8 @@ export const getCementeryRecords = async (input: {
   page?: number;
   order_by?: Prisma.cementeryOrderByWithRelationInput;
   filter?: Prisma.cementeryWhereInput;
-}): Promise<Envelope<cementery[]>> => {
-  const response: Envelope<cementery[]> = {
+}): Promise<Envelope<CementeryRecordWithRelations[]>> => {
+  const response: Envelope<CementeryRecordWithRelations[]> = {
     success: true,
     data: null,
     pagination: null,
@@ -117,7 +123,14 @@ export const getCementeryRecords = async (input: {
       inputQuery.orderBy = input.order_by;
     }
 
-    const cementeryRecords = await dbSupabase.cementery.findMany(inputQuery);
+    const cementeryRecords = await dbSupabase.cementery.findMany({
+      ...inputQuery,
+      include: {
+        neighborhood: true,
+        cementery_place: true,
+        burial_type: true,
+      },
+    });
 
     const cementeryRecordsCounted = await dbSupabase.cementery.count();
 

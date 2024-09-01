@@ -103,6 +103,7 @@ export default async function TabContentPage({
     sort_by?: string;
     sort_direction?: string;
     filter?: string;
+    record_id?: string;
   };
 }) {
   let sorted_by = {};
