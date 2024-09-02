@@ -80,6 +80,9 @@ const ComponentDictionary: Record<
   string,
   <T>(props: ComponentProps<T>) => JSX.Element
 > = {
+  // registration_equest: RegistrationRequestPage as unknown as <T>(
+  //   props: ComponentProps<T>
+  // ) => JSX.Element,
   dashboard: PropertyRecordsTable,
   property: PropertyRecordsTable,
   cementery: CementeryRecordsTable,

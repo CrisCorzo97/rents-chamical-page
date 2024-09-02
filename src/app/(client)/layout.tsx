@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClientHeader } from './components/ui';
+import { MainHeader } from '../ui';
 
 export default function MainLayout({
   children,
@@ -8,7 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <main className='min-h-screen flex flex-col'>
-      <ClientHeader />
+      <MainHeader />
       <section className='grow p-4'>{children}</section>
       <footer className='w-full h-28 bg-slate-200 grow-0 mt-8' />
     </main>

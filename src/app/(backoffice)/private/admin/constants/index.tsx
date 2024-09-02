@@ -3,6 +3,7 @@ import {
   Church,
   CircleUserRound,
   LayoutDashboard,
+  UserRoundCheck,
 } from 'lucide-react';
 
 export type SidebarTab = {
@@ -23,6 +24,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         icon: <LayoutDashboard />,
         label: 'Dashboard',
         href: '/private/admin/dashboard',
+      },
+      {
+        id: 'registration_request',
+        icon: <UserRoundCheck />,
+        label: 'Solicitudes de registro',
+        href: '/private/admin/registration_request',
       },
       {
         id: 'property',

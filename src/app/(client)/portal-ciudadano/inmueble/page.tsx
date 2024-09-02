@@ -1,3 +1,4 @@
+'use client';
 import { Button, Input } from '@/components/ui';
 import {
   Breadcrumb,
@@ -16,8 +17,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import Link from 'next/link';
+import ReCAPTCHA from 'react-google-recaptcha';
+
+const G_RECAPTCHA_SITE_KEY = process.env.G_RECAPTCHA_SITE_KEY!;
 
 export default function PropertyPage() {
+  const handleRecaptcha = (token: string | null) => {
+    console.log(token);
+  };
+
   return (
     <>
       <Breadcrumb className='max-w-6xl mx-auto h-12'>
@@ -65,6 +73,13 @@ export default function PropertyPage() {
           <CardContent>
             <form>
               <Input placeholder='0123-4567-7890' />
+              <ReCAPTCHA
+                sitekey={
+                  G_RECAPTCHA_SITE_KEY ??
+                  '6LfDNzIqAAAAAB0hIO4txu1Lb_5fH_IHLF39bG4-'
+                }
+                onChange={handleRecaptcha}
+              />
             </form>
           </CardContent>
           <CardFooter className='border-t px-6 py-4'>
@@ -74,4 +89,11 @@ export default function PropertyPage() {
       </section>
     </>
   );
+}
+function useRecaptcha(): {
+  capchaToken: any;
+  recaptchaRef: any;
+  handleRecaptcha: any;
+} {
+  throw new Error('Function not implemented.');
 }
