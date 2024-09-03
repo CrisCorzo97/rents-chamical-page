@@ -1,4 +1,3 @@
-'use client';
 import { Button, Input } from '@/components/ui';
 import {
   Breadcrumb,
@@ -17,14 +16,22 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import Link from 'next/link';
-import ReCAPTCHA from 'react-google-recaptcha';
 
-const G_RECAPTCHA_SITE_KEY = process.env.G_RECAPTCHA_SITE_KEY!;
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
 
-export default function PropertyPage() {
-  const handleRecaptcha = (token: string | null) => {
-    console.log(token);
-  };
+export default async function PropertyPage() {
+  const recaptchaToken = await window.grecaptcha.enterprise?.execute(
+    'site-key',
+    {
+      action: 'LOGIN',
+    }
+  );
+
+  // const res = await axios.post("link", {loginInfo, recaptchaToken})]
 
   return (
     <>
@@ -73,12 +80,10 @@ export default function PropertyPage() {
           <CardContent>
             <form>
               <Input placeholder='0123-4567-7890' />
-              <ReCAPTCHA
-                sitekey={
-                  G_RECAPTCHA_SITE_KEY ??
-                  '6LfDNzIqAAAAAB0hIO4txu1Lb_5fH_IHLF39bG4-'
-                }
-                onChange={handleRecaptcha}
+              <div
+                className='g-recaptcha'
+                data-sitekey={''}
+                data-action='PROPERTY_QUERY'
               />
             </form>
           </CardContent>
@@ -87,6 +92,8 @@ export default function PropertyPage() {
           </CardFooter>
         </Card>
       </section>
+
+      {/* <PropertyQueryForm /> */}
     </>
   );
 }
