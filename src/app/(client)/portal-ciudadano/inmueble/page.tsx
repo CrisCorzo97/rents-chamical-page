@@ -30,13 +30,6 @@ const G_RECAPTCHA_SITE_KEY =
   '6LfuwjQqAAAAABoQBWXBvhveIlOKKw5Rpt17xWi2';
 
 export default function PropertyPage() {
-  // await globalThis.window?.grecaptcha?.enterprise?.render('g-recaptcha', {
-  //   sitekey: { G_RECAPTCHA_SITE_KEY },
-  //   action: 'test',
-  // });
-
-  // const res = await axios.post("link", {loginInfo, recaptchaToken})]
-
   const onloadCallback = () => {
     globalThis.window?.grecaptcha?.enterprise?.ready(() => {
       globalThis.window?.grecaptcha?.enterprise?.render('g_recaptcha', {
@@ -93,12 +86,7 @@ export default function PropertyPage() {
           <CardContent>
             <form>
               <Input placeholder='0123-4567-7890' />
-              <div
-                id='g_recaptcha'
-                // className='g-recaptcha'
-                // data-sitekey={G_RECAPTCHA_SITE_KEY}
-                // data-action='property_request'
-              ></div>
+              <div id='g_recaptcha'></div>
             </form>
             <Script
               src='https://www.google.com/recaptcha/enterprise.js?render=explicit'
@@ -112,8 +100,6 @@ export default function PropertyPage() {
           </CardFooter>
         </Card>
       </section>
-
-      {/* <PropertyQueryForm /> */}
     </>
   );
 }
