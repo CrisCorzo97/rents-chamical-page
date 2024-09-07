@@ -15,27 +15,33 @@ import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { cn } from '@/lib/cn';
 import { stateToSortBy } from '@/lib/table';
-import { Pagination } from '@/types/envelope';
+import { Envelope, Pagination } from '@/types/envelope';
 import { cementery } from '@prisma/client';
 import {
   ColumnDef,
   getCoreRowModel,
+  SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { useState } from 'react';
-import { CementeryRecordWithRelations } from '../../interfaces/cementery';
-import { ComponentProps } from '../../page';
+import { CementeryRecordWithRelations } from './cementery.interface';
 
 const MISSING_FIELDS: Record<string, string> = {
   address_taxpayer: 'Dirección',
 };
 
-export function CementeryRecordsTable<DataType>({
+interface CementeryRecordsTableProps {
+  data: Envelope<cementery[]>;
+  sorting: SortingState;
+  filter: string;
+}
+
+export function CementeryPageClient({
   data,
   filter,
   sorting,
-}: ComponentProps<DataType>) {
+}: CementeryRecordsTableProps) {
   const [queryFilter, setQueryFilter] = useState<string>(filter);
   const [recordDetails, setRecordDetails] =
     useState<CementeryRecordWithRelations | null>(null);
@@ -44,7 +50,7 @@ export function CementeryRecordsTable<DataType>({
     pagination: data.pagination as Pagination,
   });
 
-  const columns: ColumnDef<DataType>[] = [
+  const columns: ColumnDef<cementery>[] = [
     {
       id: 'taxpayer',
       header: ({ column }) => (
@@ -144,7 +150,7 @@ export function CementeryRecordsTable<DataType>({
   });
 
   return (
-    <section className='w-full flex flex-wrap gap-3'>
+    <section className='w-full mb-10 flex flex-wrap gap-3'>
       <div className='w-full flex-1'>
         <div className='flex items-center py-4'>
           <Input
@@ -154,7 +160,7 @@ export function CementeryRecordsTable<DataType>({
             className='max-w-sm'
           />
         </div>
-        <CustomDataTable<DataType>
+        <CustomDataTable<cementery>
           tableTitle='Registros de cementerio'
           columns={columns}
           table={table}

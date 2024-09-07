@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import Script from 'next/script';
+import { createAssessment } from '../actions';
 
 declare global {
   interface Window {
@@ -28,6 +29,8 @@ declare global {
 const G_RECAPTCHA_SITE_KEY =
   process.env.G_RECAPTCHA_SITE_KEY ??
   '6LfuwjQqAAAAABoQBWXBvhveIlOKKw5Rpt17xWi2';
+const G_RECAPTCHA_PROJECT_ID =
+  process.env.G_RECAPTCHA_PROJECT_ID ?? 'municipalidad-ch-1725278195483';
 
 export default function PropertyPage() {
   const onloadCallback = () => {
@@ -74,31 +77,44 @@ export default function PropertyPage() {
       </section>
 
       <section className='max-w-6xl mx-auto flex gap-4 flex-wrap'>
-        <Card className='max-w-2xl'>
-          <CardHeader>
-            <CardTitle>Buscador</CardTitle>
-            <CardDescription>
-              Por favor, introduce tu matrícula catastral. Si no cuentas con
-              ella, deberás acercarte por la oficina de rentas de la
-              municipalidad.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form>
-              <Input placeholder='0123-4567-7890' />
+        <form
+          action={(formData) => {
+            const token = formData.get('g_recaptcha')?.toString();
+            createAssessment({
+              projectID: G_RECAPTCHA_PROJECT_ID,
+              recaptchaKey: G_RECAPTCHA_SITE_KEY,
+              token,
+              recaptchaAction: 'test',
+            });
+          }}
+          id='property-form'
+        >
+          <Card className='max-w-2xl'>
+            <CardHeader>
+              <CardTitle>Buscador</CardTitle>
+              <CardDescription>
+                Por favor, introduce tu matrícula catastral. Si no cuentas con
+                ella, deberás acercarte por la oficina de rentas de la
+                municipalidad.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='flex flex-col gap-4'>
+              <Input name='HOLAA' type='text' placeholder='0123-4567-7890' />
               <div id='g_recaptcha'></div>
-            </form>
-            <Script
-              src='https://www.google.com/recaptcha/enterprise.js?render=explicit'
-              onLoad={onloadCallback}
-              async
-              defer
-            ></Script>
-          </CardContent>
-          <CardFooter className='border-t px-6 py-4'>
-            <Button>Save</Button>
-          </CardFooter>
-        </Card>
+              <Script
+                src='https://www.google.com/recaptcha/enterprise.js?render=explicit'
+                onLoad={onloadCallback}
+                async
+                defer
+              ></Script>
+            </CardContent>
+            <CardFooter className='border-t px-6 py-4'>
+              <Button form='property-form' type='submit'>
+                Save
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
       </section>
     </>
   );

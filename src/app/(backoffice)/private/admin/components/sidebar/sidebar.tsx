@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { SIDEBAR_TABS_BY_ROLE } from '../constants';
+import { SIDEBAR_TABS_BY_ROLE } from './constants';
 
 const sidebarListStyles = {
   li: {

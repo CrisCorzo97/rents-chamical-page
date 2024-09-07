@@ -8,7 +8,7 @@ import {
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { Sidebar } from './components/sidebar';
+import { Sidebar } from './components';
 
 export default async function AdminPageLayout({
   children,

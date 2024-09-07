@@ -1,6 +1,11 @@
 'use server';
 import { RecaptchaEnterpriseServiceClient } from '@google-cloud/recaptcha-enterprise';
-import axios from 'axios';
+
+const G_RECAPTCHA_SITE_KEY =
+  process.env.G_RECAPTCHA_SITE_KEY ??
+  '6LfuwjQqAAAAABoQBWXBvhveIlOKKw5Rpt17xWi2';
+const G_RECAPTCHA_PROJECT_ID =
+  process.env.G_RECAPTCHA_PROJECT_ID ?? 'municipalidad-ch-1725278195483';
 
 /**
  * Crea una evaluación para analizar el riesgo de una acción de la IU.
@@ -10,13 +15,15 @@ import axios from 'axios';
  * token: El token generado obtenido del cliente.
  * recaptchaAction: El nombre de la acción que corresponde al token.
  */
-async function createAssessment({
+export async function createAssessment({
   // PENDIENTE: Reemplaza el token y las variables de acción de reCAPTCHA antes de ejecutar la muestra.
-  projectID = 'municipalidad-ch-1725278195483',
-  recaptchaKey = '6Lds-DQqAAAAAF1kH7L7Y3jqsD5FJfUdFATukcUE',
-  token = 'action-token',
-  recaptchaAction = 'action-name',
+  projectID = G_RECAPTCHA_PROJECT_ID,
+  recaptchaKey = G_RECAPTCHA_SITE_KEY,
+  token = 'default-token',
+  recaptchaAction = 'default-action',
 }) {
+  console.log({ projectID, recaptchaKey, token, recaptchaAction });
+
   // Crea el cliente de reCAPTCHA.
   // TODO: almacena en caché el código de generación de clientes (recomendado) o llama a client.close() antes de salir del método.
   const client = new RecaptchaEnterpriseServiceClient();
@@ -63,22 +70,22 @@ async function createAssessment({
   }
 }
 
-export const validateRecaptcha = async (token: string) => {
-  try {
-    const body = {
-      event: {
-        token: 'TOKEN',
-        expectedAction: 'USER_ACTION',
-        siteKey: '6Lds-DQqAAAAAF1kH7L7Y3jqsD5FJfUdFATukcUE',
-      },
-    };
+// export const validateRecaptcha = async (token: string) => {
+//   try {
+//     const body = {
+//       event: {
+//         token: 'TOKEN',
+//         expectedAction: 'USER_ACTION',
+//         siteKey: '6Lds-DQqAAAAAF1kH7L7Y3jqsD5FJfUdFATukcUE',
+//       },
+//     };
 
-    const response = await axios.post(
-      'https://recaptchaenterprise.googleapis.com/v1/projects/municipalidad-ch-1725278195483/assessments?key=API_KEY',
-      { token }
-    );
-    return response.data;
-  } catch (error) {
-    throw new Error('Error validating reCAPTCHA');
-  }
-};
+//     const response = await axios.post(
+//       'https://recaptchaenterprise.googleapis.com/v1/projects/municipalidad-ch-1725278195483/assessments?key=API_KEY',
+//       { token }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw new Error('Error validating reCAPTCHA');
+//   }
+// };
