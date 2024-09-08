@@ -3,6 +3,7 @@ import {
   Church,
   CircleUserRound,
   LayoutDashboard,
+  ReceiptText,
   UserRoundCheck,
 } from 'lucide-react';
 
@@ -26,10 +27,10 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         href: '/private/admin/dashboard',
       },
       {
-        id: 'registration_request',
-        icon: <UserRoundCheck />,
-        label: 'Solicitudes de registro',
-        href: '/private/admin/registration_request',
+        id: 'receipts',
+        icon: <ReceiptText />,
+        label: 'Comprobantes',
+        href: '/private/admin/receipts',
       },
       {
         id: 'property',
@@ -45,6 +46,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
       },
     ],
     bottom: [
+      {
+        id: 'registration_request',
+        icon: <UserRoundCheck />,
+        label: 'Solicitudes de registro',
+        href: '/private/admin/registration_request',
+      },
       {
         id: 'account',
         icon: <CircleUserRound />,
