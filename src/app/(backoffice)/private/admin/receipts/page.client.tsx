@@ -23,8 +23,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
+import { CirclePlus } from 'lucide-react';
 import { useState } from 'react';
 import { CementeryRecordWithRelations } from '../cementery/cementery.interface';
+import { ConfirmModal } from './components';
 
 const MISSING_FIELDS: Record<string, string> = {
   address_taxpayer: 'Dirección',
@@ -45,7 +47,7 @@ export const ReceiptClientPage = ({
   const [recordDetails, setRecordDetails] =
     useState<CementeryRecordWithRelations | null>(null);
 
-  const [createModal, setCreateModal] = useState<boolean>(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
 
   const { handleSort, handlePagination, handleFilter } = useFPS({
     pagination: data.pagination as Pagination,
@@ -153,18 +155,31 @@ export const ReceiptClientPage = ({
   return (
     <section className='w-full mb-10 flex flex-wrap gap-3'>
       <div className='w-full flex-1'>
-        <div className='flex items-center justify-between py-4'>
+        <Card className='mt-6 flex flex-col items-center justify-center border-dashed bg-neutral-100'>
+          <CardHeader>
+            <CardTitle className='text-lg font-semibold'>
+              Acciones rápidas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className='flex gap-2 mt-4'>
+            <Button size='lg' className='flex gap-2'>
+              <CirclePlus size={18} />
+              Crear
+            </Button>
+            <ConfirmModal />
+          </CardContent>
+        </Card>
+
+        <div className='flex items-center justify-between mb-4 mt-6'>
           <Input
             placeholder='Filtrar por contribuyente'
             value={queryFilter}
             onChange={(event) => setQueryFilter(event.target.value)}
             className='max-w-sm'
           />
-
-          <Button>Crear</Button>
         </div>
         <CustomDataTable<cementery>
-          tableTitle='Registros de cementerio'
+          tableTitle='Historial de comprobantes'
           columns={columns}
           table={table}
           pagination={data.pagination as Pagination}

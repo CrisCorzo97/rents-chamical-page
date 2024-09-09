@@ -70,7 +70,7 @@ export default async function ReceiptPage({
       </Breadcrumb>
 
       <article>
-        <h1 className='text-2xl font-bold mt-6'>Comprobantes de pago</h1>
+        <h1 className='text-2xl font-bold'>Comprobantes de pago</h1>
 
         <ReceiptClientPage
           data={data}
