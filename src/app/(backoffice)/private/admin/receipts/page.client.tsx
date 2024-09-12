@@ -9,6 +9,12 @@ import {
 } from '@/components/ui/card';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
@@ -24,6 +30,7 @@ import {
 } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { CirclePlus } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { CementeryRecordWithRelations } from '../cementery/cementery.interface';
 import { ConfirmModal } from './components';
@@ -46,8 +53,6 @@ export const ReceiptClientPage = ({
   const [queryFilter, setQueryFilter] = useState<string>(filter);
   const [recordDetails, setRecordDetails] =
     useState<CementeryRecordWithRelations | null>(null);
-
-  const [openConfirmModal, setOpenConfirmModal] = useState<boolean>(false);
 
   const { handleSort, handlePagination, handleFilter } = useFPS({
     pagination: data.pagination as Pagination,
@@ -162,10 +167,52 @@ export const ReceiptClientPage = ({
             </CardTitle>
           </CardHeader>
           <CardContent className='flex gap-2 mt-4'>
-            <Button size='lg' className='flex gap-2'>
-              <CirclePlus size={18} />
-              Crear
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button size='lg' className='flex gap-2'>
+                  <CirclePlus size={18} />
+                  Crear
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className='w-full'>
+                <DropdownMenuItem>
+                  <Link
+                    href='/private/admin/receipts/create-cementery-receipt'
+                    prefetch
+                    className='w-full'
+                  >
+                    Cementerio
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
+                    href='/private/admin/receipts/create-driver-license-receipt'
+                    prefetch
+                    className='w-full'
+                  >
+                    Licencia de conducir
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
+                    href='/private/admin/receipts/create-property-receipt'
+                    prefetch
+                    className='w-full'
+                  >
+                    Inmueble
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
+                    href='/private/admin/receipts/create-various-rates-receipt'
+                    prefetch
+                    className='w-full'
+                  >
+                    Tasas diversas
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <ConfirmModal />
           </CardContent>
         </Card>

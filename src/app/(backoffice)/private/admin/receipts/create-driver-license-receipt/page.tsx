@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from 'next/link';
 
-export default async function GenerateReceiptPage() {
+export default async function GenerateDriverLicenseReceiptPage() {
   return (
     <ScrollArea className='mx-6 h-admin-scroll-area'>
       <Breadcrumb className='h-12 mt-6'>
@@ -39,9 +39,12 @@ export default async function GenerateReceiptPage() {
       </Breadcrumb>
 
       <article>
-        <h1 className='text-2xl font-bold mt-6'>Crear comprobante</h1>
+        <h1 className='text-2xl font-bold'>
+          Crear comprobante de Licencia de conducir
+        </h1>
         <p className='text-gray-500 mt-2'>
-          Aquí puedes ver los comprobantes de pago de los usuarios.
+          Complete el formulario para generar un comprobante de Licencia de
+          conducir.
         </p>
       </article>
     </ScrollArea>
