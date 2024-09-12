@@ -7,9 +7,41 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cementery } from '@prisma/client';
 import Link from 'next/link';
+import { ReceiptForm } from './components/receiptForm';
 
 export default async function GenerateCementeryReceiptPage() {
+  const onSearch = async (formData: FormData) => {
+    'use server';
+    const fullName = formData.get('full_name');
+    console.log({ fullName });
+    const record: cementery = {
+      id: 'adalksd',
+      taxpayer: 'Mengano Fulano',
+      address_taxpayer: 'Calle falsa 123',
+      id_burial_type: BigInt(1),
+      id_neighborhood: BigInt(16),
+      section: '',
+      row: null,
+      location_number: null,
+      id_cementery_place: BigInt(1),
+      deceased_name: 'Dominguez Abel Omar',
+      last_year_paid: BigInt(2021),
+      created_at: new Date('2021-09-29T00:00:00.000Z'),
+      updated_at: new Date('2021-09-29T00:00:00.000Z'),
+      missing_fields: '["section","row","location_number"]',
+    };
+
+    return record;
+  };
+
+  const onSubmit = async (formData: FormData) => {
+    'use server';
+    const data = Object.fromEntries(formData.entries());
+    console.log({ data });
+  };
+
   return (
     <ScrollArea className='mx-6 h-admin-scroll-area'>
       <Breadcrumb className='h-12 mt-6'>
@@ -43,6 +75,8 @@ export default async function GenerateCementeryReceiptPage() {
         <p className='text-gray-500 mt-2'>
           Complete el formulario para generar un comprobante de Cementerio.
         </p>
+
+        <ReceiptForm onSerach={onSearch} onSubmit={onSubmit} />
       </article>
     </ScrollArea>
   );
