@@ -186,11 +186,11 @@ export const ReceiptClientPage = ({
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link
-                    href='/private/admin/receipts/create-driver-license-receipt'
+                    href='/private/admin/receipts/create-patent-receipt'
                     prefetch
                     className='w-full'
                   >
-                    Licencia de conducir
+                    Patente
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>

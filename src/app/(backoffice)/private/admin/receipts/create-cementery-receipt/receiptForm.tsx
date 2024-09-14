@@ -80,7 +80,6 @@ export const ReceiptForm = ({ onSearch, onSubmit }: ReceiptFormProps) => {
 
       <CardResult
         record={record}
-        isSearching={isSearching}
         recordNotFound={recordNotFound}
         onSubmit={onSubmit}
       />
@@ -90,17 +89,11 @@ export const ReceiptForm = ({ onSearch, onSubmit }: ReceiptFormProps) => {
 
 interface CardResultProps {
   record: cementery | null;
-  isSearching: boolean;
   recordNotFound: boolean;
   onSubmit: (data: FormData) => void;
 }
 
-const CardResult = ({
-  record,
-  isSearching,
-  recordNotFound,
-  onSubmit,
-}: CardResultProps) => {
+const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
   const [amountValue, setAmountValue] = useState<string>('');
 
   return (
@@ -283,7 +276,10 @@ const CardResult = ({
           </CardHeader>
 
           <CardContent>
-            <p>Por favor, intente nuevamente.</p>
+            <p>
+              Por favor, verifique los datos ingresados e intente nuevamente o
+              cree un nuevo registro.
+            </p>
           </CardContent>
         </Card>
       ) : (

@@ -8,8 +8,18 @@ import {
 } from '@/components/ui/breadcrumb';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from 'next/link';
+import { getTaxesOrContributions } from './actions';
+import { ReceiptForm } from './receiptForm';
 
 export default async function GenerateVariousRatesReceiptPage() {
+  const taxesOrContributions = await getTaxesOrContributions();
+
+  const onSubmit = async (formData: FormData) => {
+    'use server';
+    const data = Object.fromEntries(formData.entries());
+    console.log({ data });
+  };
+
   return (
     <ScrollArea className='mx-6 h-admin-scroll-area'>
       <Breadcrumb className='h-12 mt-6'>
@@ -38,13 +48,18 @@ export default async function GenerateVariousRatesReceiptPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <article>
+      <article className='mb-10'>
         <h1 className='text-2xl font-bold'>
           Crear comprobante de Tasas diversas
         </h1>
         <p className='text-gray-500 mt-2'>
           Complete el formulario para generar un comprobante de Tasas diversas.
         </p>
+
+        <ReceiptForm
+          taxesOrContributions={taxesOrContributions}
+          onSubmit={onSubmit}
+        />
       </article>
     </ScrollArea>
   );

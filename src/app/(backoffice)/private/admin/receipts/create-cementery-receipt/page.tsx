@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cementery } from '@prisma/client';
 import Link from 'next/link';
-import { ReceiptForm } from './components/receiptForm';
+import { ReceiptForm } from './receiptForm';
 
 export default async function GenerateCementeryReceiptPage() {
   const onSearch = async (formData: FormData) => {
