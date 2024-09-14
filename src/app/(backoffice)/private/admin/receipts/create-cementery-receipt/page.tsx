@@ -33,7 +33,7 @@ export default async function GenerateCementeryReceiptPage() {
       missing_fields: '["section","row","location_number"]',
     };
 
-    return record;
+    return fullName === 'Dominguez Abel Omar' ? record : null;
   };
 
   const onSubmit = async (formData: FormData) => {
@@ -70,13 +70,13 @@ export default async function GenerateCementeryReceiptPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <article>
+      <article className='mb-10'>
         <h1 className='text-2xl font-bold'>Crear comprobante de Cementerio</h1>
         <p className='text-gray-500 mt-2'>
           Complete el formulario para generar un comprobante de Cementerio.
         </p>
 
-        <ReceiptForm onSerach={onSearch} onSubmit={onSubmit} />
+        <ReceiptForm onSearch={onSearch} onSubmit={onSubmit} />
       </article>
     </ScrollArea>
   );

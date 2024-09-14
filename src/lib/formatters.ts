@@ -12,3 +12,38 @@ export function formatCuilInput(value: string): string {
 
   return onlyNums;
 }
+
+export function formatCurrency(input: string) {
+  // Remover cualquier carácter que no sea dígito o coma
+  let value = input.replace(/[^\d,]/g, '');
+
+  if (value.at(-1) === ',') {
+    value = value.slice(0, -1);
+
+    if (!isNaN(Number(value))) {
+      value = Number(value).toLocaleString('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+
+      return `${value},`;
+    }
+  }
+
+  // Reeemplazo la coma por un punto
+  value = value.replace(',', '.');
+
+  // Si el valor es un número, lo formateo
+  if (!isNaN(Number(value))) {
+    value = Number(value).toLocaleString('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  return value;
+}

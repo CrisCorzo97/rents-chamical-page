@@ -9,19 +9,37 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
+import { formatCurrency } from '@/lib/formatters';
 import { cementery } from '@prisma/client';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
 interface ReceiptFormProps {
-  onSerach: (data: FormData) => Promise<cementery>;
+  onSearch: (data: FormData) => Promise<cementery | null>;
   onSubmit: (data: FormData) => void;
 }
 
-export const ReceiptForm = ({ onSerach, onSubmit }: ReceiptFormProps) => {
+export const ReceiptForm = ({ onSearch, onSubmit }: ReceiptFormProps) => {
   const [record, setRecord] = useState<cementery | null>(null);
+  const [recordNotFound, setRecordNotFound] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  console.log({ record });
+  const handleSubmit = (formData: FormData) => {
+    setIsSearching(true);
+    setTimeout(() => {
+      onSearch(formData)
+        .then((data) => {
+          if (data) {
+            setRecordNotFound(false);
+            setRecord(data);
+          } else {
+            setRecordNotFound(true);
+            setRecord(data);
+          }
+        })
+        .finally(() => setIsSearching(false));
+    }, 1500);
+  };
 
   return (
     <>
@@ -35,10 +53,7 @@ export const ReceiptForm = ({ onSerach, onSubmit }: ReceiptFormProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form
-              action={(formData) => onSerach(formData).then(setRecord)}
-              className='flex gap-3'
-            >
+            <form action={handleSubmit} className='flex gap-3'>
               <FormItem className='w-full'>
                 <Label>Apellido y Nombre</Label>
                 <Input
@@ -50,14 +65,47 @@ export const ReceiptForm = ({ onSerach, onSubmit }: ReceiptFormProps) => {
               </FormItem>
 
               <FormItem className='mt-3 self-end'>
-                <Button type='submit'>Buscar</Button>
+                <Button
+                  type='submit'
+                  loading={isSearching}
+                  className='flex gap-2 transition-all'
+                >
+                  Buscar
+                </Button>
               </FormItem>
             </form>
           </CardContent>
         </Card>
       </section>
 
-      <section>
+      <CardResult
+        record={record}
+        isSearching={isSearching}
+        recordNotFound={recordNotFound}
+        onSubmit={onSubmit}
+      />
+    </>
+  );
+};
+
+interface CardResultProps {
+  record: cementery | null;
+  isSearching: boolean;
+  recordNotFound: boolean;
+  onSubmit: (data: FormData) => void;
+}
+
+const CardResult = ({
+  record,
+  isSearching,
+  recordNotFound,
+  onSubmit,
+}: CardResultProps) => {
+  const [amountValue, setAmountValue] = useState<string>('');
+
+  return (
+    <section>
+      {record ? (
         <Card className='mt-6 max-w-3xl'>
           <CardHeader>
             <CardTitle>Comprobante de Cementerio</CardTitle>
@@ -67,89 +115,180 @@ export const ReceiptForm = ({ onSerach, onSubmit }: ReceiptFormProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {record ? (
-              <form action={onSubmit} className='w-full flex flex-col gap-3'>
-                <div className='w-full flex gap-3'>
-                  <FormItem className='flex-1'>
-                    <Label>Fecha del comprobante</Label>
-                    <Input
-                      type='text'
-                      name='created_at'
-                      defaultValue={dayjs().format('DD/MM/YYYY')}
-                      disabled
-                    />
-                  </FormItem>
-                  <FormItem className='flex-1'>
-                    <Label>Apellido y nombre del contribuyente</Label>
-                    <Input
-                      type='text'
-                      name='taxpayer'
-                      defaultValue={record.taxpayer}
-                      disabled
-                    />
-                  </FormItem>
-                </div>
-
-                <div className='w-full flex gap-3'>
-                  <FormItem className='flex-1'>
-                    <Label>Apellido y nombre del difunto</Label>
-                    <Input
-                      type='text'
-                      name='deceased_name'
-                      defaultValue={record.deceased_name ?? ''}
-                      disabled
-                    />
-                  </FormItem>
-                  <FormItem className='flex-1'>
-                    <Label>Tipo de entierro</Label>
-                    <Input
-                      type='text'
-                      name='id_burial_type'
-                      defaultValue={Number(record.id_burial_type)}
-                      disabled
-                    />
-                  </FormItem>
-                </div>
-
-                <FormItem className='w-full'>
-                  <Label>Fecha de Ingreso</Label>
+            <form action={onSubmit} className='w-full flex flex-col gap-3'>
+              <div className='w-full flex flex-wrap gap-3'>
+                <FormItem className='flex-none'>
+                  <Label>Fecha del comprobante</Label>
                   <Input
-                    type='date'
-                    name='entry_date'
-                    placeholder='2021-12-31'
-                    required
+                    type='text'
+                    name='created_at'
+                    value={dayjs().format('DD/MM/YYYY')}
+                    readOnly
+                    className='cursor-not-allowed'
                   />
                 </FormItem>
-
-                <FormItem className='w-full'>
-                  <Label>Fecha de Egreso</Label>
+                <FormItem className='flex-1'>
+                  <Label>Apellido y nombre del contribuyente</Label>
                   <Input
-                    type='date'
-                    name='exit_date'
-                    placeholder='2021-12-31'
-                    required
+                    type='text'
+                    name='taxpayer'
+                    value={record.taxpayer}
+                    readOnly
+                    className='cursor-not-allowed'
                   />
                 </FormItem>
+                <FormItem className='flex-none'>
+                  <Label>Último año pagado</Label>
+                  <Input
+                    type='text'
+                    name='last_year_paid'
+                    value={Number(record.last_year_paid)}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+              </div>
 
-                <FormItem className='w-full'>
+              <div className='w-full flex gap-3'>
+                <FormItem className='flex-1'>
+                  <Label>Dirección del contribuyente</Label>
+                  <Input
+                    type='text'
+                    name='address_taxpayer'
+                    value={record.address_taxpayer ?? ''}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+                <FormItem className='flex-1'>
+                  <Label>Barrio</Label>
+                  <Input
+                    type='text'
+                    name='id_neighborhood'
+                    value={'Centro'}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+              </div>
+
+              <div className='w-full flex gap-3'>
+                <FormItem className='flex-1'>
+                  <Label>Apellido y nombre del difunto</Label>
+                  <Input
+                    type='text'
+                    name='deceased_name'
+                    value={record.deceased_name ?? ''}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+                <FormItem className='flex-1'>
+                  <Label>Cementerio</Label>
+                  <Input
+                    type='text'
+                    name='id_cementery_place'
+                    value={'Municipal'}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+              </div>
+
+              <div className='w-full flex gap-3'>
+                <FormItem className='flex-1'>
+                  <Label>Tipo de entierro</Label>
+                  <Input
+                    type='text'
+                    name='id_burial_type'
+                    value={'Nicho'}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+                <FormItem className='flex-1'>
+                  <Label>Sección</Label>
+                  <Input
+                    type='text'
+                    name='section'
+                    value={record.section ?? ''}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+                <FormItem className='flex-1'>
+                  <Label>Fila</Label>
+                  <Input
+                    type='text'
+                    name='row'
+                    value={Number(record.row)}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+                <FormItem className='flex-1'>
+                  <Label>Número</Label>
+                  <Input
+                    type='text'
+                    name='location_number'
+                    value={Number(record.location_number)}
+                    readOnly
+                    className='cursor-not-allowed'
+                  />
+                </FormItem>
+              </div>
+
+              <div className='w-full flex gap-3'>
+                <FormItem className='flex-1'>
                   <Label>Observaciones</Label>
                   <Input
                     type='text'
                     name='observations'
-                    placeholder='Observaciones'
+                    placeholder='Tenía saldo a favor...'
                   />
                 </FormItem>
-
-                <FormItem className='mt-3 self-end'>
-                  <Button type='submit'>Generar</Button>
+                <FormItem className='flex-1'>
+                  <Label>Importe</Label>
+                  <Input
+                    type='text'
+                    name='amount'
+                    placeholder='$ 1.000'
+                    className='flex-1'
+                    value={amountValue}
+                    onChange={(e) =>
+                      setAmountValue(formatCurrency(e.target.value))
+                    }
+                  />
                 </FormItem>
-              </form>
-            ) : (
-              <p>No hay registros para mostrar.</p>
-            )}
+              </div>
+
+              <div className='mt-6 flex gap-3 self-end'>
+                <FormItem>
+                  <Button variant='secondary'>Editar</Button>
+                </FormItem>
+                <FormItem>
+                  <Button type='submit'>Crear comprobante</Button>
+                </FormItem>
+              </div>
+            </form>
           </CardContent>
         </Card>
-      </section>
-    </>
+      ) : recordNotFound ? (
+        <Card className='mt-6 max-w-3xl'>
+          <CardHeader>
+            <CardTitle>Registro no encontrado</CardTitle>
+            <CardDescription>
+              No se encontró ningún registro con los datos ingresados.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <p>Por favor, intente nuevamente.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <></>
+      )}
+    </section>
   );
 };
