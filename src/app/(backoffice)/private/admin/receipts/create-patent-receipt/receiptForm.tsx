@@ -1,5 +1,6 @@
 'use client';
 
+import { ExamplePDF } from '@/components/pdf/example';
 import { Button, Input, Label } from '@/components/ui';
 import {
   Card,
@@ -10,6 +11,7 @@ import {
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
 import { formatCurrency } from '@/lib/formatters';
+import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
@@ -19,6 +21,13 @@ interface ReceiptFormProps {
 
 export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
   const [amountValue, setAmountValue] = useState<string>('');
+  const [openPDFView, setOpenPDFView] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FormData | null>(null);
+
+  const handleFormSubmit = (formData: FormData) => {
+    setFormData(formData);
+    setOpenPDFView(true);
+  };
 
   return (
     <section>
@@ -31,7 +40,10 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={onSubmit} className='w-full flex flex-col gap-3'>
+          <form
+            action={handleFormSubmit}
+            className='w-full flex flex-col gap-3'
+          >
             <div className='w-full flex flex-wrap gap-3'>
               <FormItem className='flex-none'>
                 <Label>Fecha del comprobante</Label>
@@ -107,6 +119,12 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
           </form>
         </CardContent>
       </Card>
+
+      {openPDFView && (
+        <PDFViewer className='fixed min-h-screen w-full z-50 left-0 top-0'>
+          <ExamplePDF />
+        </PDFViewer>
+      )}
     </section>
   );
 };

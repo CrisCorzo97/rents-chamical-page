@@ -14,7 +14,7 @@ import {
   Table as TableType,
   flexRender,
 } from '@tanstack/react-table';
-import { Card, CardHeader, CardTitle } from '../card';
+import { Card, CardHeader, CardTitle } from '../ui/card';
 import { TablePagination } from './tablePagination';
 
 interface CustomDataTableProps<T> {

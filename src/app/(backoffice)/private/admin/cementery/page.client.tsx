@@ -1,5 +1,7 @@
 'use client';
 
+import { DataTableColumnHeader } from '@/components/data-table';
+import { CustomDataTable } from '@/components/data-table/customDataTable';
 import { Input, Label } from '@/components/ui';
 import {
   Card,
@@ -8,8 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { DataTableColumnHeader } from '@/components/ui/data-table';
-import { CustomDataTable } from '@/components/ui/data-table/customDataTable';
 import { Separator } from '@/components/ui/separator';
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';

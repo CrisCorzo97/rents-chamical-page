@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../select';
+} from '../ui/select';
 
 type TablePagination = {
   pagination: ResponsePagination;
