@@ -1,6 +1,5 @@
 'use client';
 
-import { ExamplePDF } from '@/components/pdf/example';
 import { Button, Input, Label } from '@/components/ui';
 import {
   Card,
@@ -14,6 +13,7 @@ import { formatCurrency } from '@/lib/formatters';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { ReceiptPFD } from './receiptPFD';
 
 interface ReceiptFormProps {
   onSubmit: (data: FormData) => void;
@@ -122,7 +122,7 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
 
       {openPDFView && (
         <PDFViewer className='fixed min-h-screen w-full z-50 left-0 top-0'>
-          <ExamplePDF />
+          <ReceiptPFD />
         </PDFViewer>
       )}
     </section>
