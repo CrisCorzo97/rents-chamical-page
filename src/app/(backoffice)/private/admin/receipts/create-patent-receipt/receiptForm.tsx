@@ -33,7 +33,7 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
     <section>
       <Card className='mt-6 max-w-3xl'>
         <CardHeader>
-          <CardTitle>Comprobante de Inmueble</CardTitle>
+          <CardTitle>Comprobante de Patente</CardTitle>
           <CardDescription>
             Revise que todos los datos del comprobante sean correctos antes de
             generar el comprobante.

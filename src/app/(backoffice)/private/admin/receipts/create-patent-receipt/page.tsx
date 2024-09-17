@@ -47,11 +47,10 @@ export default async function GeneratePatentReceiptPage() {
 
       <article className='mb-10'>
         <h1 className='text-2xl font-bold'>
-          Crear comprobante de Licencia de conducir
+          Crear comprobante de pago de Patente
         </h1>
         <p className='text-gray-500 mt-2'>
-          Complete el formulario para generar un comprobante de Licencia de
-          conducir.
+          Complete el formulario para generar un comprobante de pago de patente.
         </p>
 
         <ReceiptForm onSubmit={onSubmit} />
