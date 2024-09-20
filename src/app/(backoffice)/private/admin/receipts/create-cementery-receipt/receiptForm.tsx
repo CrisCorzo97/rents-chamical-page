@@ -2,6 +2,13 @@
 
 import { Button, Input, Label } from '@/components/ui';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -11,8 +18,10 @@ import {
 import { FormItem } from '@/components/ui/form';
 import { formatCurrency } from '@/lib/formatters';
 import { cementery } from '@prisma/client';
+import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { ReceiptPFD } from './receiptPFD';
 
 interface ReceiptFormProps {
   onSearch: (data: FormData) => Promise<cementery | null>;
@@ -260,7 +269,21 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
                   <Button variant='secondary'>Editar</Button>
                 </FormItem>
                 <FormItem>
-                  <Button type='submit'>Crear comprobante</Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button type='submit' className='hover:bg-opacity-50'>
+                        Generar comprobante
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+                      <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
+                        <ReceiptPFD />
+                      </PDFViewer>
+                      <AlertDialogFooter className='flex-none'>
+                        <AlertDialogAction>Continuar</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </FormItem>
               </div>
             </form>

@@ -2,6 +2,13 @@
 
 import { Button, Input, Label, Select } from '@/components/ui';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -18,8 +25,10 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/formatters';
 import { tax_or_contribution } from '@prisma/client';
+import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { ReceiptPFD } from './receiptPFD';
 
 interface ReceiptFormProps {
   taxesOrContributions: tax_or_contribution[];
@@ -105,7 +114,21 @@ export const ReceiptForm = ({
 
             <div className='mt-6 flex gap-3 self-end'>
               <FormItem>
-                <Button type='submit'>Crear comprobante</Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type='submit' className='hover:bg-opacity-50'>
+                      Generar comprobante
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+                    <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
+                      <ReceiptPFD />
+                    </PDFViewer>
+                    <AlertDialogFooter className='flex-none'>
+                      <AlertDialogAction>Continuar</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </FormItem>
             </div>
           </form>
