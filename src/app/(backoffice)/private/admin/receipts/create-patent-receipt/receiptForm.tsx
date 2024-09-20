@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { FormItem } from '@/components/ui/form';
 import { formatCurrency } from '@/lib/formatters';
 import { PDFViewer } from '@react-pdf/renderer';
@@ -113,18 +114,21 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
 
             <div className='mt-6 flex gap-3 self-end'>
               <FormItem>
-                <Button type='submit'>Crear comprobante</Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button type='submit'>Crear comprobante</Button>
+                  </DialogTrigger>
+                  <DialogContent className='min-h-[90vh] min-w-screen max-w-screen-2xl'>
+                    <PDFViewer className='h-[95%] w-[95%] m-auto'>
+                      <ReceiptPFD />
+                    </PDFViewer>
+                  </DialogContent>
+                </Dialog>
               </FormItem>
             </div>
           </form>
         </CardContent>
       </Card>
-
-      {openPDFView && (
-        <PDFViewer className='fixed min-h-screen w-full z-50 left-0 top-0'>
-          <ReceiptPFD />
-        </PDFViewer>
-      )}
     </section>
   );
 };
