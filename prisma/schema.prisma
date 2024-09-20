@@ -633,6 +633,7 @@ model receipt {
   id_tax_reference String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at       DateTime  @default(now()) @db.Timestamptz(6)
   confirmed_at     DateTime? @db.Timestamptz(6)
+  other_data       Json?     @db.Json
 
   @@schema("public")
 }
