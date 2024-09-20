@@ -21,6 +21,7 @@
     "@google-cloud/recaptcha-enterprise": "^5.11.0",
     "@hookform/resolvers": "^3.7.0",
     "@prisma/client": "^5.13.0",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",

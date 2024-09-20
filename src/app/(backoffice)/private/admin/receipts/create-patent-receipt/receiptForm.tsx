@@ -2,13 +2,19 @@
 
 import { Button, Input, Label } from '@/components/ui';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { FormItem } from '@/components/ui/form';
 import { formatCurrency } from '@/lib/formatters';
 import { PDFViewer } from '@react-pdf/renderer';
@@ -114,16 +120,21 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
 
             <div className='mt-6 flex gap-3 self-end'>
               <FormItem>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button type='submit'>Crear comprobante</Button>
-                  </DialogTrigger>
-                  <DialogContent className='min-h-[90vh] min-w-screen max-w-screen-2xl'>
-                    <PDFViewer className='h-[95%] w-[95%] m-auto'>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type='submit' className='hover:bg-opacity-50'>
+                      Generar comprobante
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+                    <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
                       <ReceiptPFD />
                     </PDFViewer>
-                  </DialogContent>
-                </Dialog>
+                    <AlertDialogFooter className='flex-none'>
+                      <AlertDialogAction>Continuar</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </FormItem>
             </div>
           </form>

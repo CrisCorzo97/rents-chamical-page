@@ -27,7 +27,7 @@ export default async function AdminPageLayout({
     <main className='min-h-screen flex'>
       <Sidebar userRole={userRole} />
       <section className='flex flex-col flex-1 gap-4 h-full'>
-        <header className='w-full h-12 flex grow-0 items-center justify-center bg-muted-foreground'>
+        <header className='w-full h-12 flex grow-0 items-center justify-center bg-zinc-300'>
           <section className='w-full flex items-center justify-end'>
             <NavigationMenu>
               <NavigationMenuList>
@@ -37,7 +37,7 @@ export default async function AdminPageLayout({
                     <NavigationMenuLink
                       className={navigationMenuTriggerStyle({
                         className:
-                          'bg-primary text-primary-foreground hover:bg-primary/90',
+                          'bg-neutral-500 text-primary-foreground hover:bg-primary/90',
                       })}
                     >
                       Salir de Rentas
