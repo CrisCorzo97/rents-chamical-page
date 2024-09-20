@@ -47,3 +47,30 @@ export function formatCurrency(input: string) {
 
   return value;
 }
+
+export function formatDni(input: string): string {
+  if (!input.length) {
+    return '';
+  }
+
+  if (input.length > 10) {
+    return input.slice(0, 10);
+  }
+
+  // Remover cualquier carácter que no sea dígito
+  let value = input.replace(/[^\d]/g, '');
+
+  // Si el valor es un número, lo formateo
+  if (!isNaN(Number(value))) {
+    value = Number(value).toLocaleString('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      maximumFractionDigits: 0,
+    });
+  }
+
+  // le quito el signo de la moneda
+  value = value.replace('$', '').trim();
+
+  return value;
+}
