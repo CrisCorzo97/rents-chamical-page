@@ -21,7 +21,7 @@ import { useFPS } from '@/hooks/useFPS';
 import { cn } from '@/lib/cn';
 import { stateToSortBy } from '@/lib/table';
 import { Envelope, Pagination } from '@/types/envelope';
-import { cementery } from '@prisma/client';
+import { receipt } from '@prisma/client';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -29,18 +29,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
+import dayjs from 'dayjs';
 import { CirclePlus } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { CementeryRecordWithRelations } from '../cementery/cementery.interface';
 import { ConfirmModal } from './components';
 
-const MISSING_FIELDS: Record<string, string> = {
-  address_taxpayer: 'Dirección',
-};
-
 interface ReceiptClientPageProps {
-  data: Envelope<cementery[]>;
+  data: Envelope<receipt[]>;
   sorting: SortingState;
   filter: string;
 }
@@ -51,76 +47,59 @@ export const ReceiptClientPage = ({
   sorting,
 }: ReceiptClientPageProps) => {
   const [queryFilter, setQueryFilter] = useState<string>(filter);
-  const [recordDetails, setRecordDetails] =
-    useState<CementeryRecordWithRelations | null>(null);
+  const [recordDetails, setRecordDetails] = useState<receipt | null>(null);
 
   const { handleSort, handlePagination, handleFilter } = useFPS({
     pagination: data.pagination as Pagination,
   });
 
-  const columns: ColumnDef<cementery>[] = [
+  const columns: ColumnDef<receipt>[] = [
     {
       id: 'taxpayer',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='CONTRIBUYENTE' />
       ),
       accessorKey: 'taxpayer',
-      enableColumnFilter: true,
+      enableSorting: true,
     },
     {
-      id: 'address_taxpayer',
-      accessorKey: 'address_taxpayer',
+      id: 'amount',
+      accessorKey: 'amount',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='DIRECCIÓN' />
+        <DataTableColumnHeader column={column} title='IMPORTE' />
       ),
       cell: ({ row }) => {
-        const address = row.getValue('address_taxpayer');
+        const amount = row.getValue('amount') as number;
 
-        return address ? `${address}` : '-';
+        return amount.toLocaleString('es-AR', {
+          style: 'currency',
+          currency: 'ARS',
+          maximumFractionDigits: 2,
+        });
       },
       enableSorting: false,
     },
     {
-      id: 'deceased_name',
-      accessorKey: 'deceased_name',
+      id: 'tax_type',
+      accessorKey: 'tax_type',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='NOMBRE DIFUNTO' />
+        <DataTableColumnHeader column={column} title='TASA / CONTIBUCIÓN' />
       ),
-      cell: ({ row }) => {
-        const deceased_name = row.getValue('deceased_name');
-
-        return deceased_name ? `${deceased_name}` : '-';
-      },
+    },
+    {
+      id: 'created_at',
+      accessorKey: 'created_at',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='FECHA CREACIÓN' />
+      ),
       enableSorting: true,
     },
     {
-      id: 'last_year_paid',
-      accessorKey: 'last_year_paid',
+      id: 'confirmed_at',
+      accessorKey: 'confirmed_at',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='ÚLTIMO AÑO PAGO' />
+        <DataTableColumnHeader column={column} title='FECHA CONFIRMACIÓN' />
       ),
-      sortDescFirst: false,
-    },
-    {
-      id: 'missing_fields',
-      accessorKey: 'missing_fields',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='CAMPOS FALTANTES' />
-      ),
-      cell: ({ row }) => {
-        let missing_fields: string[] | null = null;
-        let value = row.getValue('missing_fields') as string | null;
-
-        if (value) {
-          const array = JSON.parse(value) as string[];
-
-          missing_fields = array.map(
-            (field: string) => MISSING_FIELDS[field] ?? field
-          );
-        }
-
-        return missing_fields ? missing_fields.join(', ') : '-';
-      },
       enableSorting: true,
     },
   ];
@@ -168,7 +147,7 @@ export const ReceiptClientPage = ({
           </CardHeader>
           <CardContent className='flex gap-2 mt-4'>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button size='lg' className='flex gap-2'>
                   <CirclePlus size={18} />
                   Crear
@@ -225,15 +204,15 @@ export const ReceiptClientPage = ({
             className='max-w-sm'
           />
         </div>
-        <CustomDataTable<cementery>
+        <CustomDataTable<receipt>
           tableTitle='Historial de comprobantes'
           columns={columns}
           table={table}
           pagination={data.pagination as Pagination}
           handlePagination={handlePagination}
           onRecordClick={(record) => {
-            if (recordDetails?.id !== (record as cementery).id) {
-              setRecordDetails(record as CementeryRecordWithRelations);
+            if (recordDetails?.id !== record.id) {
+              setRecordDetails(record);
             } else {
               setRecordDetails(null);
             }
@@ -265,51 +244,31 @@ export const ReceiptClientPage = ({
             <CardContent className='flex flex-col gap-2'>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Contribuyente:</Label>{' '}
-                {recordDetails.taxpayer ?? '-'}
+                {recordDetails.taxpayer}
               </span>
               <span className='font-light text-sm'>
-                <Label className='font-semibold'>Dirección:</Label>{' '}
-                {recordDetails.address_taxpayer ?? '-'}
+                <Label className='font-semibold'>Importe:</Label>{' '}
+                {recordDetails.amount.toLocaleString('es-AR', {
+                  style: 'currency',
+                  currency: 'ARS',
+                  maximumFractionDigits: 2,
+                })}
               </span>
               <span className='font-light text-sm'>
-                <Label className='font-semibold'>Barrio:</Label>{' '}
-                {recordDetails.neighborhood?.name ?? '-'}
+                <Label className='font-semibold'>Tasa / Contribución:</Label>{' '}
+                {recordDetails.tax_type}
               </span>
               <span className='font-light text-sm'>
-                <Label className='font-semibold'>Cementerio:</Label>{' '}
-                {recordDetails.cementery_place?.name ?? '-'}
+                <Label className='font-semibold'>ID de referencia:</Label>{' '}
+                {recordDetails.id_tax_reference}
               </span>
               <span className='font-light text-sm'>
-                <Label className='font-semibold'>Tipo de entierro:</Label>{' '}
-                {recordDetails.burial_type?.type ?? '-'}
+                <Label className='font-semibold'>Fecha de creación:</Label>{' '}
+                {dayjs(recordDetails.created_at).format('DD/MM/YYYY HH:mm')}
               </span>
               <span className='font-light text-sm'>
-                <Label className='font-semibold'>Sección:</Label>{' '}
-                {recordDetails.section ?? '-'}
-              </span>
-              <span className='font-light text-sm'>
-                <Label className='font-semibold'>Fila:</Label>{' '}
-                {recordDetails.row ?? '-'}
-              </span>
-              <span className='font-light text-sm'>
-                <Label className='font-semibold'>Nro de localización:</Label>{' '}
-                {recordDetails.location_number ?? '-'}
-              </span>
-              <span className='font-light text-sm'>
-                <Label className='font-semibold'>Nombre del difunto:</Label>{' '}
-                {`${recordDetails.deceased_name}` ?? '-'}
-              </span>
-              <span className='font-light text-sm'>
-                <Label className='font-semibold'>Último año abonado:</Label>{' '}
-                {`${recordDetails.last_year_paid}` ?? '-'}
-              </span>
-              <span className='font-light text-sm'>
-                <Label className='font-semibold'>Campos faltantes:</Label>{' '}
-                {recordDetails.missing_fields
-                  ? JSON.parse(recordDetails.missing_fields)
-                      .map((field: string) => MISSING_FIELDS[field] ?? field)
-                      .join('')
-                  : '-'}
+                <Label className='font-semibold'>Fecha de confirmación:</Label>{' '}
+                {dayjs(recordDetails.confirmed_at).format('DD/MM/YYYY HH:mm')}
               </span>
             </CardContent>
           </>

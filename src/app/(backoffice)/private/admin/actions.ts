@@ -16,8 +16,8 @@ import dayjs from 'dayjs';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
-import { CementeryRecordWithRelations } from './interfaces/cementery';
-import { PropertyRecordWithRelations } from './interfaces/property';
+import { CementeryRecordWithRelations } from './cementery/cementery.interface';
+import { PropertyRecordWithRelations } from './property/property.interface';
 
 const role_dictionary: Record<string, string> = {
   '1': 'administrador',
@@ -36,6 +36,7 @@ export const getProperties = async (input: {
   const response: Envelope<PropertyRecordWithRelations[]> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -100,6 +101,7 @@ export const getCementeryRecords = async (input: {
   const response: Envelope<CementeryRecordWithRelations[]> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -158,6 +160,7 @@ export const getCitySections = async (): Promise<Envelope<city_section[]>> => {
   const response: Envelope<city_section[]> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -181,6 +184,7 @@ export const getNeighborhoods = async (): Promise<Envelope<neighborhood[]>> => {
   const response: Envelope<neighborhood[]> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -205,6 +209,7 @@ export const addNeighborhood = async (input: {
   const response: Envelope<string> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -240,6 +245,7 @@ export const updateNeighborhood = async (input: {
   const response: Envelope<string> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -278,6 +284,7 @@ export const getCementeryPlaces = async (): Promise<
   const response: Envelope<cementery_place[]> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -302,6 +309,7 @@ export const addCementeryPlace = async (input: {
   const response: Envelope<string> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -337,6 +345,7 @@ export const updateCementeryPlace = async (input: {
   const response: Envelope<string> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -373,6 +382,7 @@ export const getBurialTypes = async (): Promise<Envelope<burial_type[]>> => {
   const response: Envelope<burial_type[]> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -398,6 +408,7 @@ export const addBurialType = async (input: {
   const response: Envelope<string> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {
@@ -435,6 +446,7 @@ export const updateBurialType = async (input: {
   const response: Envelope<string> = {
     success: true,
     data: null,
+    error: null,
     pagination: null,
   };
   try {

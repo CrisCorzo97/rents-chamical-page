@@ -1,7 +1,7 @@
 export type Envelope<T> = {
   success: boolean;
   data: T | null;
-  error?: string;
+  error: string | null;
   pagination: Pagination | null;
 };
 

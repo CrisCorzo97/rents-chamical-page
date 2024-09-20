@@ -9,8 +9,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { sortByToState } from '@/lib/table';
 import Link from 'next/link';
-import { getCementeryRecords } from '../actions';
 import { ReceiptClientPage } from './page.client';
+import { getConfirmedReceipts } from './receipt-actions';
 
 export default async function ReceiptPage({
   searchParams,
@@ -38,7 +38,7 @@ export default async function ReceiptPage({
     };
   }
 
-  const data = await getCementeryRecords({
+  const data = await getConfirmedReceipts({
     page,
     limit,
     order_by,

@@ -22,6 +22,7 @@ interface CustomDataTableProps<T> {
   columns: ColumnDef<T>[];
   table: TableType<T>;
   pagination: Pagination;
+  isFetching?: boolean;
   onRecordClick?: (record: T) => void;
   handlePagination: (
     input: {
@@ -42,6 +43,7 @@ export function CustomDataTable<DataType>(
     columns,
     table,
     pagination,
+    isFetching,
     onRecordClick,
     handlePagination,
   } = props;
@@ -72,7 +74,16 @@ export function CustomDataTable<DataType>(
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isFetching ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
+                  Cargando...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -96,7 +107,7 @@ export function CustomDataTable<DataType>(
                   colSpan={columns.length}
                   className='h-24 text-center'
                 >
-                  No results.
+                  Nada por aquí
                 </TableCell>
               </TableRow>
             )}
