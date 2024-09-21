@@ -20,23 +20,21 @@ import { formatCurrency, formatDni } from '@/lib/formatters';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import utc from 'dayjs/plugin/utc';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import { ReceiptPFD } from './receiptPFD';
 
 dayjs.extend(customParseFormat);
-dayjs.extend(utc);
 
 const formSchema = z.object({
-  created_at: z.date(),
+  created_at: z.string().datetime(),
   domain: z.string().min(6).max(7),
   taxpayer: z.string(),
   dni: z.string().min(10).max(10),
   vehicle: z.string(),
   brand: z.string(),
   year_to_pay: z.number(),
-  observations: z.string(),
+  observations: z.string().optional(),
   amount: z.number(),
 });
 
@@ -52,24 +50,23 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
 
   const handleFormSubmit = (formData: FormData) => {
     const formDataObject = Object.fromEntries(formData.entries());
-    const { created_at, ...rest } = formDataObject;
+    const { created_at, amount, year_to_pay, ...rest } = formDataObject;
 
-    const parsedDate = dayjs.utc().toISOString();
-    console.log({ created_at, parsedDate });
+    const parsedDataObject = {
+      ...rest,
+      created_at: dayjs().toISOString(),
+      amount: Number(
+        (amount as string).replace(/[.$]/g, '').replace(',', '.').trim()
+      ),
+      year_to_pay: Number(year_to_pay),
+    };
 
     try {
       // Validar los datos usando el esquema de Zod
-      formSchema.parse({
-        ...rest,
-        created_at: parsedDate,
-        amount: Number(
-          (formDataObject.amount as string).replace(/^[$,\.]/, '').trim()
-        ),
-        year_to_pay: Number(formDataObject.year_to_pay),
-      });
+      formSchema.parse(parsedDataObject);
 
       // Si es válido, puedes proceder con el submit
-      console.log('Formulario válido', formDataObject);
+      console.log('Formulario válido', parsedDataObject);
     } catch (error) {
       console.log({ error });
       if (error instanceof z.ZodError) {
@@ -85,10 +82,6 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
       }
     }
   };
-
-  useEffect(() => {
-    console.log({ errors });
-  }, [errors]);
 
   return (
     <section>
