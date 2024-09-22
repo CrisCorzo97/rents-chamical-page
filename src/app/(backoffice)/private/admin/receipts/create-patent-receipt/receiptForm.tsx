@@ -5,7 +5,9 @@ import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
@@ -17,20 +19,29 @@ import {
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
 import { formatCurrency, formatDni } from '@/lib/formatters';
+import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useState } from 'react';
 import { z } from 'zod';
+import { createReceipt } from '../receipt-actions';
+import { PatentReceiptData } from './page';
 import { ReceiptPFD } from './receiptPFD';
 
 dayjs.extend(customParseFormat);
 
 const formSchema = z.object({
   created_at: z.string().datetime(),
-  domain: z.string().min(6).max(7),
+  domain: z
+    .string()
+    .min(6, { message: 'Debe contener al menos 6 caracteres.' })
+    .max(7, { message: 'Debe contener como máximo 7 caracteres.' }),
   taxpayer: z.string(),
-  dni: z.string().min(10).max(10),
+  dni: z
+    .string()
+    .min(9, { message: 'Debe contener al menos 9 caracteres.' })
+    .max(10, { message: 'Debe contener como máximo 10 caracteres.' }),
   vehicle: z.string(),
   brand: z.string(),
   year_to_pay: z.number(),
@@ -38,35 +49,61 @@ const formSchema = z.object({
   amount: z.number(),
 });
 
-interface ReceiptFormProps {
-  onSubmit: (data: FormData) => void;
-}
-
-export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
+export const ReceiptForm = () => {
   const [amountValue, setAmountValue] = useState<string>('');
   const [dniValue, setDniValue] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [isMutating, setIsMutating] = useState<boolean>(false);
 
-  const handleFormSubmit = (formData: FormData) => {
+  const handleFormSubmit = async (formData: FormData) => {
+    setIsMutating(true);
     const formDataObject = Object.fromEntries(formData.entries());
-    const { created_at, amount, year_to_pay, ...rest } = formDataObject;
 
-    const parsedDataObject = {
-      ...rest,
+    const parsedDataObject: PatentReceiptData = {
+      domain: formDataObject.domain as string,
+      taxpayer: formDataObject.taxpayer as string,
+      dni: formDataObject.dni as string,
+      vehicle: formDataObject.vehicle as string,
+      brand: formDataObject.brand as string,
       created_at: dayjs().toISOString(),
       amount: Number(
-        (amount as string).replace(/[.$]/g, '').replace(',', '.').trim()
+        (formDataObject.amount as string)
+          .replace(/[.$]/g, '')
+          .replace(',', '.')
+          .trim()
       ),
-      year_to_pay: Number(year_to_pay),
+      year_to_pay: Number(formDataObject.year_to_pay),
     };
 
     try {
       // Validar los datos usando el esquema de Zod
       formSchema.parse(parsedDataObject);
 
-      // Si es válido, puedes proceder con el submit
-      console.log('Formulario válido', parsedDataObject);
+      try {
+        const createData: Prisma.receiptCreateInput = {
+          id: crypto.randomUUID(),
+          created_at: parsedDataObject.created_at,
+          taxpayer: parsedDataObject.taxpayer,
+          amount: parsedDataObject.amount,
+          tax_type: 'PATENTE',
+          other_data: {
+            domain: parsedDataObject.domain,
+            dni: parsedDataObject.dni,
+            vehicle: parsedDataObject.vehicle,
+            brand: parsedDataObject.brand,
+            year_to_pay: parsedDataObject.year_to_pay,
+            observations: parsedDataObject.observations,
+          },
+        };
+
+        await createReceipt({ data: createData });
+
+        // Mostrar el diálogo de confirmación
+        setOpenDialog(true);
+      } catch (error) {
+        console.log({ error });
+      }
     } catch (error) {
       console.log({ error });
       if (error instanceof z.ZodError) {
@@ -80,6 +117,8 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
 
         setErrors(newErrors);
       }
+    } finally {
+      setIsMutating(false);
     }
   };
 
@@ -116,7 +155,11 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
                   name='domain'
                   placeholder='AB123CD'
                   required
+                  className={errors.domain ? 'border-red-500' : ''}
                 />
+                {errors.domain && (
+                  <span className='text-red-500 text-xs'>{errors.domain}</span>
+                )}
               </FormItem>
             </div>
 
@@ -139,7 +182,11 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
                   required
                   value={dniValue}
                   onChange={(e) => setDniValue(formatDni(e.target.value))}
+                  className={errors.dni ? 'border-red-500' : ''}
                 />
+                {errors.dni && (
+                  <span className='text-red-500 text-xs'>{errors.dni}</span>
+                )}
               </FormItem>
             </div>
 
@@ -198,16 +245,27 @@ export const ReceiptForm = ({ onSubmit }: ReceiptFormProps) => {
               <FormItem>
                 <AlertDialog open={openDialog}>
                   <AlertDialogTrigger asChild>
-                    <Button type='submit' className='hover:bg-opacity-50'>
+                    <Button
+                      type='submit'
+                      className='hover:bg-opacity-50'
+                      loading={isMutating}
+                    >
                       Generar comprobante
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+                    <AlertDialogTitle>Comprobante generado</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      El comprobante ha sido generado con éxito. Puede
+                      descargarlo a continuación.
+                    </AlertDialogDescription>
                     <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
                       <ReceiptPFD />
                     </PDFViewer>
                     <AlertDialogFooter className='flex-none'>
-                      <AlertDialogAction>Continuar</AlertDialogAction>
+                      <AlertDialogAction onClick={() => setOpenDialog(false)}>
+                        Continuar
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
