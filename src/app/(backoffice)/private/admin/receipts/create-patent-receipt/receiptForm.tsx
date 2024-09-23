@@ -23,7 +23,7 @@ import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { z } from 'zod';
 import { createReceipt } from '../receipt-actions';
 import { PatentReceiptData } from './page';
@@ -54,72 +54,71 @@ export const ReceiptForm = () => {
   const [dniValue, setDniValue] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [isMutating, setIsMutating] = useState<boolean>(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleFormSubmit = async (formData: FormData) => {
-    setIsMutating(true);
-    const formDataObject = Object.fromEntries(formData.entries());
+  const handleFormSubmit = (formData: FormData) => {
+    startTransition(async () => {
+      const formDataObject = Object.fromEntries(formData.entries());
 
-    const parsedDataObject: PatentReceiptData = {
-      domain: formDataObject.domain as string,
-      taxpayer: formDataObject.taxpayer as string,
-      dni: formDataObject.dni as string,
-      vehicle: formDataObject.vehicle as string,
-      brand: formDataObject.brand as string,
-      created_at: dayjs().toISOString(),
-      amount: Number(
-        (formDataObject.amount as string)
-          .replace(/[.$]/g, '')
-          .replace(',', '.')
-          .trim()
-      ),
-      year_to_pay: Number(formDataObject.year_to_pay),
-    };
-
-    try {
-      // Validar los datos usando el esquema de Zod
-      formSchema.parse(parsedDataObject);
+      const parsedDataObject: PatentReceiptData = {
+        domain: formDataObject.domain as string,
+        taxpayer: formDataObject.taxpayer as string,
+        dni: formDataObject.dni as string,
+        vehicle: formDataObject.vehicle as string,
+        brand: formDataObject.brand as string,
+        created_at: dayjs().toISOString(),
+        amount: Number(
+          (formDataObject.amount as string)
+            .replace(/[.$]/g, '')
+            .replace(',', '.')
+            .trim()
+        ),
+        year_to_pay: Number(formDataObject.year_to_pay),
+      };
 
       try {
-        const createData: Prisma.receiptCreateInput = {
-          id: crypto.randomUUID(),
-          created_at: parsedDataObject.created_at,
-          taxpayer: parsedDataObject.taxpayer,
-          amount: parsedDataObject.amount,
-          tax_type: 'PATENTE',
-          other_data: {
-            domain: parsedDataObject.domain,
-            dni: parsedDataObject.dni,
-            vehicle: parsedDataObject.vehicle,
-            brand: parsedDataObject.brand,
-            year_to_pay: parsedDataObject.year_to_pay,
-            observations: parsedDataObject.observations,
-          },
-        };
+        // Validar los datos usando el esquema de Zod
+        formSchema.parse(parsedDataObject);
 
-        await createReceipt({ data: createData });
+        try {
+          const createData: Prisma.receiptCreateInput = {
+            id: crypto.randomUUID(),
+            created_at: parsedDataObject.created_at,
+            taxpayer: parsedDataObject.taxpayer,
+            amount: parsedDataObject.amount,
+            tax_type: 'PATENTE',
+            other_data: {
+              domain: parsedDataObject.domain,
+              dni: parsedDataObject.dni,
+              vehicle: parsedDataObject.vehicle,
+              brand: parsedDataObject.brand,
+              year_to_pay: parsedDataObject.year_to_pay,
+              observations: parsedDataObject.observations,
+            },
+          };
 
-        // Mostrar el diálogo de confirmación
-        setOpenDialog(true);
+          await createReceipt({ data: createData });
+
+          // Mostrar el diálogo de confirmación
+          setOpenDialog(true);
+        } catch (error) {
+          console.log({ error });
+        }
       } catch (error) {
         console.log({ error });
-      }
-    } catch (error) {
-      console.log({ error });
-      if (error instanceof z.ZodError) {
-        // Capturar errores y mostrarlos en el formulario
-        const newErrors: Record<string, string> = {};
+        if (error instanceof z.ZodError) {
+          // Capturar errores y mostrarlos en el formulario
+          const newErrors: Record<string, string> = {};
 
-        error.errors.forEach((err) => {
-          const path = err.path.join('.');
-          newErrors[path] = err.message;
-        });
+          error.errors.forEach((err) => {
+            const path = err.path.join('.');
+            newErrors[path] = err.message;
+          });
 
-        setErrors(newErrors);
+          setErrors(newErrors);
+        }
       }
-    } finally {
-      setIsMutating(false);
-    }
+    });
   };
 
   return (
@@ -248,7 +247,7 @@ export const ReceiptForm = () => {
                     <Button
                       type='submit'
                       className='hover:bg-opacity-50'
-                      loading={isMutating}
+                      loading={isPending}
                     >
                       Generar comprobante
                     </Button>
