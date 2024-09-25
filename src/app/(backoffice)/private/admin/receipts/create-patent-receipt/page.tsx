@@ -7,10 +7,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Prisma } from '@prisma/client';
-import { randomUUID } from 'crypto';
 import Link from 'next/link';
-import { createReceipt } from '../receipt-actions';
 import { ReceiptForm } from './receiptForm';
 
 export interface PatentReceiptData {
@@ -26,26 +23,6 @@ export interface PatentReceiptData {
 }
 
 export default async function GeneratePatentReceiptPage() {
-  const onSubmit = async (formData: PatentReceiptData) => {
-    const createData: Prisma.receiptCreateInput = {
-      id: randomUUID(),
-      created_at: formData.created_at,
-      taxpayer: formData.taxpayer,
-      amount: formData.amount,
-      tax_type: 'PATENTE',
-      other_data: {
-        domain: formData.domain,
-        dni: formData.dni,
-        vehicle: formData.vehicle,
-        brand: formData.brand,
-        year_to_pay: formData.year_to_pay,
-        observations: formData.observations,
-      },
-    };
-
-    await createReceipt({ data: createData });
-  };
-
   return (
     <ScrollArea className='mx-6 h-admin-scroll-area'>
       <Breadcrumb className='h-12 mt-6'>

@@ -18,14 +18,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
+import { Toaster } from '@/components/ui/sonner';
 import { formatCurrency, formatDni } from '@/lib/formatters';
-import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { z } from 'zod';
-import { createReceipt } from '../receipt-actions';
 import { PatentReceiptData } from './page';
 import { ReceiptPFD } from './receiptPFD';
 
@@ -55,6 +55,7 @@ export const ReceiptForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
+  const [isThrowError, setIsThrowError] = useState<boolean>(false);
 
   const handleFormSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -81,27 +82,32 @@ export const ReceiptForm = () => {
         formSchema.parse(parsedDataObject);
 
         try {
-          const createData: Prisma.receiptCreateInput = {
-            id: crypto.randomUUID(),
-            created_at: parsedDataObject.created_at,
-            taxpayer: parsedDataObject.taxpayer,
-            amount: parsedDataObject.amount,
-            tax_type: 'PATENTE',
-            other_data: {
-              domain: parsedDataObject.domain,
-              dni: parsedDataObject.dni,
-              vehicle: parsedDataObject.vehicle,
-              brand: parsedDataObject.brand,
-              year_to_pay: parsedDataObject.year_to_pay,
-              observations: parsedDataObject.observations,
-            },
-          };
+          throw new Error('Not implemented yet');
+          // const createData: Prisma.receiptCreateInput = {
+          //   id: crypto.randomUUID(),
+          //   created_at: parsedDataObject.created_at,
+          //   taxpayer: parsedDataObject.taxpayer,
+          //   amount: parsedDataObject.amount,
+          //   tax_type: 'PATENTE',
+          //   other_data: {
+          //     domain: parsedDataObject.domain,
+          //     dni: parsedDataObject.dni,
+          //     vehicle: parsedDataObject.vehicle,
+          //     brand: parsedDataObject.brand,
+          //     year_to_pay: parsedDataObject.year_to_pay,
+          //     observations: parsedDataObject.observations,
+          //   },
+          // };
 
-          await createReceipt({ data: createData });
+          // await createReceipt({ data: createData });
 
-          // Mostrar el diálogo de confirmación
-          setOpenDialog(true);
+          // // Mostrar el diálogo de confirmación
+          // setOpenDialog(true);
         } catch (error) {
+          toast.error(
+            'Hubo un error al generar el comprobante de patente. Intente nuevamente.',
+            { duration: 5000 }
+          );
           console.log({ error });
         }
       } catch (error) {
@@ -123,6 +129,7 @@ export const ReceiptForm = () => {
 
   return (
     <section>
+      <Toaster />
       <Card className='mt-6 max-w-3xl'>
         <CardHeader>
           <CardTitle>Comprobante de Patente</CardTitle>
