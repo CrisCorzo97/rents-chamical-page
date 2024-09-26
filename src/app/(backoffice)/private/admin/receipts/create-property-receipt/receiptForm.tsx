@@ -20,34 +20,42 @@ import { formatCurrency } from '@/lib/formatters';
 import { property } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useState, useTransition } from 'react';
+import { getProperties } from '../../actions';
+import { PropertyRecordWithRelations } from '../../property/property.interface';
 import { ReceiptPFD } from './receiptPFD';
 
-interface ReceiptFormProps {
-  onSearch: (data: FormData) => Promise<property | null>;
-  onSubmit: (data: FormData) => void;
-}
+dayjs.extend(customParseFormat);
 
-export const ReceiptForm = ({ onSearch, onSubmit }: ReceiptFormProps) => {
-  const [record, setRecord] = useState<property | null>(null);
-  const [recordNotFound, setRecordNotFound] = useState<boolean>(false);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
+export const ReceiptForm = () => {
+  const [searchResult, setSearchResult] = useState<
+    PropertyRecordWithRelations[]
+  >([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [isSearching, startSearchTransition] = useTransition();
+  const [isMutating, startMutatingTransition] = useTransition();
+
+  const handleSearch = (formData: FormData) => {
+    startSearchTransition(async () => {
+      const search = formData.get('search') as string;
+
+      try {
+        const properties = await getProperties({
+          filter: {
+            OR: [
+              { enrollment: { contains: search } },
+              { taxpayer: { contains: search } },
+            ],
+          },
+        });
+      } catch (error) {}
+    });
+  };
 
   const handleSubmit = (formData: FormData) => {
-    setIsSearching(true);
-    setTimeout(() => {
-      onSearch(formData)
-        .then((data) => {
-          if (data) {
-            setRecordNotFound(false);
-            setRecord(data);
-          } else {
-            setRecordNotFound(true);
-            setRecord(data);
-          }
-        })
-        .finally(() => setIsSearching(false));
-    }, 1500);
+    startMutatingTransition(async () => {});
   };
 
   return (
@@ -57,16 +65,16 @@ export const ReceiptForm = ({ onSearch, onSubmit }: ReceiptFormProps) => {
           <CardHeader>
             <CardTitle>Buscar registro de Inmueble</CardTitle>
             <CardDescription>
-              Ingrese la matrícula para buscar el registro.
+              Ingrese un nombre o matrícula para buscar el registro.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={handleSubmit} className='flex gap-3'>
+            <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
-                <Label>Matrícula</Label>
+                <Label>Nombre o matrícula</Label>
                 <Input
                   type='text'
-                  name='enrollment'
+                  name='search'
                   placeholder='3771-836-1948'
                   required
                 />
@@ -86,11 +94,11 @@ export const ReceiptForm = ({ onSearch, onSubmit }: ReceiptFormProps) => {
         </Card>
       </section>
 
-      <CardResult
+      {/* <CardResult
         record={record}
         recordNotFound={recordNotFound}
-        onSubmit={onSubmit}
-      />
+        onSubmit={handleSubmit}
+      /> */}
     </>
   );
 };

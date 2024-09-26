@@ -16,8 +16,6 @@ export default async function GeneratePropertyReceiptPage() {
     'use server';
     const enrollment = formData.get('enrollment');
 
-    console.log({ enrollment });
-
     const record: property = {
       id: 'adalksd',
       taxpayer: 'Mengano Fulano',
@@ -77,7 +75,7 @@ export default async function GeneratePropertyReceiptPage() {
           Complete el formulario para generar un comprobante de Inmueble.
         </p>
 
-        <ReceiptForm onSearch={onSearch} onSubmit={onSubmit} />
+        <ReceiptForm />
       </article>
     </ScrollArea>
   );

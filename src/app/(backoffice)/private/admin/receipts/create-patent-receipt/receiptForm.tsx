@@ -55,7 +55,6 @@ export const ReceiptForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
-  const [isThrowError, setIsThrowError] = useState<boolean>(false);
 
   const handleFormSubmit = (formData: FormData) => {
     startTransition(async () => {
