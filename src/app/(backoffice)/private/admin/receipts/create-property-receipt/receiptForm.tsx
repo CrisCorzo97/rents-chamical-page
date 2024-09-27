@@ -16,15 +16,18 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
+import { Toaster } from '@/components/ui/sonner';
 import { formatCurrency } from '@/lib/formatters';
 import { property } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 import { getProperties } from '../../actions';
 import { PropertyRecordWithRelations } from '../../property/property.interface';
 import { ReceiptPFD } from './receiptPFD';
+import { SearchResultTable } from './searchResultTable';
 
 dayjs.extend(customParseFormat);
 
@@ -32,6 +35,8 @@ export const ReceiptForm = () => {
   const [searchResult, setSearchResult] = useState<
     PropertyRecordWithRelations[]
   >([]);
+  const [selectedRecord, setSelectedRecord] = useState<property | null>(null);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isSearching, startSearchTransition] = useTransition();
@@ -39,6 +44,7 @@ export const ReceiptForm = () => {
 
   const handleSearch = (formData: FormData) => {
     startSearchTransition(async () => {
+      setSelectedRecord(null);
       const search = formData.get('search') as string;
 
       try {
@@ -50,7 +56,18 @@ export const ReceiptForm = () => {
             ],
           },
         });
-      } catch (error) {}
+
+        if (!properties.data?.length) {
+          toast.error(
+            'No se encontraron registros. Intente nuevamente o agregue un nuevo registro.',
+            { duration: 5000 }
+          );
+        }
+
+        setSearchResult(properties.data ?? []);
+      } catch (error) {
+        console.error(error);
+      }
     });
   };
 
@@ -61,6 +78,7 @@ export const ReceiptForm = () => {
   return (
     <>
       <section>
+        <Toaster />
         <Card className='mt-6 max-w-3xl'>
           <CardHeader>
             <CardTitle>Buscar registro de Inmueble</CardTitle>
@@ -94,22 +112,26 @@ export const ReceiptForm = () => {
         </Card>
       </section>
 
-      {/* <CardResult
-        record={record}
-        recordNotFound={recordNotFound}
-        onSubmit={handleSubmit}
-      /> */}
+      <section className='mt-6 max-w-3xl'>
+        <SearchResultTable
+          data={searchResult}
+          onSelect={(record) => {
+            setSelectedRecord(record);
+          }}
+        />
+      </section>
+
+      <CardResult record={selectedRecord} onSubmit={handleSubmit} />
     </>
   );
 };
 
 interface CardResultProps {
   record: property | null;
-  recordNotFound: boolean;
   onSubmit: (data: FormData) => void;
 }
 
-const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
+const CardResult = ({ record, onSubmit }: CardResultProps) => {
   const [amountValue, setAmountValue] = useState<string>('');
 
   return (
@@ -284,22 +306,6 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
                 </FormItem>
               </div>
             </form>
-          </CardContent>
-        </Card>
-      ) : recordNotFound ? (
-        <Card className='mt-6 max-w-3xl'>
-          <CardHeader>
-            <CardTitle>Registro no encontrado</CardTitle>
-            <CardDescription>
-              No se encontró ningún registro con los datos ingresados.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <p>
-              Por favor, verifique los datos ingresados e intente nuevamente o
-              cree un nuevo registro.
-            </p>
           </CardContent>
         </Card>
       ) : (

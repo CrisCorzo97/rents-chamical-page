@@ -21,10 +21,10 @@ interface CustomDataTableProps<T> {
   tableTitle: string;
   columns: ColumnDef<T>[];
   table: TableType<T>;
-  pagination: Pagination;
+  pagination?: Pagination;
   isFetching?: boolean;
   onRecordClick?: (record: T) => void;
-  handlePagination: (
+  handlePagination?: (
     input: {
       page: number;
       limit: number;
@@ -114,10 +114,14 @@ export function CustomDataTable<DataType>(
           </TableBody>
         </Table>
       </div>
-      <TablePagination
-        pagination={pagination}
-        handlePagination={handlePagination}
-      />
+      {pagination && handlePagination ? (
+        <TablePagination
+          pagination={pagination}
+          handlePagination={handlePagination}
+        />
+      ) : (
+        <></>
+      )}
     </Card>
   );
 }
