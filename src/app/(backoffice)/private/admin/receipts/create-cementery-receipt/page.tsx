@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cementery } from '@prisma/client';
 import Link from 'next/link';
-import { ReceiptForm } from './receiptForm';
+import { GenerateCementeryReceiptPageClient } from './page.client';
 
 export default async function GenerateCementeryReceiptPage() {
   const onSearch = async (formData: FormData) => {
@@ -76,7 +76,7 @@ export default async function GenerateCementeryReceiptPage() {
           Complete el formulario para generar un comprobante de Cementerio.
         </p>
 
-        <ReceiptForm onSearch={onSearch} onSubmit={onSubmit} />
+        <GenerateCementeryReceiptPageClient />
       </article>
     </ScrollArea>
   );

@@ -313,7 +313,7 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
                   </Button>
                 </FormItem>
                 <FormItem>
-                  <AlertDialog>
+                  <AlertDialog open={openDialog}>
                     <AlertDialogTrigger asChild>
                       <Button
                         loading={isMutating}

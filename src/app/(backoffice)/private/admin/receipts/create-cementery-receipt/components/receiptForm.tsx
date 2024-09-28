@@ -1,11 +1,11 @@
-'use client';
-
 import { Button, Input, Label } from '@/components/ui';
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
@@ -20,90 +20,45 @@ import { formatCurrency } from '@/lib/formatters';
 import { cementery } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { z } from 'zod';
 import { ReceiptPFD } from './receiptPFD';
 
-interface ReceiptFormProps {
-  onSearch: (data: FormData) => Promise<cementery | null>;
-  onSubmit: (data: FormData) => void;
+const formSchema = z.object({
+  enrollment: z.string().optional(),
+  taxpayer: z.string(),
+  taxpayer_type: z.string().optional(),
+  address: z.string(),
+  front_length: z.string(),
+  last_year_paid: z.number(),
+  observations: z.string().optional(),
+  amount: z.number(),
+});
+
+interface CementeryReceiptData {
+  enrollment?: string;
+  taxpayer: string;
+  taxpayer_type?: string;
+  address: string;
+  front_length: string;
+  last_year_paid: number;
+  observations?: string;
+  amount: number;
 }
-
-export const ReceiptForm = ({ onSearch, onSubmit }: ReceiptFormProps) => {
-  const [record, setRecord] = useState<cementery | null>(null);
-  const [recordNotFound, setRecordNotFound] = useState<boolean>(false);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-
-  const handleSubmit = (formData: FormData) => {
-    setIsSearching(true);
-    setTimeout(() => {
-      onSearch(formData)
-        .then((data) => {
-          if (data) {
-            setRecordNotFound(false);
-            setRecord(data);
-          } else {
-            setRecordNotFound(true);
-            setRecord(data);
-          }
-        })
-        .finally(() => setIsSearching(false));
-    }, 1500);
-  };
-
-  return (
-    <>
-      <section>
-        <Card className='mt-6 max-w-3xl'>
-          <CardHeader>
-            <CardTitle>Buscar registro de Cementerio</CardTitle>
-            <CardDescription>
-              Ingrese el nombre del contribuyente o del difunto para buscar el
-              registro.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form action={handleSubmit} className='flex gap-3'>
-              <FormItem className='w-full'>
-                <Label>Apellido y Nombre</Label>
-                <Input
-                  type='text'
-                  name='full_name'
-                  placeholder='Mengano Fulano'
-                  required
-                />
-              </FormItem>
-
-              <FormItem className='mt-3 self-end'>
-                <Button
-                  type='submit'
-                  loading={isSearching}
-                  className='flex gap-2 transition-all'
-                >
-                  Buscar
-                </Button>
-              </FormItem>
-            </form>
-          </CardContent>
-        </Card>
-      </section>
-
-      <CardResult
-        record={record}
-        recordNotFound={recordNotFound}
-        onSubmit={onSubmit}
-      />
-    </>
-  );
-};
 
 interface CardResultProps {
   record: cementery | null;
-  recordNotFound: boolean;
-  onSubmit: (data: FormData) => void;
 }
 
-const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
+export const ReceiptForm = ({ record }: CardResultProps) => {
   const [amountValue, setAmountValue] = useState<string>('');
+  const [isMutating, startMutatingTransition] = useTransition();
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleSubmit = (formData: FormData) => {
+    startMutatingTransition(async () => {});
+  };
 
   return (
     <section>
@@ -117,7 +72,7 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={onSubmit} className='w-full flex flex-col gap-3'>
+            <form action={handleSubmit} className='w-full flex flex-col gap-3'>
               <div className='w-full flex flex-wrap gap-3'>
                 <FormItem className='flex-none'>
                   <Label>Fecha del comprobante</Label>
@@ -185,7 +140,7 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
-                <FormItem className='flex-1'>
+                <FormItem className='flex-none'>
                   <Label>Cementerio</Label>
                   <Input
                     type='text'
@@ -195,10 +150,7 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
-              </div>
-
-              <div className='w-full flex gap-3'>
-                <FormItem className='flex-1'>
+                <FormItem className='flex-none'>
                   <Label>Tipo de entierro</Label>
                   <Input
                     type='text'
@@ -208,6 +160,9 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
+              </div>
+
+              <div className='w-full flex gap-3'>
                 <FormItem className='flex-1'>
                   <Label>Sección</Label>
                   <Input
@@ -236,6 +191,14 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
                     value={Number(record.location_number)}
                     readOnly
                     className='cursor-not-allowed'
+                  />
+                </FormItem>
+                <FormItem className='flex-1'>
+                  <Label>Año a pagar</Label>
+                  <Input
+                    type='number'
+                    name='year_to_pay'
+                    min={dayjs().year()}
                   />
                 </FormItem>
               </div>
@@ -269,40 +232,35 @@ const CardResult = ({ record, recordNotFound, onSubmit }: CardResultProps) => {
                   <Button variant='secondary'>Editar</Button>
                 </FormItem>
                 <FormItem>
-                  <AlertDialog>
+                  <AlertDialog open={openDialog}>
                     <AlertDialogTrigger asChild>
-                      <Button type='submit' className='hover:bg-opacity-50'>
+                      <Button
+                        loading={isMutating}
+                        type='submit'
+                        className='hover:bg-opacity-50'
+                      >
                         Generar comprobante
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+                      <AlertDialogTitle>Comprobante generado</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        El comprobante ha sido generado con éxito. Puede
+                        descargarlo a continuación.
+                      </AlertDialogDescription>
                       <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
                         <ReceiptPFD />
                       </PDFViewer>
                       <AlertDialogFooter className='flex-none'>
-                        <AlertDialogAction>Continuar</AlertDialogAction>
+                        <AlertDialogAction onClick={() => setOpenDialog(false)}>
+                          Continuar
+                        </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
                 </FormItem>
               </div>
             </form>
-          </CardContent>
-        </Card>
-      ) : recordNotFound ? (
-        <Card className='mt-6 max-w-3xl'>
-          <CardHeader>
-            <CardTitle>Registro no encontrado</CardTitle>
-            <CardDescription>
-              No se encontró ningún registro con los datos ingresados.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <p>
-              Por favor, verifique los datos ingresados e intente nuevamente o
-              cree un nuevo registro.
-            </p>
           </CardContent>
         </Card>
       ) : (
