@@ -92,6 +92,11 @@ export const ReceiptClientPage = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='FECHA CREACIÓN' />
       ),
+      cell: ({ row }) => {
+        const created_at = row.getValue('created_at') as number;
+
+        return dayjs(created_at).format('DD/MM/YYYY HH:mm');
+      },
       enableSorting: true,
     },
     {
@@ -100,6 +105,11 @@ export const ReceiptClientPage = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='FECHA CONFIRMACIÓN' />
       ),
+      cell: ({ row }) => {
+        const confirmed_at = row.getValue('confirmed_at') as number;
+
+        return dayjs(confirmed_at).format('DD/MM/YYYY HH:mm');
+      },
       enableSorting: true,
     },
   ];

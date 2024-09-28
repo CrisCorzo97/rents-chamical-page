@@ -105,7 +105,7 @@ export const ReceiptForm = () => {
           setOpenDialog(true);
         } catch (error) {
           toast.error(
-            'Hubo un error al generar el comprobante de patente. Intente nuevamente.',
+            'Error al generar el comprobante de patente. Intente nuevamente.',
             { duration: 5000 }
           );
           console.log({ error });

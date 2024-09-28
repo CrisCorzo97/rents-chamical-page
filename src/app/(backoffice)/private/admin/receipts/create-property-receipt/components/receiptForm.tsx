@@ -1,11 +1,11 @@
-'use client';
-
 import { Button, Input, Label } from '@/components/ui';
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
@@ -18,124 +18,134 @@ import {
 import { FormItem } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
 import { formatCurrency } from '@/lib/formatters';
-import { property } from '@prisma/client';
+import { Prisma, property } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { getProperties } from '../../actions';
-import { PropertyRecordWithRelations } from '../../property/property.interface';
+import { z } from 'zod';
+import { updateProperty } from '../../../property/actions.property';
+import { createReceipt } from '../../receipt-actions';
 import { ReceiptPFD } from './receiptPFD';
-import { SearchResultTable } from './searchResultTable';
 
-dayjs.extend(customParseFormat);
+const formSchema = z.object({
+  enrollment: z.string().optional(),
+  taxpayer: z.string(),
+  taxpayer_type: z.string().optional(),
+  address: z.string(),
+  front_length: z.string(),
+  last_year_paid: z.number(),
+  observations: z.string().optional(),
+  amount: z.number(),
+});
 
-export const ReceiptForm = () => {
-  const [searchResult, setSearchResult] = useState<
-    PropertyRecordWithRelations[]
-  >([]);
-  const [selectedRecord, setSelectedRecord] = useState<property | null>(null);
+interface PropertyReceiptData {
+  created_at: string;
+  enrollment?: string;
+  taxpayer: string;
+  taxpayer_type?: string;
+  address: string;
+  front_length: string;
+  last_year_paid: number;
+  observations?: string;
+  amount: number;
+  year_to_pay: number;
+}
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [isSearching, startSearchTransition] = useTransition();
+interface ReceiptFormProps {
+  record: property | null;
+}
+
+export const ReceiptForm = ({ record }: ReceiptFormProps) => {
+  const [amountValue, setAmountValue] = useState<string>('');
   const [isMutating, startMutatingTransition] = useTransition();
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSearch = (formData: FormData) => {
-    startSearchTransition(async () => {
-      setSelectedRecord(null);
-      const search = formData.get('search') as string;
+  const handleSubmit = (formData: FormData) => {
+    startMutatingTransition(async () => {
+      const formDataObject = Object.fromEntries(formData.entries());
+
+      const parsedDataObject: PropertyReceiptData = {
+        created_at: dayjs().toISOString(),
+        enrollment: formDataObject.enrollment as string,
+        taxpayer: formDataObject.taxpayer as string,
+        taxpayer_type: formDataObject.taxpayer
+          ? (formDataObject.taxpayer as string)
+          : undefined,
+        address: formDataObject.address as string,
+        front_length: formDataObject.front_length as string,
+        last_year_paid: Number(formDataObject.last_year_paid as string),
+        observations: formDataObject.observations
+          ? (formDataObject.observations as string)
+          : undefined,
+        amount: Number(
+          (formDataObject.amount as string)
+            .replace(/[.$]/g, '')
+            .replace(',', '.')
+            .trim()
+        ),
+        year_to_pay: Number(formDataObject.year_to_pay as string),
+      };
 
       try {
-        const properties = await getProperties({
-          filter: {
-            OR: [
-              { enrollment: { contains: search } },
-              { taxpayer: { contains: search } },
-            ],
-          },
-        });
+        formSchema.parse(parsedDataObject);
 
-        if (!properties.data?.length) {
+        try {
+          await updateProperty({
+            where: { id: record?.id },
+            data: { last_year_paid: parsedDataObject.year_to_pay },
+          });
+
+          const createData: Prisma.receiptCreateInput = {
+            id: crypto.randomUUID(),
+            created_at: parsedDataObject.created_at,
+            taxpayer: parsedDataObject.taxpayer,
+            amount: parsedDataObject.amount,
+            tax_type: 'INMUEBLE',
+            id_tax_reference: record?.id,
+            other_data: {
+              enrollment: parsedDataObject.enrollment,
+              taxpayer_type: parsedDataObject.taxpayer_type,
+              address: parsedDataObject.address,
+              front_length: parsedDataObject.front_length,
+              last_year_paid: parsedDataObject.last_year_paid,
+              observations: parsedDataObject.observations,
+              year_to_pay: parsedDataObject.year_to_pay,
+            },
+          };
+
+          await createReceipt({ data: createData });
+
+          // Mostrar el diálogo de confirmación
+          setOpenDialog(true);
+        } catch (error) {
           toast.error(
-            'No se encontraron registros. Intente nuevamente o agregue un nuevo registro.',
+            'Error al generar el comprobante de inmueble. Intente nuevamente.',
             { duration: 5000 }
           );
+          console.log({ error });
         }
-
-        setSearchResult(properties.data ?? []);
       } catch (error) {
-        console.error(error);
+        console.log({ error });
+        if (error instanceof z.ZodError) {
+          // Capturar errores y mostrarlos en el formulario
+          const newErrors: Record<string, string> = {};
+
+          error.errors.forEach((err) => {
+            const path = err.path.join('.');
+            newErrors[path] = err.message;
+          });
+
+          setErrors(newErrors);
+        }
       }
     });
   };
 
-  const handleSubmit = (formData: FormData) => {
-    startMutatingTransition(async () => {});
-  };
-
-  return (
-    <>
-      <section>
-        <Toaster />
-        <Card className='mt-6 max-w-3xl'>
-          <CardHeader>
-            <CardTitle>Buscar registro de Inmueble</CardTitle>
-            <CardDescription>
-              Ingrese un nombre o matrícula para buscar el registro.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form action={handleSearch} className='flex gap-3'>
-              <FormItem className='w-full'>
-                <Label>Nombre o matrícula</Label>
-                <Input
-                  type='text'
-                  name='search'
-                  placeholder='3771-836-1948'
-                  required
-                />
-              </FormItem>
-
-              <FormItem className='mt-3 self-end'>
-                <Button
-                  type='submit'
-                  loading={isSearching}
-                  className='flex gap-2 transition-all'
-                >
-                  Buscar
-                </Button>
-              </FormItem>
-            </form>
-          </CardContent>
-        </Card>
-      </section>
-
-      <section className='mt-6 max-w-3xl'>
-        <SearchResultTable
-          data={searchResult}
-          onSelect={(record) => {
-            setSelectedRecord(record);
-          }}
-        />
-      </section>
-
-      <CardResult record={selectedRecord} onSubmit={handleSubmit} />
-    </>
-  );
-};
-
-interface CardResultProps {
-  record: property | null;
-  onSubmit: (data: FormData) => void;
-}
-
-const CardResult = ({ record, onSubmit }: CardResultProps) => {
-  const [amountValue, setAmountValue] = useState<string>('');
-
   return (
     <section>
+      <Toaster />
       {record ? (
         <Card className='mt-6 max-w-3xl'>
           <CardHeader>
@@ -146,7 +156,7 @@ const CardResult = ({ record, onSubmit }: CardResultProps) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={onSubmit} className='w-full flex flex-col gap-3'>
+            <form action={handleSubmit} className='w-full flex flex-col gap-3'>
               <div className='w-full flex flex-wrap gap-3'>
                 <FormItem className='flex-none'>
                   <Label>Fecha del comprobante</Label>
@@ -257,6 +267,16 @@ const CardResult = ({ record, onSubmit }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
+                <FormItem className='flex-1'>
+                  <Label>Año a pagar</Label>
+                  <Input
+                    type='number'
+                    name='year_to_pay'
+                    max={dayjs().year()}
+                    placeholder='2024'
+                    required
+                  />
+                </FormItem>
               </div>
 
               <div className='w-full flex gap-3'>
@@ -285,21 +305,37 @@ const CardResult = ({ record, onSubmit }: CardResultProps) => {
 
               <div className='mt-6 flex gap-3 self-end'>
                 <FormItem>
-                  <Button variant='secondary'>Editar</Button>
+                  <Button
+                    // Agregar redirección a la página de edición de registro
+                    variant='secondary'
+                  >
+                    Editar
+                  </Button>
                 </FormItem>
                 <FormItem>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button type='submit' className='hover:bg-opacity-50'>
+                      <Button
+                        loading={isMutating}
+                        type='submit'
+                        className='hover:bg-opacity-50'
+                      >
                         Generar comprobante
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+                      <AlertDialogTitle>Comprobante generado</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        El comprobante ha sido generado con éxito. Puede
+                        descargarlo a continuación.
+                      </AlertDialogDescription>
                       <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
                         <ReceiptPFD />
                       </PDFViewer>
                       <AlertDialogFooter className='flex-none'>
-                        <AlertDialogAction>Continuar</AlertDialogAction>
+                        <AlertDialogAction onClick={() => setOpenDialog(false)}>
+                          Continuar
+                        </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>

@@ -23,7 +23,7 @@ export const SearchResultTable = ({
         <DataTableColumnHeader column={column} title='CONTRIBUYENTE' />
       ),
       accessorKey: 'taxpayer',
-      enableColumnFilter: true,
+      enableSorting: false,
     },
     {
       id: 'enrollment',
@@ -57,7 +57,7 @@ export const SearchResultTable = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='ÚLTIMO AÑO DE PAGO' />
       ),
-      sortDescFirst: false,
+      enableSorting: false,
     },
   ];
 

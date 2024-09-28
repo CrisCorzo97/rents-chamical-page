@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { property } from '@prisma/client';
 import Link from 'next/link';
-import { ReceiptForm } from './receiptForm';
+import { GeneratePropertyReceiptClientPage } from './page.client';
 
 export default async function GeneratePropertyReceiptPage() {
   const onSearch = async (formData: FormData) => {
@@ -75,7 +75,7 @@ export default async function GeneratePropertyReceiptPage() {
           Complete el formulario para generar un comprobante de Inmueble.
         </p>
 
-        <ReceiptForm />
+        <GeneratePropertyReceiptClientPage />
       </article>
     </ScrollArea>
   );
