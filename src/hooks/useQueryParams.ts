@@ -35,7 +35,7 @@ export function useQueryParams() {
         }
       });
 
-      replace(`${pathname}?${params.toString()}`);
+      replace(`${pathname}?${params.toString()}`, { scroll: false });
     },
     [params, pathname, replace]
   );
