@@ -1,22 +1,22 @@
 import { DataTableColumnHeader } from '@/components/data-table';
 import { CustomDataTable } from '@/components/data-table/customDataTable';
-import { cementery } from '@prisma/client';
 import {
   ColumnDef,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { CementeryRecordWithRelations } from '../../../cementery/cementery.interface';
 
 interface SearchResultTableProps {
-  data: cementery[];
-  onSelect: (record: cementery) => void;
+  data: CementeryRecordWithRelations[];
+  onSelect: (record: CementeryRecordWithRelations) => void;
 }
 
 export const SearchResultTable = ({
   data,
   onSelect,
 }: SearchResultTableProps) => {
-  const columns: ColumnDef<cementery>[] = [
+  const columns: ColumnDef<CementeryRecordWithRelations>[] = [
     {
       id: 'taxpayer',
       header: ({ column }) => (
@@ -72,7 +72,7 @@ export const SearchResultTable = ({
 
   return (
     <div>
-      <CustomDataTable<cementery>
+      <CustomDataTable<CementeryRecordWithRelations>
         tableTitle='Registros de cementerio'
         columns={columns}
         table={table}

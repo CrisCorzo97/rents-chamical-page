@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
-import { cementery } from '@prisma/client';
 import { FilePlus2 } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -23,7 +22,8 @@ export const GenerateCementeryReceiptPageClient = () => {
   const [searchResult, setSearchResult] = useState<
     CementeryRecordWithRelations[]
   >([]);
-  const [selectedRecord, setSelectedRecord] = useState<cementery | null>(null);
+  const [selectedRecord, setSelectedRecord] =
+    useState<CementeryRecordWithRelations | null>(null);
   const [isSearching, startSearchTransition] = useTransition();
 
   const handleSearch = (formData: FormData) => {

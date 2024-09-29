@@ -24,11 +24,11 @@ import dayjs from 'dayjs';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { updateProperty } from '../../../property/actions.property';
 import { createReceipt } from '../../receipt-actions';
 import { ReceiptPFD } from './receiptPFD';
 
 const formSchema = z.object({
+  created_at: z.string().datetime(),
   enrollment: z.string().optional(),
   taxpayer: z.string(),
   taxpayer_type: z.string().optional(),
@@ -92,11 +92,6 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
         formSchema.parse(parsedDataObject);
 
         try {
-          await updateProperty({
-            where: { id: record?.id },
-            data: { last_year_paid: parsedDataObject.year_to_pay },
-          });
-
           const createData: Prisma.receiptCreateInput = {
             id: crypto.randomUUID(),
             created_at: parsedDataObject.created_at,
