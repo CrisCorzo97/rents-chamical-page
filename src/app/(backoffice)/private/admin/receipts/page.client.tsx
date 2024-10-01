@@ -202,6 +202,7 @@ export const ReceiptClientPage = ({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
             <ConfirmModal />
           </CardContent>
         </Card>

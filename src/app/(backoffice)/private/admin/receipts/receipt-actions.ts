@@ -4,6 +4,32 @@ import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { Prisma, receipt } from '@prisma/client';
 
+export const getReceiptById = async (input: { id: string }) => {
+  const response: Envelope<receipt> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const receipt = await dbSupabase.receipt.findUnique({
+      where: {
+        id: input.id,
+      },
+    });
+
+    response.data = receipt;
+  } catch (error) {
+    console.error({ error });
+
+    response.success = false;
+    response.error = 'Hubo un error al buscar el comprobante de pago';
+  }
+
+  return response;
+}
+
 export const getConfirmedReceipts = async (input: {
   limit?: number;
   page?: number;
