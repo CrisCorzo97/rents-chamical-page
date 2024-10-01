@@ -19,11 +19,18 @@ import {
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { formatCurrency, formatDni } from '@/lib/formatters';
 import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Info } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -179,8 +186,20 @@ export const ReceiptForm = () => {
                   required
                 />
               </FormItem>
-              <FormItem className='flex-1'>
-                <Label>DNI</Label>
+              <FormItem className='flex-1 '>
+                <Label className='inline-flex'>
+                  DNI
+                  <TooltipProvider>
+                    <Tooltip delayDuration={300}>
+                      <TooltipTrigger asChild>
+                        <Info size={14} className='text-cyan-600 ml-1' />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Escribir el númerio de DNI sin puntos</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
                 <Input
                   type='text'
                   name='dni'
