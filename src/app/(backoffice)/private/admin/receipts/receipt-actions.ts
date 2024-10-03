@@ -3,6 +3,7 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { Prisma, receipt } from '@prisma/client';
+import dayjs from 'dayjs';
 
 export const getReceiptById = async (input: { id: string }) => {
   const response: Envelope<receipt> = {
@@ -28,7 +29,7 @@ export const getReceiptById = async (input: { id: string }) => {
   }
 
   return response;
-}
+};
 
 export const getConfirmedReceipts = async (input: {
   limit?: number;
@@ -119,4 +120,101 @@ export const createReceipt = async (input: {
   }
 
   return response;
+};
+
+export const confirmReceipt = async (input: { data: receipt }) => {
+  const response: Envelope<{ id: string; confirmed_at: string }> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  const {
+    data: { id, tax_type, id_tax_reference, other_data },
+  } = input;
+
+  try {
+    const ReceiptFound = await dbSupabase.receipt.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!ReceiptFound) {
+      throw new Error('Receipt not found');
+    }
+
+    if (['INMUEBLE', 'CEMENTERIO'].includes(tax_type)) {
+      const confirmed = await getConfirmedReceipts({
+        filter: {
+          id_tax_reference: id_tax_reference,
+        },
+      });
+
+      let last_year_paid = (other_data as Prisma.JsonObject)
+        .year_to_pay as number;
+
+      if (!!confirmed && confirmed.data && confirmed.data.length > 0) {
+        const years_paid = confirmed.data.map(
+          (r) => (r.other_data as Prisma.JsonObject)!.year_to_pay as number
+        );
+
+        last_year_paid = Math.max(
+          ...years_paid,
+          (other_data as Prisma.JsonObject).year_to_pay as number
+        );
+      }
+
+      if (tax_type === 'INMUEBLE') {
+        try {
+          await dbSupabase.property.update({
+            where: {
+              id: id_tax_reference,
+            },
+            data: {
+              last_year_paid,
+            },
+          });
+        } catch (error) {
+          console.error({ error });
+          throw new Error('Error updating property');
+        }
+      } else if (tax_type === 'CEMENTERIO') {
+        try {
+          await dbSupabase.cementery.update({
+            where: {
+              id: id_tax_reference,
+            },
+            data: {
+              last_year_paid,
+            },
+          });
+        } catch (error) {
+          console.error({ error });
+          throw new Error('Error updating cemetery');
+        }
+      }
+    }
+
+    const receipt = await dbSupabase.receipt.update({
+      where: {
+        id: id,
+      },
+      data: {
+        confirmed_at: dayjs().toISOString(),
+      },
+    });
+
+    response.data = {
+      id: receipt.id,
+      confirmed_at: dayjs(receipt.confirmed_at).format('DD/MM/YYYY HH:mm'),
+    };
+  } catch (error) {
+    console.error({ error });
+    response.success = false;
+    response.error = 'Hubo un error al confirmar el comprobante de pago';
+  } finally {
+    return response;
+  }
 };
