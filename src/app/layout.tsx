@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/toaster';
 import StyledComponentsRegistry from '@/lib/ant-design/AntdRegistry';
 import theme from '@/theme/themeConfig';
 import { ConfigProvider } from 'antd';
@@ -33,7 +34,10 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <StyledComponentsRegistry>
-          <ConfigProvider theme={theme}>{children}</ConfigProvider>
+          <ConfigProvider theme={theme}>
+            {children}
+            <Toaster />
+          </ConfigProvider>
         </StyledComponentsRegistry>
       </body>
     </html>

@@ -11,17 +11,24 @@ import {
 import { FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Toast, ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 import { receipt } from '@prisma/client';
 import dayjs from 'dayjs';
 import { CircleCheckBig, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { getReceiptById } from '../receipt-actions';
+import { confirmReceipt, getReceiptById } from '../receipt-actions';
 
 export function ConfirmModal() {
   const [receiptData, setReceiptData] = useState<receipt | null>(null);
   const [error, setError] = useState<string>('');
   const [isSearching, startTransition] = useTransition();
   const [isMutating, startMutation] = useTransition();
+
+  const { toast } = useToast();
+
+  const { refresh } = useRouter();
 
   const handleSearch = (formData: FormData) => {
     startTransition(async () => {
@@ -37,6 +44,7 @@ export function ConfirmModal() {
           return setReceiptData(receipt.data);
         }
 
+        setReceiptData(null);
         return setError(
           'No se encontró el comprobante de pago, intenta nuevamente.'
         );
@@ -47,21 +55,42 @@ export function ConfirmModal() {
     });
   };
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = () => {
     startMutation(async () => {
-      const receiptId = formData.get('receipt_id') as string;
-
       try {
-        const receipt = await getReceiptById({
-          id: receiptId,
-        });
+        const receipt = await confirmReceipt({ data: receiptData! });
+
+        console.log({ receipt });
 
         if (receipt.success) {
-          setReceiptData(receipt.data);
+          toast({
+            title: 'Pago confirmado',
+            description: 'El pago se ha confirmado correctamente.',
+            action: (
+              <Toast variant='default'>
+                <ToastAction
+                  altText='Por favor, recarga la página para ver los cambios'
+                  onClick={refresh}
+                >
+                  Recargar
+                </ToastAction>
+              </Toast>
+            ),
+          });
         }
       } catch (error) {
         console.error(error);
-        setError('No se encontró el comprobante de pago, intenta nuevamente.');
+        toast({
+          title: 'Ocurrió un error',
+          description: 'Hubo un error al confirmar el pago.',
+          action: (
+            <Toast variant='destructive'>
+              <ToastAction altText='Vuelve a intentarlo más tarde'>
+                Entendido
+              </ToastAction>
+            </Toast>
+          ),
+        });
       }
     });
   };
@@ -116,8 +145,8 @@ export function ConfirmModal() {
                 />
               </FormItem>
 
-              <div className='flex gap-2'>
-                <FormItem>
+              <div className='w-full flex gap-2'>
+                <FormItem className='flex-1'>
                   <Label>Fecha de emisión</Label>
                   <Input
                     type='text'
@@ -128,7 +157,7 @@ export function ConfirmModal() {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
-                <FormItem>
+                <FormItem className='flex-1'>
                   <Label>Monto:</Label>
                   <Input
                     type='text'
