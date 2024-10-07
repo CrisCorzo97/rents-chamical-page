@@ -1,5 +1,6 @@
 'use server';
 
+import { generateReceiptCode } from '@/lib/code-generator';
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { Prisma, receipt } from '@prisma/client';
@@ -197,9 +198,15 @@ export const confirmReceipt = async (input: { data: receipt }) => {
       }
     }
 
+    const new_code = await createNextReceiptCode();
+
+    if (!new_code) {
+      throw new Error('Error generating receipt code');
+    }
+
     const receipt = await dbSupabase.receipt.update({
       where: {
-        id: id,
+        id: new_code,
       },
       data: {
         confirmed_at: dayjs().toISOString(),
@@ -216,5 +223,33 @@ export const confirmReceipt = async (input: { data: receipt }) => {
     response.error = 'Hubo un error al confirmar el comprobante de pago';
   } finally {
     return response;
+  }
+};
+
+const createNextReceiptCode = async () => {
+  try {
+    const lastReceipt = await dbSupabase.receipt.findFirst({
+      orderBy: {
+        created_at: 'desc',
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!lastReceipt) {
+      return null;
+    }
+
+    const new_code = generateReceiptCode(lastReceipt.id);
+
+    if (!new_code) {
+      return null;
+    }
+
+    return new_code;
+  } catch (error) {
+    console.error({ error });
+    return null;
   }
 };

@@ -13,11 +13,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toast, ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
+import { validateReceiptCode } from '@/lib/code-generator';
 import { receipt } from '@prisma/client';
 import dayjs from 'dayjs';
 import { CircleCheckBig, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { z } from 'zod';
 import { confirmReceipt, getReceiptById } from '../receipt-actions';
 
 export function ConfirmModal() {
@@ -35,22 +37,37 @@ export function ConfirmModal() {
       const receiptId = formData.get('receipt_id') as string;
 
       try {
-        const receipt = await getReceiptById({
-          id: receiptId,
-        });
+        z.string()
+          .refine((val) => validateReceiptCode(val), {
+            message: 'El código del comprobante es inválido.',
+          })
+          .parse(receiptId);
 
-        if (receipt.data) {
-          setError('');
-          return setReceiptData(receipt.data);
+        try {
+          const receipt = await getReceiptById({
+            id: receiptId,
+          });
+
+          if (receipt.data) {
+            setError('');
+            return setReceiptData(receipt.data);
+          }
+
+          setReceiptData(null);
+          return setError(
+            'No se encontró el comprobante de pago, intenta nuevamente.'
+          );
+        } catch (error) {
+          console.error(error);
+          setError(
+            'No se encontró el comprobante de pago, intenta nuevamente.'
+          );
         }
-
-        setReceiptData(null);
-        return setError(
-          'No se encontró el comprobante de pago, intenta nuevamente.'
-        );
       } catch (error) {
-        console.error(error);
-        setError('No se encontró el comprobante de pago, intenta nuevamente.');
+        console.log({ error });
+        if (error instanceof z.ZodError) {
+          setError(error.errors[0].message);
+        }
       }
     });
   };
@@ -59,8 +76,6 @@ export function ConfirmModal() {
     startMutation(async () => {
       try {
         const receipt = await confirmReceipt({ data: receiptData! });
-
-        console.log({ receipt });
 
         if (receipt.success) {
           toast({
@@ -120,8 +135,9 @@ export function ConfirmModal() {
                 <Input
                   type='text'
                   name='receipt_id'
-                  placeholder='0000000000'
+                  placeholder='2024-000000'
                   required
+                  onChange={() => setError('')}
                 />
                 <Button type='submit' loading={isSearching}>
                   <Search size={24} color='#FFF' />
