@@ -90,8 +90,7 @@ export const ReceiptForm = () => {
         formSchema.parse(parsedDataObject);
 
         try {
-          const createData: Prisma.receiptCreateInput = {
-            id: crypto.randomUUID(),
+          const createData: Omit<Prisma.receiptCreateInput, 'id'> = {
             created_at: parsedDataObject.created_at,
             taxpayer: parsedDataObject.taxpayer,
             amount: parsedDataObject.amount,

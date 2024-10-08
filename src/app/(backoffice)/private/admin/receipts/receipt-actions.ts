@@ -47,6 +47,9 @@ export const getConfirmedReceipts = async (input: {
 
   try {
     const inputQuery: Prisma.receiptFindManyArgs = {
+      where: {
+        confirmed_at: { not: null },
+      },
       take: 5,
       orderBy: {
         confirmed_at: 'desc',
@@ -54,10 +57,13 @@ export const getConfirmedReceipts = async (input: {
     };
 
     if (input.filter) {
-      inputQuery.where = input.filter;
+      inputQuery.where = {
+        ...inputQuery.where,
+        ...input.filter,
+      };
     }
     if (input.page) {
-      inputQuery.skip = +input.page - 1;
+      inputQuery.skip = (+input.page - 1) * (input?.limit ?? 5);
     }
     if (input.limit) {
       inputQuery.take = +input.limit;
@@ -66,12 +72,7 @@ export const getConfirmedReceipts = async (input: {
       inputQuery.orderBy = input.order_by;
     }
 
-    const confirmed_receipts = await dbSupabase.receipt.findMany({
-      where: {
-        confirmed_at: { not: null },
-      },
-      orderBy: input.order_by,
-    });
+    const confirmed_receipts = await dbSupabase.receipt.findMany(inputQuery);
 
     const count = await dbSupabase.receipt.count({
       where: {
@@ -98,7 +99,7 @@ export const getConfirmedReceipts = async (input: {
 };
 
 export const createReceipt = async (input: {
-  data: Prisma.receiptCreateInput;
+  data: Omit<Prisma.receiptCreateInput, 'id'>;
 }) => {
   const response: Envelope<receipt> = {
     success: true,
@@ -108,8 +109,19 @@ export const createReceipt = async (input: {
   };
 
   try {
+    const new_code = await createNextReceiptCode();
+
+    if (!new_code) {
+      response.success = false;
+      response.error = 'Hubo un error al generar el código del comprobante';
+      return response;
+    }
+
     const receipt = await dbSupabase.receipt.create({
-      data: input.data,
+      data: {
+        id: new_code,
+        ...input.data,
+      },
     });
 
     response.data = receipt;
@@ -138,7 +150,7 @@ export const confirmReceipt = async (input: { data: receipt }) => {
   try {
     const ReceiptFound = await dbSupabase.receipt.findUnique({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -149,7 +161,7 @@ export const confirmReceipt = async (input: { data: receipt }) => {
     if (['INMUEBLE', 'CEMENTERIO'].includes(tax_type)) {
       const confirmed = await getConfirmedReceipts({
         filter: {
-          id_tax_reference: id_tax_reference,
+          id_tax_reference,
         },
       });
 
@@ -198,15 +210,9 @@ export const confirmReceipt = async (input: { data: receipt }) => {
       }
     }
 
-    const new_code = await createNextReceiptCode();
-
-    if (!new_code) {
-      throw new Error('Error generating receipt code');
-    }
-
     const receipt = await dbSupabase.receipt.update({
       where: {
-        id: new_code,
+        id,
       },
       data: {
         confirmed_at: dayjs().toISOString(),

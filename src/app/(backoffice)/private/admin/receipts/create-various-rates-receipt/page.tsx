@@ -14,12 +14,6 @@ import { ReceiptForm } from './receiptForm';
 export default async function GenerateVariousRatesReceiptPage() {
   const taxesOrContributions = await getTaxesOrContributions();
 
-  const onSubmit = async (formData: FormData) => {
-    'use server';
-    const data = Object.fromEntries(formData.entries());
-    console.log({ data });
-  };
-
   return (
     <ScrollArea className='mx-6 h-admin-scroll-area'>
       <Breadcrumb className='h-12 mt-6'>
@@ -56,10 +50,7 @@ export default async function GenerateVariousRatesReceiptPage() {
           Complete el formulario para generar un comprobante de Tasas diversas.
         </p>
 
-        <ReceiptForm
-          taxesOrContributions={taxesOrContributions}
-          onSubmit={onSubmit}
-        />
+        <ReceiptForm taxesOrContributions={taxesOrContributions} />
       </article>
     </ScrollArea>
   );

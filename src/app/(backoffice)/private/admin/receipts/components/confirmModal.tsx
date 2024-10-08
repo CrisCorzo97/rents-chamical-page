@@ -11,7 +11,7 @@ import {
 import { FormItem } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Toast, ToastAction } from '@/components/ui/toast';
+import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { validateReceiptCode } from '@/lib/code-generator';
 import { receipt } from '@prisma/client';
@@ -82,14 +82,12 @@ export function ConfirmModal() {
             title: 'Pago confirmado',
             description: 'El pago se ha confirmado correctamente.',
             action: (
-              <Toast variant='default'>
-                <ToastAction
-                  altText='Por favor, recarga la página para ver los cambios'
-                  onClick={refresh}
-                >
-                  Recargar
-                </ToastAction>
-              </Toast>
+              <ToastAction
+                altText='Por favor, recarga la página para ver los cambios'
+                onClick={refresh}
+              >
+                Recargar
+              </ToastAction>
             ),
           });
         }
@@ -99,11 +97,9 @@ export function ConfirmModal() {
           title: 'Ocurrió un error',
           description: 'Hubo un error al confirmar el pago.',
           action: (
-            <Toast variant='destructive'>
-              <ToastAction altText='Vuelve a intentarlo más tarde'>
-                Entendido
-              </ToastAction>
-            </Toast>
+            <ToastAction altText='Vuelve a intentarlo más tarde'>
+              Entendido
+            </ToastAction>
           ),
         });
       }
