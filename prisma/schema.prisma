@@ -385,6 +385,7 @@ model role {
 model tax_or_contribution {
   id                       BigInt                     @id @default(autoincrement())
   name                     String                     @default("") @db.VarChar
+  status                   Boolean                    @default(true)
   rent_tax_or_contribution rent_tax_or_contribution[]
 
   @@schema("public")
