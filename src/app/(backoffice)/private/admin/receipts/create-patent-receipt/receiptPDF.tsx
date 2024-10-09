@@ -7,6 +7,8 @@ import {
   Text,
   View,
 } from '@react-pdf/renderer';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -113,10 +115,22 @@ const styles = StyleSheet.create({
   },
 });
 
-interface ReceiptPDFProps {}
+export interface ReceiptPDFProps {
+  data: {
+    receiptId: string;
+    domain: string;
+    vehicle: string;
+    brand: string;
+    owner: string;
+    dni: string;
+    year_to_pay: number;
+    observations: string;
+    amount: number;
+  };
+}
 
 // Create Document Component
-export const ReceiptPDF = () => {
+export const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
   return (
     <Document
       title='Comprobante de pago de patente'
@@ -126,7 +140,7 @@ export const ReceiptPDF = () => {
     >
       <Page size='A4' style={styles.page}>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para el contribuyente
@@ -135,7 +149,7 @@ export const ReceiptPDF = () => {
           </View>
         </View>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para el Tribunal de Cuentas
@@ -144,7 +158,7 @@ export const ReceiptPDF = () => {
           </View>
         </View>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para la Municipalidad
@@ -156,7 +170,26 @@ export const ReceiptPDF = () => {
   );
 };
 
-const Receipt = () => {
+const Receipt = ({ data }: ReceiptPDFProps) => {
+  const {
+    receiptId,
+    domain,
+    vehicle,
+    brand,
+    owner,
+    dni,
+    year_to_pay,
+    observations,
+    amount,
+  } = data;
+
+  const fullDate = dayjs().locale('es').format('DD-MMMM-YYYY');
+
+  const day = fullDate.split('-')[0];
+  const month = fullDate.split('-')[1].toLowerCase();
+  const monthCapitalized = month.charAt(0).toUpperCase() + month.slice(1);
+  const year = fullDate.split('-')[2];
+
   return (
     <View style={styles.receipt}>
       <View style={styles.headerReceipt}>
@@ -223,7 +256,7 @@ const Receipt = () => {
                 fontWeight: 'normal',
               }}
             >
-              30-00000000-0
+              {receiptId}
             </Text>
           </View>
         </View>
@@ -256,7 +289,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              ABC 123
+              {domain}
             </Text>
           </View>
           <View
@@ -284,7 +317,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Gol
+              {vehicle}
             </Text>
           </View>
           <View
@@ -312,7 +345,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Volkswagen
+              {brand}
             </Text>
           </View>
         </View>
@@ -342,7 +375,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Juan Pérez
+              {owner}
             </Text>
           </View>
           <View
@@ -370,7 +403,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              23.571.481
+              {dni}
             </Text>
           </View>
         </View>
@@ -400,7 +433,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              2024
+              {year_to_pay}
             </Text>
           </View>
           <View
@@ -428,7 +461,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Tenía saldo a favor...
+              {observations}
             </Text>
           </View>
         </View>
@@ -458,7 +491,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              16
+              {day}
             </Text>
           </View>
           <View
@@ -486,7 +519,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Septiembre
+              {monthCapitalized}
             </Text>
           </View>
           <View
@@ -514,7 +547,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              2024
+              {year}
             </Text>
           </View>
         </View>
@@ -560,7 +593,7 @@ const Receipt = () => {
                   fontSize: 14,
                 }}
               >
-                14.000.000
+                {amount.toLocaleString('es-AR', { maximumFractionDigits: 2 })}
               </Text>
             </View>
           </View>

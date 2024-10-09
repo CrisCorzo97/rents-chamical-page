@@ -36,7 +36,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { createReceipt } from '../receipt-actions';
 import { PatentReceiptData } from './page';
-import { ReceiptPDF } from './receiptPDF';
+import { ReceiptPDF, ReceiptPDFProps } from './receiptPDF';
 
 dayjs.extend(customParseFormat);
 
@@ -63,6 +63,17 @@ export const ReceiptForm = () => {
   const [dniValue, setDniValue] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [contentDialog, setContentDialog] = useState<ReceiptPDFProps['data']>({
+    receiptId: '',
+    domain: '',
+    owner: '',
+    dni: '',
+    vehicle: '',
+    brand: '',
+    year_to_pay: 0,
+    observations: '',
+    amount: 0,
+  });
   const [isPending, startTransition] = useTransition();
 
   const handleFormSubmit = (formData: FormData) => {
@@ -105,7 +116,26 @@ export const ReceiptForm = () => {
             },
           };
 
-          await createReceipt({ data: createData });
+          const { success, data, error } = await createReceipt({
+            data: createData,
+          });
+
+          if (!success || !data) {
+            throw new Error(error ?? '');
+          }
+
+          // Actualizar el contenido del diálogo
+          setContentDialog({
+            receiptId: data.id,
+            domain: parsedDataObject.domain,
+            owner: parsedDataObject.taxpayer,
+            dni: parsedDataObject.dni,
+            vehicle: parsedDataObject.vehicle,
+            brand: parsedDataObject.brand,
+            year_to_pay: parsedDataObject.year_to_pay,
+            observations: parsedDataObject.observations ?? '',
+            amount: parsedDataObject.amount,
+          });
 
           // Mostrar el diálogo de confirmación
           setOpenDialog(true);
@@ -284,7 +314,7 @@ export const ReceiptForm = () => {
                       descargarlo a continuación.
                     </AlertDialogDescription>
                     <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                      <ReceiptPDF />
+                      <ReceiptPDF data={contentDialog} />
                     </PDFViewer>
                     <AlertDialogFooter className='flex-none'>
                       <AlertDialogAction onClick={() => setOpenDialog(false)}>
