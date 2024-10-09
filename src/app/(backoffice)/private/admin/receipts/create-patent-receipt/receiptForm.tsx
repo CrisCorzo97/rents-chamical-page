@@ -36,7 +36,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { createReceipt } from '../receipt-actions';
 import { PatentReceiptData } from './page';
-import { ReceiptPFD } from './receiptPFD';
+import { ReceiptPDF } from './receiptPDF';
 
 dayjs.extend(customParseFormat);
 
@@ -284,7 +284,7 @@ export const ReceiptForm = () => {
                       descargarlo a continuación.
                     </AlertDialogDescription>
                     <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                      <ReceiptPFD />
+                      <ReceiptPDF />
                     </PDFViewer>
                     <AlertDialogFooter className='flex-none'>
                       <AlertDialogAction onClick={() => setOpenDialog(false)}>

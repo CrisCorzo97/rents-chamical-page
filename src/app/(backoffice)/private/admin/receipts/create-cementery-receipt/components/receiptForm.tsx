@@ -26,7 +26,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { CementeryRecordWithRelations } from '../../../cementery/cementery.interface';
 import { createReceipt } from '../../receipt-actions';
-import { ReceiptPFD } from './receiptPFD';
+import { ReceiptPDF } from './receiptPDF';
 
 const formSchema = z.object({
   created_at: z.string(),
@@ -342,7 +342,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                         descargarlo a continuación.
                       </AlertDialogDescription>
                       <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                        <ReceiptPFD />
+                        <ReceiptPDF />
                       </PDFViewer>
                       <AlertDialogFooter className='flex-none'>
                         <AlertDialogAction onClick={() => setOpenDialog(false)}>

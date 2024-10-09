@@ -113,8 +113,10 @@ const styles = StyleSheet.create({
   },
 });
 
+interface ReceiptPDFProps {}
+
 // Create Document Component
-export const ReceiptPFD = () => {
+export const ReceiptPDF = () => {
   return (
     <Document
       title='Comprobante de pago de patente'
