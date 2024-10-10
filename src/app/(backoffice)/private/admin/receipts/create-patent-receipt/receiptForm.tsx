@@ -221,7 +221,10 @@ export const ReceiptForm = () => {
                   <TooltipProvider>
                     <Tooltip delayDuration={300}>
                       <TooltipTrigger asChild>
-                        <Info size={14} className='text-cyan-600 ml-1' />
+                        <Info
+                          size={14}
+                          className='text-cyan-600 ml-1 cursor-pointer'
+                        />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Escribir el númerio de DNI sin puntos</p>

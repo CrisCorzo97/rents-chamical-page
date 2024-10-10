@@ -2,7 +2,7 @@
 
 import { DataTableColumnHeader } from '@/components/data-table';
 import { CustomDataTable } from '@/components/data-table/customDataTable';
-import { Input, Label } from '@/components/ui';
+import { Button, Input, Label } from '@/components/ui';
 import {
   Card,
   CardContent,
@@ -24,6 +24,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { PropertyRecordWithRelations } from './property.interface';
 
@@ -153,13 +155,20 @@ export function PropertyPageClient({
   return (
     <section className='w-full mb-10 flex flex-wrap gap-3'>
       <div className='w-full flex-1'>
-        <div className='flex items-center py-4'>
+        <div className='flex items-center justify-between py-4'>
           <Input
             placeholder='Filtrar por contribuyente'
             value={queryFilter}
             onChange={(event) => setQueryFilter(event.target.value)}
-            className='max-w-sm'
+            className='max-w-sm h-11'
           />
+
+          <Link href='/private/admin/property/create' prefetch>
+            <Button className='flex items-center gap-2' size='lg'>
+              <Plus size={18} />
+              Nuevo registro
+            </Button>
+          </Link>
         </div>
         <CustomDataTable<property>
           tableTitle='Registros de inmuebles'
@@ -234,7 +243,7 @@ export function PropertyPageClient({
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Último año abonado:</Label>{' '}
-                {`${recordDetails.last_year_paid}` ?? '-'}
+                {recordDetails?.last_year_paid ?? '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Campos faltantes:</Label>{' '}
