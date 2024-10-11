@@ -2,6 +2,14 @@
 
 import { Button, Input, Label, Select } from '@/components/ui';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -15,9 +23,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Toaster } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
-import { city_section, neighborhood } from '@prisma/client';
-import { useTransition } from 'react';
+import { city_section, neighborhood, Prisma } from '@prisma/client';
+import Link from 'next/link';
+import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { createProperty } from '../actions.property';
+
+const formSchema = z.object({
+  taxpayer: z.string(),
+  taxpayer_type: z.nullable(z.string()),
+  enrollment: z.nullable(z.string()),
+  is_part: z.boolean(),
+  address: z.string(),
+  neighborhood: z.number(),
+  city_section: z.number(),
+  front_length: z.number(),
+});
 
 interface CreatePropertyRecordFormProps {
   neighborhoods: neighborhood[];
@@ -29,13 +53,113 @@ export const CreatePropertyRecordForm = ({
   neighborhoods,
 }: CreatePropertyRecordFormProps) => {
   const [isMutating, startTransition] = useTransition();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
   const handleSubmit = (formData: FormData) => {
-    startTransition(async () => {});
+    startTransition(async () => {
+      const formObject = Object.fromEntries(formData.entries());
+
+      const front_length = Number(
+        (formObject.front_length as string).replace(',', '.')
+      );
+
+      const parsedData = {
+        taxpayer: formObject.taxpayer as string,
+        taxpayer_type: ['', 'none'].includes(formObject.taxpayer_type as string)
+          ? null
+          : (formObject.taxpayer_type as string),
+        enrollment:
+          (formObject.enrollment as string) === ''
+            ? null
+            : (formObject.enrollment as string),
+        is_part: formObject.is_part === 'on',
+        address: formObject.address as string,
+        neighborhood: Number(formObject.neighborhood as string),
+        city_section: Number(formObject.city_section as string),
+        front_length,
+      };
+
+      try {
+        formSchema.parse(parsedData);
+
+        try {
+          const missing_fields = [];
+
+          if (!parsedData.enrollment) missing_fields.push('enrollment');
+
+          const createData: Prisma.propertyCreateInput = {
+            taxpayer: parsedData.taxpayer,
+            taxpayer_type: parsedData.taxpayer_type,
+            enrollment: parsedData.enrollment,
+            is_part: parsedData.is_part,
+            address: parsedData.address,
+            neighborhood: {
+              connect: { id: parsedData.neighborhood },
+            },
+            city_section: {
+              connect: { id: parsedData.city_section },
+            },
+            front_length: parsedData.front_length,
+            missing_fields: !missing_fields.length
+              ? null
+              : JSON.stringify(missing_fields),
+          };
+
+          const { success, data, error } = await createProperty(createData);
+
+          if (!success || !data) {
+            throw new Error(error ?? '');
+          }
+
+          setOpenSuccess(true);
+        } catch (error) {
+          console.error(error);
+
+          toast.error(
+            'Error al crear el registro de propiedad. Revise los datos ingresados e intente nuevamente.',
+            {
+              duration: 5000,
+            }
+          );
+        }
+      } catch (error) {
+        console.error(error);
+        if (error instanceof z.ZodError) {
+          // Capturar errores y mostrarlos en el formulario
+          const newErrors: Record<string, string> = {};
+
+          error.errors.forEach((err) => {
+            const path = err.path.join('.');
+            newErrors[path] = err.message;
+          });
+
+          setErrors(newErrors);
+        }
+      }
+    });
   };
 
   return (
     <section>
+      <Toaster />
+
+      <AlertDialog open={openSuccess}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Registro creado</AlertDialogTitle>
+          <AlertDialogDescription>
+            El registro de propiedad se ha creado correctamente.
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogAction asChild>
+              <Link href='/private/admin/property'>
+                <Button onClick={() => setOpenSuccess(false)}>Finalizar</Button>
+              </Link>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Card className='w-full max-w-3xl mt-6'>
         <CardHeader>
           <CardTitle>Nuevo registro</CardTitle>
@@ -115,8 +239,10 @@ export const CreatePropertyRecordForm = ({
 
             <div className='flex gap-2 w-full'>
               <FormItem className='w-1/3'>
-                <Label>Sección</Label>
-                <Select name='city_section'>
+                <Label>
+                  Sección <span className='text-red-500'>*</span>
+                </Label>
+                <Select name='city_section' required>
                   <SelectTrigger>
                     <SelectValue placeholder='Seleccione una sección' />
                   </SelectTrigger>
@@ -134,7 +260,7 @@ export const CreatePropertyRecordForm = ({
                   Mts de frente <span className='text-red-500'>*</span>
                 </Label>
                 <Input
-                  type='number'
+                  type='text'
                   name='front_length'
                   required
                   placeholder='10'
@@ -144,7 +270,7 @@ export const CreatePropertyRecordForm = ({
 
             <div className='w-full justify-end flex mt-6'>
               <FormItem>
-                <Button type='submit' className=''>
+                <Button type='submit' loading={isMutating}>
                   Crear
                 </Button>
               </FormItem>
