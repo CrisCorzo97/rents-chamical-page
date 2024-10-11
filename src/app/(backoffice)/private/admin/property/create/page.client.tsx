@@ -1,6 +1,6 @@
 'use client';
 
-import { Input, Label, Select } from '@/components/ui';
+import { Button, Input, Label, Select } from '@/components/ui';
 import {
   Card,
   CardContent,
@@ -15,7 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { city_section, neighborhood } from '@prisma/client';
+import { useTransition } from 'react';
 
 interface CreatePropertyRecordFormProps {
   neighborhoods: neighborhood[];
@@ -26,6 +28,12 @@ export const CreatePropertyRecordForm = ({
   citySections,
   neighborhoods,
 }: CreatePropertyRecordFormProps) => {
+  const [isMutating, startTransition] = useTransition();
+
+  const handleSubmit = (formData: FormData) => {
+    startTransition(async () => {});
+  };
+
   return (
     <section>
       <Card className='w-full max-w-3xl mt-6'>
@@ -36,20 +44,16 @@ export const CreatePropertyRecordForm = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action='' className='w-full flex flex-col gap-3'>
+          <form action={handleSubmit} className='w-full flex flex-col gap-3'>
             <div className='flex gap-2 w-full'>
-              <FormItem>
-                <Label>Matrícula</Label>
-                <Input name='enrollment' placeholder='Matrícula' />
-              </FormItem>
               <FormItem className='flex-1'>
                 <Label>
                   Contribuyente <span className='text-red-500'>*</span>
                 </Label>
                 <Input name='taxpayer' placeholder='Jose Perez' required />
               </FormItem>
-              <FormItem>
-                <Label>Tipo</Label>
+              <FormItem className='w-1/3'>
+                <Label>Tipo de contribuyente</Label>
                 <Select name='taxpayer_type'>
                   <SelectTrigger>
                     <SelectValue placeholder='Seleccione un tipo' />
@@ -70,13 +74,24 @@ export const CreatePropertyRecordForm = ({
             </div>
 
             <div className='flex gap-2 w-full'>
-              <FormItem className='flex-1'>
-                <Label className=''>
-                  Dirección <span className='text-red-500'>*</span>
-                </Label>
-                <Input name='address' placeholder='Matrícula' required />
+              <FormItem className='w-1/2'>
+                <Label>Matrícula</Label>
+                <Input name='enrollment' placeholder='XXXX-XXXX-XXX' />
               </FormItem>
               <FormItem>
+                <Label>¿Es parte?</Label>
+                <Switch name='is_part' className='block' />
+              </FormItem>
+            </div>
+
+            <div className='flex gap-2 w-full'>
+              <FormItem className='flex-1'>
+                <Label>
+                  Dirección <span className='text-red-500'>*</span>
+                </Label>
+                <Input name='address' placeholder='9 de Julio' required />
+              </FormItem>
+              <FormItem className='w-1/3'>
                 <Label>
                   Barrio <span className='text-red-500'>*</span>
                 </Label>
@@ -99,31 +114,39 @@ export const CreatePropertyRecordForm = ({
             </div>
 
             <div className='flex gap-2 w-full'>
-              <FormItem className='flex-1'>
-                <Label className=''>
-                  Dirección <span className='text-red-500'>*</span>
-                </Label>
-                <Input name='address' placeholder='Matrícula' required />
-              </FormItem>
-              <FormItem>
-                <Label>
-                  Barrio <span className='text-red-500'>*</span>
-                </Label>
-                <Select name='neighborhood' required>
+              <FormItem className='w-1/3'>
+                <Label>Sección</Label>
+                <Select name='city_section'>
                   <SelectTrigger>
-                    <SelectValue placeholder='Seleccione un barrio' />
+                    <SelectValue placeholder='Seleccione una sección' />
                   </SelectTrigger>
                   <SelectContent>
-                    {neighborhoods.map((neighborhood) => (
-                      <SelectItem
-                        key={neighborhood.id}
-                        value={`${neighborhood.id}`}
-                      >
-                        {neighborhood.name}
+                    {citySections.map((section) => (
+                      <SelectItem key={section.id} value={`${section.id}`}>
+                        {section.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              </FormItem>
+              <FormItem className='w-1/3'>
+                <Label>
+                  Mts de frente <span className='text-red-500'>*</span>
+                </Label>
+                <Input
+                  type='number'
+                  name='front_length'
+                  required
+                  placeholder='10'
+                />
+              </FormItem>
+            </div>
+
+            <div className='w-full justify-end flex mt-6'>
+              <FormItem>
+                <Button type='submit' className=''>
+                  Crear
+                </Button>
               </FormItem>
             </div>
           </form>
