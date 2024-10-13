@@ -1,11 +1,19 @@
 import { DataTableColumnHeader } from '@/components/data-table';
 import { CustomDataTable } from '@/components/data-table/customDataTable';
+import { Button } from '@/components/ui';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { property } from '@prisma/client';
 import {
   ColumnDef,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { MousePointerClick } from 'lucide-react';
 
 interface SearchResultTableProps {
   data: property[];
@@ -59,6 +67,34 @@ export const SearchResultTable = ({
       ),
       enableSorting: false,
     },
+    {
+      id: 'actions',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='' />
+      ),
+      cell: ({ row }) => {
+        return (
+          <TooltipProvider>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='outline'
+                  className='flex items-center gap-2'
+                  size='icon'
+                  onClick={() => onSelect(row.original)}
+                >
+                  <MousePointerClick size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className='bg-black text-white'>
+                <span>Seleccionar</span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      },
+      enableSorting: false,
+    },
   ];
 
   const table = useReactTable({
@@ -76,7 +112,7 @@ export const SearchResultTable = ({
         tableTitle='Registros de inmuebles'
         columns={columns}
         table={table}
-        onRecordClick={(record) => onSelect(record)}
+        onRecordClick={() => {}}
       />
     </div>
   );
