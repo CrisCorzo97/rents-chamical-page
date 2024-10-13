@@ -1,3 +1,4 @@
+import { WorkInProgressIllustration } from '@/assets/illustrations';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -30,7 +31,16 @@ export default async function DashboardPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div>Dashboard</div>
+      <div className='flex flex-col items-center justify-center h-full'>
+        <WorkInProgressIllustration className='w-80 h-80 mx-auto mt-12' />
+        <h1 className='text-2xl font-bold text-center mt-6'>
+          ¡Estamos trabajando en esta página!
+        </h1>
+        <p className='text-center mt-2'>
+          Próximamente podrás disfrutar de todas las funcionalidades de esta
+          sección.
+        </p>
+      </div>
     </ScrollArea>
   );
 }
