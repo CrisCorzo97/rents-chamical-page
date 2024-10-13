@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { sortByToState } from '@/lib/table';
 import Link from 'next/link';
-import { getProperties } from '../actions';
+import { getProperties } from './actions.property';
 import { PropertyPageClient } from './page.client';
 
 export default async function PropertyPage({

@@ -2,6 +2,86 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { city_section, neighborhood, Prisma, property } from '@prisma/client';
+import { PropertyRecordWithRelations } from './property.interface';
+
+export const getPropertyRecordById = async (
+  id: string
+): Promise<PropertyRecordWithRelations | null> => {
+  const propertyRecord = await dbSupabase.property.findUnique({
+    where: { id },
+    include: {
+      city_section: true,
+      neighborhood: true,
+    },
+  });
+
+  return propertyRecord;
+};
+
+/* --- ACCIONES DE LOS REGISTROS DE INMUEBLES --- */
+export const getProperties = async (input: {
+  limit?: number;
+  page?: number;
+  order_by?: Prisma.propertyOrderByWithRelationInput;
+  filter?: Prisma.propertyWhereInput;
+}): Promise<Envelope<PropertyRecordWithRelations[]>> => {
+  const response: Envelope<PropertyRecordWithRelations[]> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+  try {
+    const inputQuery: Prisma.propertyFindManyArgs = {
+      take: 5,
+      orderBy: {
+        taxpayer: 'asc',
+      },
+    };
+
+    if (input.filter) {
+      inputQuery.where = input.filter;
+    }
+    if (input.page) {
+      inputQuery.skip = (+input.page - 1) * (input?.limit ?? 5);
+    }
+    if (input.limit) {
+      inputQuery.take = +input.limit;
+    }
+    if (input.order_by) {
+      inputQuery.orderBy = input.order_by;
+    }
+
+    const properties = await dbSupabase.property.findMany({
+      ...inputQuery,
+      include: {
+        city_section: true,
+        neighborhood: true,
+      },
+    });
+
+    const propertiesCounted = await dbSupabase.property.count({
+      where: inputQuery.where,
+    });
+
+    response.data = properties;
+    response.pagination = {
+      total_pages: Math.ceil(propertiesCounted / (inputQuery.take ?? 5)),
+      total_items: propertiesCounted,
+      page: input.page ? +input.page : 1,
+      limit_per_page: inputQuery.take ?? 5,
+    };
+
+    return response;
+  } catch (error) {
+    console.error({ error });
+
+    response.success = false;
+    response.error = 'Hubo un error al obtener los registros de inmuebles.';
+
+    return response;
+  }
+};
 
 export const createProperty = async (
   input: Prisma.propertyCreateInput

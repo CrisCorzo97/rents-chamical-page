@@ -89,7 +89,6 @@ export function CustomDataTable<DataType>(
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => onRecordClick?.(row.original)}
-                  className='cursor-pointer hover:bg-gray-100'
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

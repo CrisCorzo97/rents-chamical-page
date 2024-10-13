@@ -11,12 +11,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { cn } from '@/lib/cn';
 import { stateToSortBy } from '@/lib/table';
 import { Envelope, Pagination } from '@/types/envelope';
-import { city_section, neighborhood, property } from '@prisma/client';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -24,7 +29,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { Plus } from 'lucide-react';
+import { FileText, Pencil, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PropertyRecordWithRelations } from './property.interface';
@@ -35,7 +40,7 @@ const MISSING_FIELDS: Record<string, string> = {
 };
 
 interface PropertyPageClientProps {
-  data: Envelope<property[]>;
+  data: Envelope<PropertyRecordWithRelations[]>;
   sorting: SortingState;
   filter: string;
 }
@@ -53,7 +58,7 @@ export function PropertyPageClient({
     pagination: data.pagination as Pagination,
   });
 
-  const columns: ColumnDef<property>[] = [
+  const columns: ColumnDef<PropertyRecordWithRelations>[] = [
     {
       id: 'taxpayer',
       header: ({ column }) => (
@@ -118,6 +123,65 @@ export function PropertyPageClient({
       },
       enableSorting: true,
     },
+    {
+      id: 'actions',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='' />
+      ),
+      cell: ({ row }) => {
+        const selectRecord = () => {
+          if (recordDetails?.id !== row.original.id) {
+            setRecordDetails(row.original);
+          } else {
+            setRecordDetails(null);
+          }
+        };
+
+        return (
+          <div className='flex items-center gap-2'>
+            <TooltipProvider>
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='outline'
+                    className='flex items-center gap-2'
+                    size='icon'
+                    onClick={selectRecord}
+                  >
+                    <FileText size={18} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className='bg-black text-white'>
+                  <span>Ver detalles</span>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <Link
+              href={`/private/admin/property/edit/${row.original.id}`}
+              prefetch
+            >
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='outline'
+                      className='flex items-center gap-2'
+                      size='icon'
+                    >
+                      <Pencil size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className='bg-black text-white'>
+                    <span>Editar registro</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Link>
+          </div>
+        );
+      },
+      enableSorting: false,
+    },
   ];
 
   useCallbackDebouncing({
@@ -170,23 +234,12 @@ export function PropertyPageClient({
             </Button>
           </Link>
         </div>
-        <CustomDataTable<property>
+        <CustomDataTable<PropertyRecordWithRelations>
           tableTitle='Registros de inmuebles'
           columns={columns}
           table={table}
           pagination={data.pagination as Pagination}
-          onRecordClick={(record) => {
-            if (recordDetails?.id !== (record as property).id) {
-              setRecordDetails(
-                record as property & {
-                  city_section: city_section;
-                  neighborhood: neighborhood;
-                }
-              );
-            } else {
-              setRecordDetails(null);
-            }
-          }}
+          onRecordClick={() => {}}
           handlePagination={handlePagination}
         />
       </div>
