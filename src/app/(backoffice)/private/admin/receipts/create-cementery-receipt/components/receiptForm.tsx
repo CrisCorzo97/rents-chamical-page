@@ -21,6 +21,7 @@ import { formatCurrency } from '@/lib/formatters';
 import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
+import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -322,7 +323,9 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
 
               <div className='mt-6 flex gap-3 self-end'>
                 <FormItem>
-                  <Button variant='secondary'>Editar</Button>
+                  <Link href={`/private/admin/cementery/edit/${record.id}`}>
+                    <Button variant='outline'>Editar</Button>
+                  </Link>
                 </FormItem>
                 <FormItem>
                   <AlertDialog open={openDialog}>

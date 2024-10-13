@@ -11,6 +11,7 @@ import {
 import { FormItem } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
 import { FilePlus2 } from 'lucide-react';
+import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { getCementeryRecords } from '../../actions';
@@ -102,14 +103,12 @@ export const GenerateCementeryReceiptPageClient = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button
-              variant='outline'
-              // Agregar redirección a la página de creación de registro
-              className='flex gap-3 transition-all'
-            >
-              <FilePlus2 size={20} />
-              Crear nuevo registro
-            </Button>
+            <Link href={`/private/admin/cementery/create`}>
+              <Button variant='outline' className='flex gap-3 transition-all'>
+                <FilePlus2 size={20} />
+                Crear nuevo registro
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </section>
