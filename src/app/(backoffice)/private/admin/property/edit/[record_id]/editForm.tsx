@@ -26,11 +26,11 @@ import {
 import { Toaster } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
 import { city_section, neighborhood, Prisma } from '@prisma/client';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { createProperty } from '../../actions.property';
+import { updateProperty } from '../../actions.property';
 import { PropertyRecordWithRelations } from '../../property.interface';
 
 const formSchema = z.object({
@@ -58,6 +58,8 @@ export const EditPropertyRecordForm = ({
   const [isMutating, startTransition] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
+
+  const { replace } = useRouter();
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -91,25 +93,28 @@ export const EditPropertyRecordForm = ({
 
           if (!parsedData.enrollment) missing_fields.push('enrollment');
 
-          const createData: Prisma.propertyCreateInput = {
-            taxpayer: parsedData.taxpayer,
-            taxpayer_type: parsedData.taxpayer_type,
-            enrollment: parsedData.enrollment,
-            is_part: parsedData.is_part,
-            address: parsedData.address,
-            neighborhood: {
-              connect: { id: parsedData.neighborhood },
+          const updatedData: Prisma.propertyUpdateArgs = {
+            where: { id: record.id },
+            data: {
+              taxpayer: parsedData.taxpayer,
+              taxpayer_type: parsedData.taxpayer_type,
+              enrollment: parsedData.enrollment,
+              is_part: parsedData.is_part,
+              address: parsedData.address,
+              neighborhood: {
+                connect: { id: parsedData.neighborhood },
+              },
+              city_section: {
+                connect: { id: parsedData.city_section },
+              },
+              front_length: parsedData.front_length,
+              missing_fields: !missing_fields.length
+                ? null
+                : JSON.stringify(missing_fields),
             },
-            city_section: {
-              connect: { id: parsedData.city_section },
-            },
-            front_length: parsedData.front_length,
-            missing_fields: !missing_fields.length
-              ? null
-              : JSON.stringify(missing_fields),
           };
 
-          const { success, data, error } = await createProperty(createData);
+          const { success, data, error } = await updateProperty(updatedData);
 
           if (!success || !data) {
             throw new Error(error ?? '');
@@ -120,7 +125,7 @@ export const EditPropertyRecordForm = ({
           console.error(error);
 
           toast.error(
-            'Error al crear el registro de propiedad. Revise los datos ingresados e intente nuevamente.',
+            'Error al editar el registro de propiedad. Revise los datos ingresados e intente nuevamente.',
             {
               duration: 5000,
             }
@@ -155,9 +160,14 @@ export const EditPropertyRecordForm = ({
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
-              <Link href='/private/admin/property'>
-                <Button onClick={() => setOpenSuccess(false)}>Finalizar</Button>
-              </Link>
+              <Button
+                onClick={() => {
+                  setOpenSuccess(false);
+                  replace('/private/admin/property');
+                }}
+              >
+                Finalizar
+              </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

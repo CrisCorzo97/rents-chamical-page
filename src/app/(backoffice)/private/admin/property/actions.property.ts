@@ -2,6 +2,7 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { city_section, neighborhood, Prisma, property } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 import { PropertyRecordWithRelations } from './property.interface';
 
 export const getPropertyRecordById = async (
@@ -18,7 +19,6 @@ export const getPropertyRecordById = async (
   return propertyRecord;
 };
 
-/* --- ACCIONES DE LOS REGISTROS DE INMUEBLES --- */
 export const getProperties = async (input: {
   limit?: number;
   page?: number;
@@ -97,6 +97,8 @@ export const createProperty = async (
     const newProperty = await dbSupabase.property.create({ data: input });
 
     response.data = newProperty.id;
+
+    revalidatePath('/private/admin/property');
   } catch (error) {
     console.error(error);
     response.success = false;
@@ -108,10 +110,27 @@ export const createProperty = async (
 
 export const updateProperty = async (
   args: Prisma.propertyUpdateArgs
-): Promise<property['id']> => {
-  const updatedProperty = await dbSupabase.property.update(args);
+): Promise<Envelope<property['id']>> => {
+  const response: Envelope<property['id']> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
 
-  return updatedProperty.id;
+  try {
+    const updatedProperty = await dbSupabase.property.update(args);
+
+    response.data = updatedProperty.id;
+
+    revalidatePath('/private/admin/property');
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+    response.error = 'Error al editar el registro de propiedad';
+  }
+
+  return response;
 };
 
 export const getCitySections = async (): Promise<city_section[]> => {
