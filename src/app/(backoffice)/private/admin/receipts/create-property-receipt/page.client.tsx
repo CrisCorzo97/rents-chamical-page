@@ -14,6 +14,7 @@ import { property } from '@prisma/client';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { FilePlus2 } from 'lucide-react';
+import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { getProperties } from '../../actions';
@@ -105,14 +106,12 @@ export const GeneratePropertyReceiptClientPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button
-              variant='outline'
-              // Agregar redirección a la página de creación de registro
-              className='flex gap-3 transition-all'
-            >
-              <FilePlus2 size={20} />
-              Crear nuevo registro
-            </Button>
+            <Link href={`/private/admin/property/create`}>
+              <Button variant='outline' className='flex gap-3 transition-all'>
+                <FilePlus2 size={20} />
+                Crear nuevo registro
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </section>

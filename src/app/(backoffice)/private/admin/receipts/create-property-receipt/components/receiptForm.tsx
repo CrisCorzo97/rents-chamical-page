@@ -21,6 +21,7 @@ import { formatCurrency } from '@/lib/formatters';
 import { Prisma, property } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
+import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -299,12 +300,9 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
 
               <div className='mt-6 flex gap-3 self-end'>
                 <FormItem>
-                  <Button
-                    // Agregar redirección a la página de edición de registro
-                    variant='secondary'
-                  >
-                    Editar
-                  </Button>
+                  <Link href={`/private/admin/property/edit/${record.id}`}>
+                    <Button variant='outline'>Editar</Button>
+                  </Link>
                 </FormItem>
                 <FormItem>
                   <AlertDialog open={openDialog}>
