@@ -33,14 +33,13 @@ export default async function AdminPageLayout({
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <Link href='/' prefetch legacyBehavior passHref>
-                    {/*Cambiar el HREF por la URL correspondiente */}
                     <NavigationMenuLink
                       className={navigationMenuTriggerStyle({
                         className:
                           'bg-neutral-500 text-primary-foreground hover:bg-primary/90',
                       })}
                     >
-                      Salir de Rentas
+                      Volver al Inicio
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
