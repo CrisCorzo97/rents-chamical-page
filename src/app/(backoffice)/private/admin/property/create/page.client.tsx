@@ -53,7 +53,6 @@ export const CreatePropertyRecordForm = ({
   neighborhoods,
 }: CreatePropertyRecordFormProps) => {
   const [isMutating, startTransition] = useTransition();
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
   const handleSubmit = (formData: FormData) => {
@@ -125,17 +124,6 @@ export const CreatePropertyRecordForm = ({
         }
       } catch (error) {
         console.error(error);
-        if (error instanceof z.ZodError) {
-          // Capturar errores y mostrarlos en el formulario
-          const newErrors: Record<string, string> = {};
-
-          error.errors.forEach((err) => {
-            const path = err.path.join('.');
-            newErrors[path] = err.message;
-          });
-
-          setErrors(newErrors);
-        }
       }
     });
   };

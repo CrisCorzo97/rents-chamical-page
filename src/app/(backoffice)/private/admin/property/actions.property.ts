@@ -71,16 +71,14 @@ export const getProperties = async (input: {
       page: input.page ? +input.page : 1,
       limit_per_page: inputQuery.take ?? 5,
     };
-
-    return response;
   } catch (error) {
     console.error({ error });
 
     response.success = false;
     response.error = 'Hubo un error al obtener los registros de inmuebles.';
-
-    return response;
   }
+
+  return response;
 };
 
 export const createProperty = async (
