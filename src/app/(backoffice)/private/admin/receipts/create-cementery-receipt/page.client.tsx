@@ -73,12 +73,7 @@ export const GenerateCementeryReceiptPageClient = () => {
             <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
                 <Label>Apellido y Nombre</Label>
-                <Input
-                  type='text'
-                  name='search'
-                  placeholder='Jose Perez'
-                  required
-                />
+                <Input type='text' name='search' required />
               </FormItem>
 
               <FormItem className='mt-3 self-end'>

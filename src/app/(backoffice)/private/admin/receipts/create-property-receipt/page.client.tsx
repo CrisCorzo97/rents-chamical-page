@@ -76,12 +76,7 @@ export const GeneratePropertyReceiptClientPage = () => {
             <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
                 <Label>Nombre o matrícula</Label>
-                <Input
-                  type='text'
-                  name='search'
-                  placeholder='3771-836-1948'
-                  required
-                />
+                <Input type='text' name='search' required />
               </FormItem>
 
               <FormItem className='mt-3 self-end'>
