@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { sortByToState } from '@/lib/table';
 import Link from 'next/link';
-import { getCementeryRecords } from '../actions';
+import { getCementeryRecords } from './actions.cementery';
 import { CementeryPageClient } from './page.client';
 
 export default async function CementeryPage({
