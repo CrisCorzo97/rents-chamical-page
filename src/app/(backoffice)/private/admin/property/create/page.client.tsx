@@ -162,7 +162,7 @@ export const CreatePropertyRecordForm = ({
                 <Label>
                   Contribuyente <span className='text-red-500'>*</span>
                 </Label>
-                <Input name='taxpayer' placeholder='Jose Perez' required />
+                <Input name='taxpayer' required />
               </FormItem>
               <FormItem className='w-1/3'>
                 <Label>Tipo de contribuyente</Label>
@@ -188,7 +188,7 @@ export const CreatePropertyRecordForm = ({
             <div className='flex gap-2 w-full'>
               <FormItem className='w-1/2'>
                 <Label>Matrícula</Label>
-                <Input name='enrollment' placeholder='XXXX-XXXX-XXX' />
+                <Input name='enrollment' />
               </FormItem>
               <FormItem>
                 <Label>¿Es parte?</Label>
@@ -201,7 +201,7 @@ export const CreatePropertyRecordForm = ({
                 <Label>
                   Dirección <span className='text-red-500'>*</span>
                 </Label>
-                <Input name='address' placeholder='9 de Julio' required />
+                <Input name='address' required />
               </FormItem>
               <FormItem className='w-1/3'>
                 <Label>
@@ -247,12 +247,7 @@ export const CreatePropertyRecordForm = ({
                 <Label>
                   Mts de frente <span className='text-red-500'>*</span>
                 </Label>
-                <Input
-                  type='text'
-                  name='front_length'
-                  required
-                  placeholder='10'
-                />
+                <Input type='text' name='front_length' required />
               </FormItem>
             </div>
 

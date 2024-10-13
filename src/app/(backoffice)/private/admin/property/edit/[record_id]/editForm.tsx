@@ -26,7 +26,7 @@ import {
 import { Toaster } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
 import { city_section, neighborhood, Prisma } from '@prisma/client';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -56,10 +56,7 @@ export const EditPropertyRecordForm = ({
   neighborhoods,
 }: EditPropertyRecordFormProps) => {
   const [isMutating, startTransition] = useTransition();
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
-
-  const { replace } = useRouter();
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -133,17 +130,6 @@ export const EditPropertyRecordForm = ({
         }
       } catch (error) {
         console.error(error);
-        if (error instanceof z.ZodError) {
-          // Capturar errores y mostrarlos en el formulario
-          const newErrors: Record<string, string> = {};
-
-          error.errors.forEach((err) => {
-            const path = err.path.join('.');
-            newErrors[path] = err.message;
-          });
-
-          setErrors(newErrors);
-        }
       }
     });
   };
@@ -160,14 +146,9 @@ export const EditPropertyRecordForm = ({
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
-              <Button
-                onClick={() => {
-                  setOpenSuccess(false);
-                  replace('/private/admin/property');
-                }}
-              >
-                Finalizar
-              </Button>
+              <Link href='/private/admin/property'>
+                <Button onClick={() => setOpenSuccess(false)}>Finalizar</Button>
+              </Link>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -187,7 +168,6 @@ export const EditPropertyRecordForm = ({
                 </Label>
                 <Input
                   name='taxpayer'
-                  placeholder='Jose Perez'
                   required
                   defaultValue={record.taxpayer}
                 />
@@ -221,7 +201,6 @@ export const EditPropertyRecordForm = ({
                 <Label>Matrícula</Label>
                 <Input
                   name='enrollment'
-                  placeholder='XXXX-XXXX-XXX'
                   defaultValue={record.enrollment ?? ''}
                 />
               </FormItem>
@@ -242,7 +221,6 @@ export const EditPropertyRecordForm = ({
                 </Label>
                 <Input
                   name='address'
-                  placeholder='9 de Julio'
                   required
                   defaultValue={record.address ?? ''}
                 />
@@ -311,7 +289,6 @@ export const EditPropertyRecordForm = ({
                   type='text'
                   name='front_length'
                   required
-                  placeholder='10'
                   defaultValue={`${record.front_length}`}
                 />
               </FormItem>
