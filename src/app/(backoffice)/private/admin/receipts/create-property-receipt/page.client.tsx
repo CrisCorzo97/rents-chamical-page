@@ -17,7 +17,7 @@ import { FilePlus2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { getProperties } from '../../actions';
+import { getProperties } from '../../property/actions.property';
 import { PropertyRecordWithRelations } from '../../property/property.interface';
 import { ReceiptForm } from './components/receiptForm';
 import { SearchResultTable } from './components/searchResultTable';

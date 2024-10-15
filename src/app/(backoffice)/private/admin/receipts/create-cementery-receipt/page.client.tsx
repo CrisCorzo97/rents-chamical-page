@@ -14,7 +14,7 @@ import { FilePlus2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { getCementeryRecords } from '../../actions';
+import { getCementeryRecords } from '../../cementery/actions.cementery';
 import { CementeryRecordWithRelations } from '../../cementery/cementery.interface';
 import { ReceiptForm } from './components/receiptForm';
 import { SearchResultTable } from './components/searchResultTable';
