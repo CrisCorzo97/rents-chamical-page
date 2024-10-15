@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
           cuil,
           role_id: Number(role_id),
         },
-        emailRedirectTo: `https://${process.env.PROJECT_URL}/auth/cambiar-clave?prev_password=${password}`,
+        emailRedirectTo: `${process.env.PROJECT_URL}/auth/cambiar-clave?prev_password=${password}`,
       },
     });
 
