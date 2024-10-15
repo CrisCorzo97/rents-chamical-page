@@ -67,7 +67,7 @@ export const MainHeader = () => {
         { label: 'Instructivos / Tutoriales', key: 'tutorials', href: '#' },
       ],
     },
-    { label: 'Salir', key: 'exit', href: '/' }, // cambiar esto por la url a redireccionar
+    // { label: 'Salir', key: 'exit', href: '/' }, // cambiar esto por la url a redireccionar
   ];
 
   return (

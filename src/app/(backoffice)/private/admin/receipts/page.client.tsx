@@ -166,20 +166,20 @@ export const ReceiptClientPage = ({
               <DropdownMenuContent className='w-full'>
                 <DropdownMenuItem>
                   <Link
+                    href='/private/admin/receipts/create-various-rates-receipt'
+                    prefetch
+                    className='w-full'
+                  >
+                    Tasas diversas
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
                     href='/private/admin/receipts/create-cementery-receipt'
                     prefetch
                     className='w-full'
                   >
                     Cementerio
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link
-                    href='/private/admin/receipts/create-patent-receipt'
-                    prefetch
-                    className='w-full'
-                  >
-                    Patente
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -193,11 +193,11 @@ export const ReceiptClientPage = ({
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link
-                    href='/private/admin/receipts/create-various-rates-receipt'
+                    href='/private/admin/receipts/create-patent-receipt'
                     prefetch
                     className='w-full'
                   >
-                    Tasas diversas
+                    Patente
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
