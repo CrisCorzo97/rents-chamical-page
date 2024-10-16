@@ -206,8 +206,8 @@ export function ChangePasswordComponent({
       </Flex>
       <SuccessModal
         open={isSuccessful}
-        title='¡Solicitud enviada con éxito!'
-        subtitle='En las próximas 48 horas hábiles, recibirás un correo electrónico informando el estado de la misma.'
+        title='¡Contraseña cambiada!'
+        subtitle='Tu contraseña ha sido cambiada exitosamente. Ahora puedes iniciar sesión con tu nueva contraseña.'
         icon={<CheckCircleFilled style={{ color: '#5ba02e' }} />}
         extra={[
           [
