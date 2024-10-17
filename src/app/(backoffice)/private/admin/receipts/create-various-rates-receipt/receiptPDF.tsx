@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from '@react-pdf/renderer';
+import dayjs from 'dayjs';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -113,8 +114,22 @@ const styles = StyleSheet.create({
   },
 });
 
+export interface ReceiptPDFProps {
+  data: {
+    receiptId: string;
+    domain: string;
+    vehicle: string;
+    brand: string;
+    owner: string;
+    dni: string;
+    year_to_pay: number;
+    observations: string;
+    amount: number;
+  };
+}
+
 // Create Document Component
-export const ReceiptPDF = () => {
+export const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
   return (
     <Document
       title='Comprobante de pago de patente'
@@ -124,7 +139,7 @@ export const ReceiptPDF = () => {
     >
       <Page size='A4' style={styles.page}>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para el contribuyente
@@ -133,7 +148,7 @@ export const ReceiptPDF = () => {
           </View>
         </View>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para el Tribunal de Cuentas
@@ -142,7 +157,7 @@ export const ReceiptPDF = () => {
           </View>
         </View>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para la Municipalidad
@@ -154,7 +169,26 @@ export const ReceiptPDF = () => {
   );
 };
 
-const Receipt = () => {
+const Receipt = ({ data }: ReceiptPDFProps) => {
+  const {
+    receiptId,
+    domain,
+    vehicle,
+    brand,
+    owner,
+    dni,
+    year_to_pay,
+    observations,
+    amount,
+  } = data;
+
+  const fullDate = dayjs().locale('es').format('DD-MMMM-YYYY');
+
+  const day = fullDate.split('-')[0];
+  const month = fullDate.split('-')[1].toLowerCase();
+  const monthCapitalized = month.charAt(0).toUpperCase() + month.slice(1);
+  const year = fullDate.split('-')[2];
+
   return (
     <View style={styles.receipt}>
       <View style={styles.headerReceipt}>
