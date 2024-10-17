@@ -36,7 +36,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { createReceipt } from '../receipt-actions';
-import { ReceiptPDF } from './receiptPDF';
+import { ReceiptPDF, ReceiptPDFProps } from './receiptPDF';
 
 dayjs.extend(customParseFormat);
 
@@ -64,6 +64,13 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
   const [amountValue, setAmountValue] = useState<string>('');
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
+  const [contentDialog, setContentDialog] = useState<ReceiptPDFProps['data']>({
+    receiptId: '',
+    taxpayer: '',
+    taxOrContibution: '',
+    observations: '',
+    amount: 0,
+  });
 
   const handleFormSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -92,7 +99,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
           created_at: parsedDataObject.created_at,
           taxpayer: parsedDataObject.taxpayer,
           amount: parsedDataObject.amount,
-          tax_type: 'PATENTE',
+          tax_type: 'TASAS DIVERSAS',
           other_data: {
             observations: parsedDataObject.observations,
           },
@@ -109,6 +116,19 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
           );
           console.error(response.error);
         }
+
+        // Actualizar el contenido del diálogo con los datos del comprobante
+        setContentDialog({
+          receiptId: response.data?.id ?? '',
+          taxpayer: parsedDataObject.taxpayer,
+          taxOrContibution:
+            taxesOrContributions.find(
+              (toc) =>
+                Number(toc.id) === parsedDataObject.tax_or_contribution_id
+            )?.name ?? '',
+          observations: parsedDataObject.observations ?? '',
+          amount: parsedDataObject.amount,
+        });
 
         // Mostrar el diálogo de confirmación
         setOpenDialog(true);
@@ -221,7 +241,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
                       descargarlo a continuación.
                     </AlertDialogDescription>
                     <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                      <ReceiptPDF />
+                      <ReceiptPDF data={contentDialog} />
                     </PDFViewer>
                     <AlertDialogFooter className='flex-none'>
                       <AlertDialogAction onClick={() => setOpenDialog(false)}>

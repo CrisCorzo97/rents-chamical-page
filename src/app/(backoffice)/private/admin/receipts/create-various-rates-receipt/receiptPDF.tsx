@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     gap: '6px',
   },
   bodyTitle: {
-    width: '65%',
+    width: '100%',
     margin: '0 auto',
     marginBottom: '4px',
     backgroundColor: '#E4E4E4',
@@ -117,12 +117,8 @@ const styles = StyleSheet.create({
 export interface ReceiptPDFProps {
   data: {
     receiptId: string;
-    domain: string;
-    vehicle: string;
-    brand: string;
-    owner: string;
-    dni: string;
-    year_to_pay: number;
+    taxpayer: string;
+    taxOrContibution: string;
     observations: string;
     amount: number;
   };
@@ -132,7 +128,7 @@ export interface ReceiptPDFProps {
 export const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
   return (
     <Document
-      title='Comprobante de pago de patente'
+      title='Comprobante de pago de Tasas Diversas'
       author='Municipalidad de Chamical'
       subject='Rentas Municipal'
       language='es'
@@ -170,17 +166,7 @@ export const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
 };
 
 const Receipt = ({ data }: ReceiptPDFProps) => {
-  const {
-    receiptId,
-    domain,
-    vehicle,
-    brand,
-    owner,
-    dni,
-    year_to_pay,
-    observations,
-    amount,
-  } = data;
+  const { receiptId, taxpayer, taxOrContibution, observations, amount } = data;
 
   const fullDate = dayjs().locale('es').format('DD-MMMM-YYYY');
 
@@ -226,7 +212,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
               fontWeight: 'bold',
             }}
           >
-            PATENTE
+            TASAS DIVERSAS
           </Text>
           <View
             style={{
@@ -255,13 +241,15 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 fontWeight: 'normal',
               }}
             >
-              30-00000000-0
+              {receiptId}
             </Text>
           </View>
         </View>
       </View>
       <View style={styles.bodyReceipt}>
-        <Text style={styles.bodyTitle}>PATENTE AUTOMOTOR Y/O MOTOVEHÍCULO</Text>
+        <Text style={styles.bodyTitle}>
+          PAGO DE {taxOrContibution.toUpperCase()}
+        </Text>
         <View style={styles.bodyLine}>
           <View
             style={{
