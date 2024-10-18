@@ -90,7 +90,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
 
         const createData: Omit<Prisma.receiptCreateInput, 'id'> = {
           created_at: parsedDataObject.created_at,
-          taxpayer: parsedDataObject.taxpayer,
+          taxpayer: parsedDataObject.taxpayer.toUpperCase(),
           amount: parsedDataObject.amount,
           tax_type: 'PATENTE',
           other_data: {

@@ -20,6 +20,7 @@ import {
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { cn } from '@/lib/cn';
+import { formatName } from '@/lib/formatters';
 import { stateToSortBy } from '@/lib/table';
 import { Envelope, Pagination } from '@/types/envelope';
 import {
@@ -66,6 +67,7 @@ export function PropertyPageClient({
       ),
       accessorKey: 'taxpayer',
       enableColumnFilter: true,
+      cell: ({ row }) => formatName(row.original.taxpayer),
     },
     {
       id: 'enrollment',
@@ -73,11 +75,7 @@ export function PropertyPageClient({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='MATRÍCULA' />
       ),
-      cell: ({ row }) => {
-        const enrollment = row.getValue('enrollment');
-
-        return enrollment ? `${enrollment}` : '-';
-      },
+      cell: ({ row }) => row.original.enrollment ?? '-',
       enableSorting: false,
     },
     {
@@ -86,11 +84,7 @@ export function PropertyPageClient({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='DIRECCIÓN' />
       ),
-      cell: ({ row }) => {
-        const address = row.getValue('address');
-
-        return address ? `${address}` : '-';
-      },
+      cell: ({ row }) => row.original.address ?? '-',
       enableSorting: false,
     },
     {
@@ -268,7 +262,9 @@ export function PropertyPageClient({
             <CardContent className='flex flex-col gap-2'>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Contribuyente:</Label>{' '}
-                {recordDetails.taxpayer ?? '-'}
+                {recordDetails.taxpayer
+                  ? formatName(recordDetails.taxpayer)
+                  : '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Tipo de contribuyente:</Label>{' '}

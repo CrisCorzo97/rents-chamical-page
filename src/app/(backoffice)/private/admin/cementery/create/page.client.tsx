@@ -88,8 +88,8 @@ export const CreateCementeryRecordForm = ({
 
         try {
           const createData: Prisma.cementeryCreateInput = {
-            taxpayer: parsedData.taxpayer,
-            deceased_name: parsedData.deceased_name,
+            taxpayer: parsedData.taxpayer.toUpperCase(),
+            deceased_name: parsedData.deceased_name?.toUpperCase(),
             address_taxpayer: parsedData.address_taxpayer,
             neighborhood: {
               connect: {

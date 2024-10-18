@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatName } from '@/lib/formatters';
 import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
@@ -105,14 +105,14 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
         try {
           const createData: Omit<Prisma.receiptCreateInput, 'id'> = {
             created_at: parsedDataObject.created_at,
-            taxpayer: parsedDataObject.taxpayer,
+            taxpayer: parsedDataObject.taxpayer.toUpperCase(),
             amount: parsedDataObject.amount,
             tax_type: 'CEMENTERIO',
             id_tax_reference: record?.id,
             other_data: {
               address_taxpayer: parsedDataObject.address_taxpayer,
               neighborhood: parsedDataObject.neighborhood,
-              deceased_name: parsedDataObject.deceased_name,
+              deceased_name: parsedDataObject.deceased_name?.toUpperCase(),
               cementery_place: parsedDataObject.cementery_place,
               burial_type: parsedDataObject.burial_type,
               section: parsedDataObject.section,
@@ -182,7 +182,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                   <Input
                     type='text'
                     name='taxpayer'
-                    value={record.taxpayer}
+                    value={formatName(record.taxpayer)}
                     readOnly
                     className='cursor-not-allowed'
                   />
@@ -228,7 +228,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                   <Input
                     type='text'
                     name='deceased_name'
-                    value={record.deceased_name ?? ''}
+                    value={formatName(record.deceased_name ?? '')}
                     readOnly
                     className='cursor-not-allowed'
                   />

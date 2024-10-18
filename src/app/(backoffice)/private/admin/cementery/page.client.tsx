@@ -20,6 +20,7 @@ import {
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { cn } from '@/lib/cn';
+import { formatName } from '@/lib/formatters';
 import { stateToSortBy } from '@/lib/table';
 import { Envelope, Pagination } from '@/types/envelope';
 import {
@@ -65,6 +66,7 @@ export function CementeryPageClient({
       ),
       accessorKey: 'taxpayer',
       enableColumnFilter: true,
+      cell: ({ row }) => formatName(row.original.taxpayer),
     },
     {
       id: 'address_taxpayer',
@@ -85,12 +87,7 @@ export function CementeryPageClient({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='NOMBRE DIFUNTO' />
       ),
-      cell: ({ row }) => {
-        const deceased_name = row.getValue('deceased_name');
-
-        return deceased_name ? `${deceased_name}` : '-';
-      },
-      enableSorting: true,
+      cell: ({ row }) => formatName(row.original.deceased_name ?? '') ?? '-',
     },
     {
       id: 'last_year_paid',
@@ -267,7 +264,9 @@ export function CementeryPageClient({
             <CardContent className='flex flex-col gap-2'>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Contribuyente:</Label>{' '}
-                {recordDetails.taxpayer ?? '-'}
+                {recordDetails.taxpayer
+                  ? formatName(recordDetails.taxpayer)
+                  : '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Dirección:</Label>{' '}
@@ -300,7 +299,7 @@ export function CementeryPageClient({
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Nombre del difunto:</Label>{' '}
                 {recordDetails.deceased_name
-                  ? `${recordDetails.deceased_name}`
+                  ? formatName(recordDetails.deceased_name)
                   : '-'}
               </span>
               <span className='font-light text-sm'>
