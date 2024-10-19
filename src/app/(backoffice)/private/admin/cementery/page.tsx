@@ -43,9 +43,18 @@ export default async function CementeryPage({
     limit,
     order_by,
     filter: {
-      taxpayer: {
-        contains: filter,
-      },
+      OR: [
+        {
+          taxpayer: {
+            contains: filter?.toUpperCase() ?? '',
+          },
+        },
+        {
+          deceased_name: {
+            contains: filter?.toUpperCase() ?? '',
+          },
+        },
+      ],
     },
   });
 

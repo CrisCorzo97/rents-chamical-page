@@ -41,8 +41,8 @@ export const GeneratePropertyReceiptClientPage = () => {
           limit: 50,
           filter: {
             OR: [
-              { enrollment: { contains: search } },
-              { taxpayer: { contains: search } },
+              { enrollment: { contains: search?.toUpperCase() ?? '' } },
+              { taxpayer: { contains: search?.toUpperCase() ?? '' } },
             ],
           },
         });

@@ -37,8 +37,8 @@ export const GenerateCementeryReceiptPageClient = () => {
           limit: 50,
           filter: {
             OR: [
-              { taxpayer: { contains: search } },
-              { deceased_name: { contains: search } },
+              { taxpayer: { contains: search?.toUpperCase() ?? '' } },
+              { deceased_name: { contains: search?.toUpperCase() ?? '' } },
             ],
           },
         });

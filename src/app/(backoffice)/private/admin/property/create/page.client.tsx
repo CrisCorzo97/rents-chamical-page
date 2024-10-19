@@ -88,7 +88,7 @@ export const CreatePropertyRecordForm = ({
           if (!parsedData.enrollment) missing_fields.push('enrollment');
 
           const createData: Prisma.propertyCreateInput = {
-            taxpayer: parsedData.taxpayer,
+            taxpayer: parsedData.taxpayer.toUpperCase(),
             taxpayer_type: parsedData.taxpayer_type,
             enrollment: parsedData.enrollment,
             is_part: parsedData.is_part,

@@ -74,3 +74,15 @@ export function formatDni(input: string): string {
 
   return value;
 }
+
+// función para formatear a Capitalize la primera letra de cada palabra
+export function formatName(input: string): string {
+  if (!input.length) {
+    return '';
+  }
+
+  return input
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}

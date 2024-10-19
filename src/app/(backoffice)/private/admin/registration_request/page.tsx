@@ -47,7 +47,7 @@ export default async function RegistrationRequestPage({
     order_by,
     filter: {
       first_name: {
-        contains: filter,
+        contains: filter?.toUpperCase() ?? '',
       },
     },
   });

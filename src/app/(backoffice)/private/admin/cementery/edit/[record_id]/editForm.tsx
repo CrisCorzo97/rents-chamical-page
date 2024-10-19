@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Toaster } from '@/components/ui/sonner';
+import { formatName } from '@/lib/formatters';
 import {
   burial_type,
   cementery_place,
@@ -94,8 +95,8 @@ export const EditCementeryRecordForm = ({
           const updatedData: Prisma.cementeryUpdateArgs = {
             where: { id: record.id },
             data: {
-              taxpayer: parsedData.taxpayer,
-              deceased_name: parsedData.deceased_name,
+              taxpayer: parsedData.taxpayer.toUpperCase(),
+              deceased_name: parsedData.deceased_name?.toUpperCase(),
               address_taxpayer: parsedData.address_taxpayer,
               neighborhood: {
                 connect: {
@@ -180,14 +181,14 @@ export const EditCementeryRecordForm = ({
                 <Input
                   name='taxpayer'
                   required
-                  defaultValue={record?.taxpayer ?? ''}
+                  defaultValue={formatName(record?.taxpayer ?? '') ?? ''}
                 />
               </FormItem>
               <FormItem className='flex-1'>
                 <Label>Nombre del difunto</Label>
                 <Input
                   name='deceased_name'
-                  defaultValue={record?.deceased_name ?? ''}
+                  defaultValue={formatName(record?.deceased_name ?? '') ?? ''}
                 />
               </FormItem>
             </div>

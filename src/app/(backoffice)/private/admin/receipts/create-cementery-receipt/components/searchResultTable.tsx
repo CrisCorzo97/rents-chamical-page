@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { formatName } from '@/lib/formatters';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -32,6 +33,7 @@ export const SearchResultTable = ({
       ),
       accessorKey: 'taxpayer',
       enableSorting: false,
+      cell: ({ row }) => formatName(row.original.taxpayer),
     },
     {
       id: 'address_taxpayer',
@@ -52,11 +54,7 @@ export const SearchResultTable = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='NOMBRE DIFUNTO' />
       ),
-      cell: ({ row }) => {
-        const deceased_name = row.getValue('deceased_name');
-
-        return deceased_name ? `${deceased_name}` : '-';
-      },
+      cell: ({ row }) => formatName(row.original.deceased_name ?? '') ?? '-',
       enableSorting: false,
     },
     {

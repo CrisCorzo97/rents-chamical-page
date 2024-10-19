@@ -44,7 +44,7 @@ export default async function ReceiptPage({
     order_by,
     filter: {
       taxpayer: {
-        contains: filter,
+        contains: filter?.toUpperCase() ?? '',
       },
     },
   });

@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { formatName } from '@/lib/formatters';
 import { property } from '@prisma/client';
 import {
   ColumnDef,
@@ -32,6 +33,7 @@ export const SearchResultTable = ({
       ),
       accessorKey: 'taxpayer',
       enableSorting: false,
+      cell: ({ row }) => formatName(row.original.taxpayer),
     },
     {
       id: 'enrollment',

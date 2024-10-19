@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Toaster } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
+import { formatName } from '@/lib/formatters';
 import { city_section, neighborhood, Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
@@ -93,7 +94,7 @@ export const EditPropertyRecordForm = ({
           const updatedData: Prisma.propertyUpdateArgs = {
             where: { id: record.id },
             data: {
-              taxpayer: parsedData.taxpayer,
+              taxpayer: parsedData.taxpayer.toUpperCase(),
               taxpayer_type: parsedData.taxpayer_type,
               enrollment: parsedData.enrollment,
               is_part: parsedData.is_part,
@@ -169,7 +170,7 @@ export const EditPropertyRecordForm = ({
                 <Input
                   name='taxpayer'
                   required
-                  defaultValue={record.taxpayer}
+                  defaultValue={formatName(record.taxpayer)}
                 />
               </FormItem>
               <FormItem className='w-1/3'>

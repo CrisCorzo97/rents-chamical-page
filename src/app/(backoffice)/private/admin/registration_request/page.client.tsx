@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useFPS } from '@/hooks';
+import { formatName } from '@/lib/formatters';
 import { stateToSortBy } from '@/lib/table';
 import { Envelope, Pagination } from '@/types/envelope';
 import { registration_request, role } from '@prisma/client';
@@ -53,8 +54,8 @@ export const RegistrationRequestTable = ({
       ),
       enableSorting: true,
       cell: ({ row }) => {
-        const first_name = row.original.first_name;
-        const last_name = row.original.last_name;
+        const first_name = formatName(row.original.first_name);
+        const last_name = formatName(row.original.last_name);
 
         return `${first_name} ${last_name}`;
       },

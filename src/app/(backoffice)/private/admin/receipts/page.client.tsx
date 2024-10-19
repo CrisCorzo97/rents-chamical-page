@@ -19,6 +19,7 @@ import { Separator } from '@/components/ui/separator';
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { cn } from '@/lib/cn';
+import { formatName } from '@/lib/formatters';
 import { stateToSortBy } from '@/lib/table';
 import { Envelope, Pagination } from '@/types/envelope';
 import { receipt } from '@prisma/client';
@@ -60,7 +61,7 @@ export const ReceiptClientPage = ({
         <DataTableColumnHeader column={column} title='CONTRIBUYENTE' />
       ),
       accessorKey: 'taxpayer',
-      enableSorting: true,
+      cell: ({ row }) => formatName(row.original.taxpayer),
     },
     {
       id: 'amount',
@@ -255,7 +256,9 @@ export const ReceiptClientPage = ({
             <CardContent className='flex flex-col gap-2'>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Contribuyente:</Label>{' '}
-                {recordDetails.taxpayer}
+                {recordDetails.taxpayer
+                  ? formatName(recordDetails.taxpayer)
+                  : '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Importe:</Label>{' '}
