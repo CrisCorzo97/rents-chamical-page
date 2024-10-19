@@ -27,7 +27,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { CementeryRecordWithRelations } from '../../../cementery/cementery.interface';
 import { createReceipt } from '../../receipt-actions';
-import { ReceiptPDF } from './receiptPDF';
+import { ReceiptPDF, ReceiptPDFProps } from './receiptPDF';
 
 const formSchema = z.object({
   created_at: z.string(),
@@ -71,7 +71,15 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
   const [amountValue, setAmountValue] = useState<string>('');
   const [isMutating, startMutatingTransition] = useTransition();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [contentDialog, setContentDialog] = useState<ReceiptPDFProps['data']>({
+    receiptId: '',
+    taxpayer: '',
+    address: '',
+    neighborhood: '',
+    yearToPay: 0,
+    observations: '',
+    amount: 0,
+  });
 
   const handleSubmit = (formData: FormData) => {
     startMutatingTransition(async () => {
@@ -124,7 +132,24 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
             },
           };
 
-          await createReceipt({ data: createData });
+          const { success, data, error } = await createReceipt({
+            data: createData,
+          });
+
+          if (!success || !data) {
+            throw new Error(error ?? '');
+          }
+
+          // Actualizar el contenido del diálogo
+          setContentDialog({
+            receiptId: data.id,
+            taxpayer: parsedDataObject.taxpayer,
+            address: parsedDataObject.address_taxpayer,
+            neighborhood: record?.neighborhood?.name ?? '',
+            yearToPay: parsedDataObject.year_to_pay,
+            observations: parsedDataObject.observations ?? '',
+            amount: parsedDataObject.amount,
+          });
 
           // Mostrar el diálogo de confirmación
           setOpenDialog(true);
@@ -137,17 +162,6 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
         }
       } catch (error) {
         console.log({ error });
-        if (error instanceof z.ZodError) {
-          // Capturar errores y mostrarlos en el formulario
-          const newErrors: Record<string, string> = {};
-
-          error.errors.forEach((err) => {
-            const path = err.path.join('.');
-            newErrors[path] = err.message;
-          });
-
-          setErrors(newErrors);
-        }
       }
     });
   };
@@ -304,6 +318,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                     type='text'
                     name='observations'
                     placeholder='Tenía saldo a favor...'
+                    maxLength={50}
                   />
                 </FormItem>
                 <FormItem className='flex-1'>
@@ -345,7 +360,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                         descargarlo a continuación.
                       </AlertDialogDescription>
                       <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                        <ReceiptPDF />
+                        <ReceiptPDF data={contentDialog} />
                       </PDFViewer>
                       <AlertDialogFooter className='flex-none'>
                         <AlertDialogAction onClick={() => setOpenDialog(false)}>
