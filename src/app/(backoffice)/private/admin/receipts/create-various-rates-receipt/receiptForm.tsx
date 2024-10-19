@@ -204,6 +204,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
                   type='text'
                   name='observations'
                   placeholder='Tenía saldo a favor...'
+                  maxLength={70}
                 />
               </FormItem>
               <FormItem className='flex-none'>

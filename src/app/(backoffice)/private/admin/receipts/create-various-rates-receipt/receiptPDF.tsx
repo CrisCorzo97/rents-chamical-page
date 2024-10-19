@@ -8,6 +8,7 @@ import {
   View,
 } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -268,7 +269,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 fontWeight: 'bold',
               }}
             >
-              Dominio:
+              Contribuyente:
             </Text>
             <Text
               style={{
@@ -276,153 +277,11 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 borderBottom: '1px dashed black',
               }}
             >
-              ABC 123
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: '1 1 100%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              Vehículo:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 70%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              Gol
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: '1 1 100%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              Marca:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 70%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              Volkswagen
+              {taxpayer}
             </Text>
           </View>
         </View>
         <View style={styles.bodyLine}>
-          <View
-            style={{
-              flex: '1 1 100%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              Titular:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 100%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              Juan Pérez
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: '1 1 50%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              D.N.I.:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 90%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              23.571.481
-            </Text>
-          </View>
-        </View>
-        <View style={styles.bodyLine}>
-          <View
-            style={{
-              flex: '1 1 40%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              Año pagado:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 40%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              2024
-            </Text>
-          </View>
           <View
             style={{
               flex: '1 1 100%',
@@ -444,11 +303,11 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
             </Text>
             <Text
               style={{
-                flex: '1 1 90%',
+                flex: '1 1 100%',
                 borderBottom: '1px dashed black',
               }}
             >
-              Tenía saldo a favor...
+              {observations}
             </Text>
           </View>
         </View>
@@ -478,7 +337,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 borderBottom: '1px dashed black',
               }}
             >
-              16
+              {day}
             </Text>
           </View>
           <View
@@ -506,7 +365,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Septiembre
+              {monthCapitalized}
             </Text>
           </View>
           <View
@@ -534,7 +393,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 borderBottom: '1px dashed black',
               }}
             >
-              2024
+              {year}
             </Text>
           </View>
         </View>
@@ -580,7 +439,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                   fontSize: 14,
                 }}
               >
-                14.000.000
+                {amount.toLocaleString('es-AR', { maximumFractionDigits: 2 })}
               </Text>
             </View>
           </View>
