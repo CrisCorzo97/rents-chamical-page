@@ -4,6 +4,7 @@ import { cn } from '@/lib/cn';
 import clsx from 'clsx';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { SIDEBAR_TABS_BY_ROLE } from './constants';
 
@@ -20,6 +21,8 @@ const sidebarListStyles = {
 
 export const Sidebar = ({ userRole }: { userRole: number }) => {
   const [isOpen, setIsOpen] = useState(true);
+
+  const pathname = usePathname();
 
   const { topItems, bottomItems } = useMemo(() => {
     const topItems = SIDEBAR_TABS_BY_ROLE[userRole].top.map((item) => ({
@@ -84,7 +87,17 @@ export const Sidebar = ({ userRole }: { userRole: number }) => {
         <div>
           <ul>
             {topItems.map((item) => (
-              <li key={item.id} className={sidebarListStyles.li.className}>
+              <li
+                key={item.id}
+                className={cn(
+                  sidebarListStyles.li.className,
+                  clsx({
+                    'bg-primary text-primary-foreground': pathname.includes(
+                      item.href
+                    ),
+                  })
+                )}
+              >
                 <Link
                   href={item.href}
                   className={sidebarListStyles.li.a.className}
@@ -107,7 +120,17 @@ export const Sidebar = ({ userRole }: { userRole: number }) => {
         <div>
           <ul>
             {bottomItems.map((item) => (
-              <li key={item.id} className={sidebarListStyles.li.className}>
+              <li
+                key={item.id}
+                className={cn(
+                  sidebarListStyles.li.className,
+                  clsx({
+                    'bg-primary text-primary-foreground': pathname.includes(
+                      item.href
+                    ),
+                  })
+                )}
+              >
                 <Link
                   href={item.href}
                   className={sidebarListStyles.li.a.className}
