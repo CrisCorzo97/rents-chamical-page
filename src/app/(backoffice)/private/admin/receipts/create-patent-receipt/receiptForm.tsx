@@ -280,6 +280,7 @@ export const ReceiptForm = () => {
                   type='text'
                   name='observations'
                   placeholder='Tenía saldo a favor...'
+                  maxLength={60}
                 />
               </FormItem>
               <FormItem className='flex-none'>
