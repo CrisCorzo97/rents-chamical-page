@@ -7,6 +7,8 @@ import {
   Text,
   View,
 } from '@react-pdf/renderer';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -77,7 +79,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   bodyLine: {
-    margin: '0 32px',
+    margin: '0 8px',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -113,18 +115,32 @@ const styles = StyleSheet.create({
   },
 });
 
+export interface ReceiptPDFProps {
+  data: {
+    receiptId: string;
+    taxpayer: string;
+    enrollment: string;
+    address: string;
+    neighborhood: string;
+    front_length: number;
+    yearToPay: number;
+    observations: string;
+    amount: number;
+  };
+}
+
 // Create Document Component
-export const ReceiptPDF = () => {
+export const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
   return (
     <Document
-      title='Comprobante de pago de patente'
+      title='Comprobante de pago de inmueble'
       author='Municipalidad de Chamical'
       subject='Rentas Municipal'
       language='es'
     >
       <Page size='A4' style={styles.page}>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para el contribuyente
@@ -133,7 +149,7 @@ export const ReceiptPDF = () => {
           </View>
         </View>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para el Tribunal de Cuentas
@@ -142,7 +158,7 @@ export const ReceiptPDF = () => {
           </View>
         </View>
         <View style={styles.section}>
-          <Receipt />
+          <Receipt data={data} />
           <View style={styles.bottomReceipt}>
             <Text style={styles.bottomReceiptText}>
               Talón para la Municipalidad
@@ -154,7 +170,26 @@ export const ReceiptPDF = () => {
   );
 };
 
-const Receipt = () => {
+const Receipt = ({ data }: ReceiptPDFProps) => {
+  const {
+    receiptId,
+    taxpayer,
+    enrollment,
+    address,
+    neighborhood,
+    front_length,
+    yearToPay,
+    observations,
+    amount,
+  } = data;
+
+  const fullDate = dayjs().locale('es').format('DD-MMMM-YYYY');
+
+  const day = fullDate.split('-')[0];
+  const month = fullDate.split('-')[1].toLowerCase();
+  const monthCapitalized = month.charAt(0).toUpperCase() + month.slice(1);
+  const year = fullDate.split('-')[2];
+
   return (
     <View style={styles.receipt}>
       <View style={styles.headerReceipt}>
@@ -192,7 +227,7 @@ const Receipt = () => {
               fontWeight: 'bold',
             }}
           >
-            PATENTE
+            INMUEBLE
           </Text>
           <View
             style={{
@@ -221,13 +256,13 @@ const Receipt = () => {
                 fontWeight: 'normal',
               }}
             >
-              30-00000000-0
+              {receiptId}
             </Text>
           </View>
         </View>
       </View>
       <View style={styles.bodyReceipt}>
-        <Text style={styles.bodyTitle}>PATENTE AUTOMOTOR Y/O MOTOVEHÍCULO</Text>
+        <Text style={styles.bodyTitle}>PAGO DE INMUEBLE</Text>
         <View style={styles.bodyLine}>
           <View
             style={{
@@ -246,101 +281,15 @@ const Receipt = () => {
                 fontWeight: 'bold',
               }}
             >
-              Dominio:
+              Contribuyente:
             </Text>
             <Text
               style={{
-                flex: '1 1 70%',
+                flex: '1 1 80%',
                 borderBottom: '1px dashed black',
               }}
             >
-              ABC 123
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: '1 1 100%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              Vehículo:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 70%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              Gol
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: '1 1 100%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              Marca:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 70%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              Volkswagen
-            </Text>
-          </View>
-        </View>
-        <View style={styles.bodyLine}>
-          <View
-            style={{
-              flex: '1 1 100%',
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '8px',
-              fontSize: '10px',
-              fontWeight: 'normal',
-            }}
-          >
-            <Text
-              style={{
-                flex: '1 1 auto',
-                fontSize: '10px',
-                fontWeight: 'bold',
-              }}
-            >
-              Titular:
-            </Text>
-            <Text
-              style={{
-                flex: '1 1 100%',
-                borderBottom: '1px dashed black',
-              }}
-            >
-              Juan Pérez
+              {taxpayer}
             </Text>
           </View>
           <View
@@ -360,22 +309,108 @@ const Receipt = () => {
                 fontWeight: 'bold',
               }}
             >
-              D.N.I.:
+              Matrícula:
             </Text>
             <Text
               style={{
-                flex: '1 1 90%',
+                flex: '1 1 75%',
                 borderBottom: '1px dashed black',
               }}
             >
-              23.571.481
+              {enrollment}
             </Text>
           </View>
         </View>
         <View style={styles.bodyLine}>
           <View
             style={{
-              flex: '1 1 40%',
+              flex: '1 1 100%',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              Dirección:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 80%',
+                borderBottom: '1px dashed black',
+              }}
+            >
+              {address}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: '1 1 60%',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              Barrio:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 80%',
+                borderBottom: '1px dashed black',
+              }}
+            >
+              {neighborhood}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.bodyLine}>
+          <View
+            style={{
+              flex: '1 1 25%',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              Mts Frente:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 30%',
+                borderBottom: '1px dashed black',
+              }}
+            >
+              {front_length.toLocaleString('es-AR')}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: '1 1 30%',
               display: 'flex',
               flexDirection: 'row',
               gap: '8px',
@@ -394,11 +429,11 @@ const Receipt = () => {
             </Text>
             <Text
               style={{
-                flex: '1 1 40%',
+                flex: '1 1 30%',
                 borderBottom: '1px dashed black',
               }}
             >
-              2024
+              {yearToPay}
             </Text>
           </View>
           <View
@@ -426,7 +461,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Tenía saldo a favor...
+              {observations}
             </Text>
           </View>
         </View>
@@ -456,7 +491,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              16
+              {day}
             </Text>
           </View>
           <View
@@ -484,7 +519,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              Septiembre
+              {monthCapitalized}
             </Text>
           </View>
           <View
@@ -512,7 +547,7 @@ const Receipt = () => {
                 borderBottom: '1px dashed black',
               }}
             >
-              2024
+              {year}
             </Text>
           </View>
         </View>
@@ -558,7 +593,7 @@ const Receipt = () => {
                   fontSize: 14,
                 }}
               >
-                14.000.000
+                {amount.toLocaleString('es-AR', { maximumFractionDigits: 2 })}
               </Text>
             </View>
           </View>
