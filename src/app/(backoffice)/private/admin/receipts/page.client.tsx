@@ -16,6 +16,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useCallbackDebouncing } from '@/hooks';
 import { useFPS } from '@/hooks/useFPS';
 import { cn } from '@/lib/cn';
@@ -31,7 +37,7 @@ import {
 } from '@tanstack/react-table';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { CirclePlus } from 'lucide-react';
+import { CirclePlus, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ConfirmModal } from './components';
@@ -112,6 +118,42 @@ export const ReceiptClientPage = ({
         return dayjs(confirmed_at).format('DD/MM/YYYY HH:mm');
       },
       enableSorting: true,
+    },
+    {
+      id: 'actions',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='' />
+      ),
+      cell: ({ row }) => {
+        const selectRecord = () => {
+          if (recordDetails?.id !== row.original.id) {
+            setRecordDetails(row.original);
+          } else {
+            setRecordDetails(null);
+          }
+        };
+
+        return (
+          <TooltipProvider>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='outline'
+                  className='flex items-center gap-2'
+                  size='icon'
+                  onClick={selectRecord}
+                >
+                  <FileText size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className='bg-black text-white'>
+                <span>Ver detalles</span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      },
+      enableSorting: false,
     },
   ];
 
@@ -222,13 +264,7 @@ export const ReceiptClientPage = ({
           table={table}
           pagination={data.pagination as Pagination}
           handlePagination={handlePagination}
-          onRecordClick={(record) => {
-            if (recordDetails?.id !== record.id) {
-              setRecordDetails(record);
-            } else {
-              setRecordDetails(null);
-            }
-          }}
+          onRecordClick={() => {}}
         />
       </div>
 
