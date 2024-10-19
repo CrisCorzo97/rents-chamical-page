@@ -42,7 +42,7 @@ export default async function Home() {
           <Card className='w-[250px]'>
             <Link
               href={
-                !!data?.session ? '/private/admin/dashboard' : '/auth/ingresar'
+                !!data?.session ? '/private/admin/receipts' : '/auth/ingresar'
               }
               prefetch
             >
