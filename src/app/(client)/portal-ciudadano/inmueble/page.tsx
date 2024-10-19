@@ -99,7 +99,7 @@ export default function PropertyPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className='flex flex-col gap-4'>
-              <Input name='HOLAA' type='text' placeholder='0123-4567-7890' />
+              <Input name='HOLAA' type='text' />
               <div id='g_recaptcha'></div>
               <Script
                 src='https://www.google.com/recaptcha/enterprise.js?render=explicit'

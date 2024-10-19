@@ -189,30 +189,19 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
 
             <FormItem className='flex-1'>
               <Label>Apellido y nombre del contribuyente</Label>
-              <Input
-                type='text'
-                name='taxpayer'
-                placeholder='Juan Pérez'
-                required
-              />
+              <Input type='text' name='taxpayer' required />
             </FormItem>
 
             <div className='w-full flex gap-3'>
               <FormItem className='flex-1'>
                 <Label>Observaciones</Label>
-                <Input
-                  type='text'
-                  name='observations'
-                  placeholder='Tenía saldo a favor...'
-                  maxLength={70}
-                />
+                <Input type='text' name='observations' maxLength={70} />
               </FormItem>
               <FormItem className='flex-none'>
                 <Label>Importe</Label>
                 <Input
                   type='text'
                   name='amount'
-                  placeholder='$ 1.000'
                   className='flex-1'
                   value={amountValue}
                   onChange={(e) =>

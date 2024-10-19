@@ -155,7 +155,6 @@ export function ChangePasswordComponent({
                 <Input.Password
                   disabled={!!prevPassword}
                   visibilityToggle={!prevPassword}
-                  placeholder='********'
                 />
               </Form.Item>
               <Form.Item<FieldType>
@@ -166,7 +165,7 @@ export function ChangePasswordComponent({
                 htmlFor='newPassword'
                 style={{ marginBottom: '0.5em' }}
               >
-                <Input.Password placeholder='********' />
+                <Input.Password />
               </Form.Item>
               <Form.Item<FieldType>
                 label='Confirmar contraseña'
@@ -188,7 +187,7 @@ export function ChangePasswordComponent({
                 ]}
                 htmlFor='confirmPassword'
               >
-                <Input.Password placeholder='********' />
+                <Input.Password />
               </Form.Item>
 
               <Button

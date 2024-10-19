@@ -289,7 +289,6 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
                     type='number'
                     name='year_to_pay'
                     max={dayjs().year()}
-                    placeholder='2024'
                     required
                   />
                 </FormItem>
@@ -298,19 +297,13 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
               <div className='w-full flex gap-3'>
                 <FormItem className='flex-1'>
                   <Label>Observaciones</Label>
-                  <Input
-                    type='text'
-                    name='observations'
-                    placeholder='Tenía saldo a favor...'
-                    maxLength={50}
-                  />
+                  <Input type='text' name='observations' maxLength={50} />
                 </FormItem>
                 <FormItem className='flex-1'>
                   <Label>Importe</Label>
                   <Input
                     type='text'
                     name='amount'
-                    placeholder='$ 1.000'
                     className='flex-1'
                     value={amountValue}
                     onChange={(e) =>
