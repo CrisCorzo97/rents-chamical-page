@@ -1,8 +1,8 @@
 import {
   Building2,
   Church,
-  CircleUserRound,
   LayoutDashboard,
+  LogOut,
   ReceiptText,
   UserRoundCheck,
 } from 'lucide-react';
@@ -54,9 +54,9 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
       },
       {
         id: 'account',
-        icon: <CircleUserRound />,
-        label: 'Cuenta',
-        href: '/private/admin/account',
+        icon: <LogOut />,
+        label: 'Cerrar sesión',
+        href: '/auth/logout',
       },
     ],
   },
@@ -84,9 +84,9 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
     bottom: [
       {
         id: 'account',
-        icon: <CircleUserRound />,
-        label: 'Cuenta',
-        href: '/private/admin/account',
+        icon: <LogOut />,
+        label: 'Cerrar sesión',
+        href: '/auth/logout',
       },
     ],
   },
@@ -114,9 +114,9 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
     bottom: [
       {
         id: 'account',
-        icon: <CircleUserRound />,
-        label: 'Cuenta',
-        href: '/private/admin/account',
+        icon: <LogOut />,
+        label: 'Cerrar sesión',
+        href: '/auth/logout',
       },
     ],
   },
@@ -144,9 +144,9 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
     bottom: [
       {
         id: 'account',
-        icon: <CircleUserRound />,
-        label: 'Cuenta',
-        href: '/private/admin/account',
+        icon: <LogOut />,
+        label: 'Cerrar sesión',
+        href: '/auth/logout',
       },
     ],
   },
