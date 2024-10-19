@@ -1,4 +1,10 @@
 'use client';
+import { SuccessModal } from '@/app/ui';
+import { formatCuilInput } from '@/lib/formatters';
+import { cuilValidator } from '@/lib/validators';
+import theme from '@/theme/themeConfig';
+import { RoleOption } from '@/types/user';
+import { ArrowLeftOutlined, CheckCircleFilled } from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -12,15 +18,9 @@ import {
   message,
 } from 'antd';
 import { Rule } from 'antd/es/form';
-import { formatCuilInput } from '@/lib/formatters';
-import theme from '@/theme/themeConfig';
-import { cuilValidator } from '@/lib/validators';
-import Link from 'next/link';
 import axios from 'axios';
-import { ArrowLeftOutlined, CheckCircleFilled } from '@ant-design/icons';
+import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { SuccessModal } from '@/app/ui';
-import { RoleOption } from '@/types/user';
 
 const roleOptions: RoleOption[] = [
   { value: '1', label: 'Administrador' },
@@ -151,7 +151,7 @@ export default function RegistrationRequestPage() {
                 ]}
                 htmlFor='first_name'
               >
-                <Input placeholder='Carlos' />
+                <Input />
               </Form.Item>
               <Form.Item<RegistrationRequestType>
                 label='Apellido'
@@ -162,7 +162,7 @@ export default function RegistrationRequestPage() {
                 ]}
                 htmlFor='last_name'
               >
-                <Input placeholder='Cabrera' />
+                <Input />
               </Form.Item>
               <Form.Item<RegistrationRequestType>
                 label='Email'
@@ -172,7 +172,7 @@ export default function RegistrationRequestPage() {
                 ]}
                 htmlFor='email'
               >
-                <Input type='email' placeholder='tuemail@aqui.com' />
+                <Input type='email' />
               </Form.Item>
 
               <Form.Item<RegistrationRequestType>
@@ -189,7 +189,7 @@ export default function RegistrationRequestPage() {
                 trigger='onChange'
                 normalize={formatCuilInput}
               >
-                <Input placeholder='20-24757105-2' maxLength={13} />
+                <Input maxLength={13} />
               </Form.Item>
               <Form.Item<RegistrationRequestType>
                 label='Rol'
@@ -199,7 +199,7 @@ export default function RegistrationRequestPage() {
                 ]}
                 htmlFor='role'
               >
-                <Select options={roleOptions} placeholder='Renta' />
+                <Select options={roleOptions} />
               </Form.Item>
 
               <Button

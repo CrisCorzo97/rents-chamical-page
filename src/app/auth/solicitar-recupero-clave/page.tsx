@@ -1,4 +1,8 @@
 'use client';
+import { SuccessModal } from '@/app/ui';
+import { MailSentIllustration } from '@/assets/illustrations';
+import theme from '@/theme/themeConfig';
+import { ArrowLeftOutlined, UserOutlined } from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -10,14 +14,10 @@ import {
   Typography,
   message,
 } from 'antd';
-import { ArrowLeftOutlined, UserOutlined } from '@ant-design/icons';
-import theme from '@/theme/themeConfig';
 import axios, { AxiosError } from 'axios';
-import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
-import { SuccessModal } from '@/app/ui';
 import Link from 'next/link';
-import { MailSentIllustration } from '@/assets/illustrations';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 
 type FieldType = {
   email: string;
@@ -119,7 +119,6 @@ export default function ResetPasswordRequestPage() {
                 <Input
                   prefix={<UserOutlined style={{ color: '#b3b3b3' }} />}
                   type='email'
-                  placeholder='tuemail@aqui.com'
                 />
               </Form.Item>
 

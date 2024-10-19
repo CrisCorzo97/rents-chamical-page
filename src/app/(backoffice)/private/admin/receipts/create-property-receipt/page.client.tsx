@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
-import { property } from '@prisma/client';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { FilePlus2 } from 'lucide-react';
@@ -28,7 +27,8 @@ export const GeneratePropertyReceiptClientPage = () => {
   const [searchResult, setSearchResult] = useState<
     PropertyRecordWithRelations[]
   >([]);
-  const [selectedRecord, setSelectedRecord] = useState<property | null>(null);
+  const [selectedRecord, setSelectedRecord] =
+    useState<PropertyRecordWithRelations | null>(null);
   const [isSearching, startSearchTransition] = useTransition();
 
   const handleSearch = (formData: FormData) => {

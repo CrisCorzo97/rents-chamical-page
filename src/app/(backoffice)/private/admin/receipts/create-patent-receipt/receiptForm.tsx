@@ -195,7 +195,6 @@ export const ReceiptForm = () => {
                 <Input
                   type='text'
                   name='domain'
-                  placeholder='AB123CD'
                   required
                   className={errors.domain ? 'border-red-500' : ''}
                 />
@@ -208,12 +207,7 @@ export const ReceiptForm = () => {
             <div className='w-full flex flex-wrap gap-3'>
               <FormItem className='flex-1'>
                 <Label>Apellido y nombre del contribuyente</Label>
-                <Input
-                  type='text'
-                  name='taxpayer'
-                  placeholder='Juan Pérez'
-                  required
-                />
+                <Input type='text' name='taxpayer' required />
               </FormItem>
               <FormItem className='flex-1 '>
                 <Label className='inline-flex'>
@@ -235,7 +229,6 @@ export const ReceiptForm = () => {
                 <Input
                   type='text'
                   name='dni'
-                  placeholder='23.571.481'
                   required
                   value={dniValue}
                   onChange={(e) => setDniValue(formatDni(e.target.value))}
@@ -250,16 +243,11 @@ export const ReceiptForm = () => {
             <div className='w-full flex flex-wrap gap-3'>
               <FormItem className='flex-1'>
                 <Label>Vehículo</Label>
-                <Input type='text' name='vehicle' placeholder='Gol' required />
+                <Input type='text' name='vehicle' required />
               </FormItem>
               <FormItem className='flex-1'>
                 <Label>Marca</Label>
-                <Input
-                  type='text'
-                  name='brand'
-                  placeholder='Volskwagen'
-                  required
-                />
+                <Input type='text' name='brand' required />
               </FormItem>
               <FormItem className='flex-1'>
                 <Label>Año pagado</Label>
@@ -267,7 +255,6 @@ export const ReceiptForm = () => {
                   type='number'
                   max={dayjs().year()}
                   name='year_to_pay'
-                  placeholder='2024'
                   required
                 />
               </FormItem>
@@ -276,18 +263,13 @@ export const ReceiptForm = () => {
             <div className='w-full flex gap-3'>
               <FormItem className='flex-1'>
                 <Label>Observaciones</Label>
-                <Input
-                  type='text'
-                  name='observations'
-                  placeholder='Tenía saldo a favor...'
-                />
+                <Input type='text' name='observations' maxLength={60} />
               </FormItem>
               <FormItem className='flex-none'>
                 <Label>Importe</Label>
                 <Input
                   type='text'
                   name='amount'
-                  placeholder='$ 1.000'
                   className='flex-1'
                   required
                   value={amountValue}

@@ -1,6 +1,8 @@
 'use client';
+import { SuccessModal } from '@/app/ui';
+import theme from '@/theme/themeConfig';
+import { CheckCircleFilled } from '@ant-design/icons';
 import {
-  Alert,
   Button,
   Card,
   Flex,
@@ -10,14 +12,11 @@ import {
   Typography,
   message,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleFilled } from '@ant-design/icons';
-import theme from '@/theme/themeConfig';
-import axios, { AxiosError } from 'axios';
-import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
-import { SuccessModal } from '@/app/ui';
-import Link from 'next/link';
 import { Rule } from 'antd/es/form';
+import axios, { AxiosError } from 'axios';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 
 type FieldType = {
   newPassword: string;
@@ -128,7 +127,7 @@ export default function ResetPasswordPage() {
                 htmlFor='newPassword'
                 style={{ marginBottom: '0.5em' }}
               >
-                <Input.Password placeholder='********' />
+                <Input.Password />
               </Form.Item>
               <Form.Item<FieldType>
                 label='Confirmar contraseña'
@@ -150,7 +149,7 @@ export default function ResetPasswordPage() {
                 ]}
                 htmlFor='confirmPassword'
               >
-                <Input.Password placeholder='********' />
+                <Input.Password />
               </Form.Item>
 
               <Button

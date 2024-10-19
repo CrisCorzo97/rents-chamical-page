@@ -8,24 +8,24 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { formatName } from '@/lib/formatters';
-import { property } from '@prisma/client';
 import {
   ColumnDef,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { MousePointerClick } from 'lucide-react';
+import { PropertyRecordWithRelations } from '../../../property/property.interface';
 
 interface SearchResultTableProps {
-  data: property[];
-  onSelect: (record: property) => void;
+  data: PropertyRecordWithRelations[];
+  onSelect: (record: PropertyRecordWithRelations) => void;
 }
 
 export const SearchResultTable = ({
   data,
   onSelect,
 }: SearchResultTableProps) => {
-  const columns: ColumnDef<property>[] = [
+  const columns: ColumnDef<PropertyRecordWithRelations>[] = [
     {
       id: 'taxpayer',
       header: ({ column }) => (
@@ -110,7 +110,7 @@ export const SearchResultTable = ({
 
   return (
     <div>
-      <CustomDataTable<property>
+      <CustomDataTable<PropertyRecordWithRelations>
         tableTitle='Registros de inmuebles'
         columns={columns}
         table={table}

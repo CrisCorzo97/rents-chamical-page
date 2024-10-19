@@ -122,7 +122,6 @@ export default function LoginPage() {
                 <Input
                   prefix={<UserOutlined style={{ color: '#b3b3b3' }} />}
                   type='email'
-                  placeholder='tuemail@aqui.com'
                 />
               </Form.Item>
               <Form.Item<FieldType>
@@ -139,7 +138,6 @@ export default function LoginPage() {
               >
                 <Input.Password
                   prefix={<LockOutlined style={{ color: '#b3b3b3' }} />}
-                  placeholder='********'
                 />
               </Form.Item>
 

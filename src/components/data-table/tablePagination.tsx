@@ -132,7 +132,7 @@ export function TablePagination(props: TablePagination) {
           }}
         >
           <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='' />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
