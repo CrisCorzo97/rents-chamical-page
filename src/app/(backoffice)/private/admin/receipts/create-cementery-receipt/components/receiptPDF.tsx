@@ -459,7 +459,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 borderBottom: '1px dashed black',
               }}
             >
-              {month}
+              {monthCapitalized}
             </Text>
           </View>
           <View
