@@ -27,6 +27,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
 import { formatName } from '@/lib/formatters';
 import { city_section, neighborhood, Prisma } from '@prisma/client';
+import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -43,6 +44,7 @@ const formSchema = z.object({
   neighborhood: z.number(),
   city_section: z.number(),
   front_length: z.number(),
+  last_year_paid: z.nullable(z.number()),
 });
 
 interface EditPropertyRecordFormProps {
@@ -81,6 +83,10 @@ export const EditPropertyRecordForm = ({
         neighborhood: Number(formObject.neighborhood as string),
         city_section: Number(formObject.city_section as string),
         front_length,
+        last_year_paid:
+          (formObject.location_number as string) === ''
+            ? null
+            : Number(formObject.location_number as string),
       };
 
       try {
@@ -106,6 +112,7 @@ export const EditPropertyRecordForm = ({
                 connect: { id: parsedData.city_section },
               },
               front_length: parsedData.front_length,
+              last_year_paid: parsedData.last_year_paid,
               missing_fields: !missing_fields.length
                 ? null
                 : JSON.stringify(missing_fields),
@@ -257,7 +264,7 @@ export const EditPropertyRecordForm = ({
             </div>
 
             <div className='flex gap-2 w-full'>
-              <FormItem className='w-1/3'>
+              <FormItem className='flex-1'>
                 <Label>
                   Sección <span className='text-red-500'>*</span>
                 </Label>
@@ -282,7 +289,7 @@ export const EditPropertyRecordForm = ({
                   </SelectContent>
                 </Select>
               </FormItem>
-              <FormItem className='w-1/3'>
+              <FormItem className='flex-1'>
                 <Label>
                   Mts de frente <span className='text-red-500'>*</span>
                 </Label>
@@ -291,6 +298,14 @@ export const EditPropertyRecordForm = ({
                   name='front_length'
                   required
                   defaultValue={`${record.front_length}`}
+                />
+              </FormItem>
+              <FormItem className='flex-1'>
+                <Label>Último año pagado</Label>
+                <Input
+                  type='number'
+                  name='last_year_paid'
+                  max={dayjs().year()}
                 />
               </FormItem>
             </div>

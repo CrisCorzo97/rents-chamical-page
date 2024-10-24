@@ -31,6 +31,7 @@ import {
   neighborhood,
   Prisma,
 } from '@prisma/client';
+import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -48,6 +49,7 @@ const formSchema = z.object({
   section: z.nullable(z.string()),
   row: z.nullable(z.number()),
   location_number: z.nullable(z.number()),
+  last_year_paid: z.nullable(z.number()),
 });
 
 interface EditCementeryRecordFormProps {
@@ -86,6 +88,10 @@ export const EditCementeryRecordForm = ({
         location_number: formObject.location_number
           ? Number(formObject.location_number)
           : null,
+        last_year_paid:
+          (formObject.location_number as string) === ''
+            ? null
+            : Number(formObject.location_number as string),
       };
 
       try {
@@ -116,6 +122,7 @@ export const EditCementeryRecordForm = ({
               section: parsedData.section,
               row: parsedData.row,
               location_number: parsedData.location_number,
+              last_year_paid: parsedData.last_year_paid,
             },
           };
           const { success, data, error } = await updateCementery(updatedData);
@@ -317,6 +324,15 @@ export const EditCementeryRecordForm = ({
                       ? Number(record.location_number)
                       : ''
                   }
+                />
+              </FormItem>
+              <FormItem className='flex-1'>
+                <Label>Último año pagado</Label>
+                <Input
+                  type='number'
+                  name='last_year_paid'
+                  defaultValue={Number(record.last_year_paid)}
+                  max={dayjs().year()}
                 />
               </FormItem>
             </div>
