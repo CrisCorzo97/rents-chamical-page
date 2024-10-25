@@ -89,9 +89,9 @@ export const EditCementeryRecordForm = ({
           ? Number(formObject.location_number)
           : null,
         last_year_paid:
-          (formObject.location_number as string) === ''
+          (formObject.last_year_paid as string) === ''
             ? null
-            : Number(formObject.location_number as string),
+            : Number(formObject.last_year_paid as string),
       };
 
       try {
