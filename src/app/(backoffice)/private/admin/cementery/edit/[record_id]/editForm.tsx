@@ -32,6 +32,7 @@ import {
   Prisma,
 } from '@prisma/client';
 import dayjs from 'dayjs';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -160,14 +161,9 @@ export const EditCementeryRecordForm = ({
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
-              <Button
-                onClick={() => {
-                  setOpenSuccess(false);
-                  replace('/private/admin/cementery');
-                }}
-              >
-                Finalizar
-              </Button>
+              <Link href='/private/admin/cementery'>
+                <Button onClick={() => setOpenSuccess(false)}>Finalizar</Button>
+              </Link>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
