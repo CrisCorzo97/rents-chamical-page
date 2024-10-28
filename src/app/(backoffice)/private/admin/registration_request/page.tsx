@@ -28,7 +28,7 @@ export default async function RegistrationRequestPage({
 }) {
   const { page, limit, sort_by, sort_direction, filter } = searchParams;
 
-  let order_by = {};
+  let order_by;
 
   const sortingState = sortByToState({
     sort_by: sort_by ?? '',

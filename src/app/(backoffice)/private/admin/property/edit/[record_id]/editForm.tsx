@@ -28,7 +28,7 @@ import { Switch } from '@/components/ui/switch';
 import { formatName } from '@/lib/formatters';
 import { city_section, neighborhood, Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -60,6 +60,8 @@ export const EditPropertyRecordForm = ({
 }: EditPropertyRecordFormProps) => {
   const [isMutating, startTransition] = useTransition();
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
+
+  const { back } = useRouter();
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -154,9 +156,14 @@ export const EditPropertyRecordForm = ({
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
-              <Link href='/private/admin/property'>
-                <Button onClick={() => setOpenSuccess(false)}>Finalizar</Button>
-              </Link>
+              <Button
+                onClick={() => {
+                  setOpenSuccess(false);
+                  back();
+                }}
+              >
+                Finalizar
+              </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

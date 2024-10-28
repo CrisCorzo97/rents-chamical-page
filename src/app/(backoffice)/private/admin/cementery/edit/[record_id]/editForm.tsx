@@ -32,7 +32,6 @@ import {
   Prisma,
 } from '@prisma/client';
 import dayjs from 'dayjs';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
@@ -69,7 +68,7 @@ export const EditCementeryRecordForm = ({
   const [isMutating, startTransition] = useTransition();
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
-  const { replace } = useRouter();
+  const { back } = useRouter();
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -161,9 +160,14 @@ export const EditCementeryRecordForm = ({
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
-              <Link href='/private/admin/cementery'>
-                <Button onClick={() => setOpenSuccess(false)}>Finalizar</Button>
-              </Link>
+              <Button
+                onClick={() => {
+                  setOpenSuccess(false);
+                  back();
+                }}
+              >
+                Finalizar
+              </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
