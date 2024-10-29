@@ -44,7 +44,7 @@ export const Sidebar = ({ userRole }: { userRole: number }) => {
   return (
     <nav
       className={cn(
-        'flex flex-col w-56 top-0 left-0 bg-secondary border-r-2 transition-all duration-300',
+        'flex flex-col w-56 top-0 left-0 bg-background border-r-2 transition-all duration-300',
         clsx({
           'w-16': !isOpen,
         })
