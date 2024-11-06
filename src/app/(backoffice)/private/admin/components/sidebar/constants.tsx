@@ -53,7 +53,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         href: '/private/admin/registration_request',
       },
       {
-        id: 'account',
+        id: 'logout',
         icon: <LogOut />,
         label: 'Cerrar sesión',
         href: '/auth/logout',
@@ -83,7 +83,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
     ],
     bottom: [
       {
-        id: 'account',
+        id: 'logout',
         icon: <LogOut />,
         label: 'Cerrar sesión',
         href: '/auth/logout',
@@ -113,7 +113,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
     ],
     bottom: [
       {
-        id: 'account',
+        id: 'logout',
         icon: <LogOut />,
         label: 'Cerrar sesión',
         href: '/auth/logout',
@@ -143,7 +143,7 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
     ],
     bottom: [
       {
-        id: 'account',
+        id: 'logout',
         icon: <LogOut />,
         label: 'Cerrar sesión',
         href: '/auth/logout',
