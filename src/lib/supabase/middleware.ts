@@ -2,10 +2,8 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+  let supabaseResponse = NextResponse.next({
+    request,
   });
 
   const supabase = createServerClient(
@@ -22,12 +20,12 @@ export async function updateSession(request: NextRequest) {
             value,
             ...options,
           });
-          response = NextResponse.next({
+          supabaseResponse = NextResponse.next({
             request: {
               headers: request.headers,
             },
           });
-          response.cookies.set({
+          supabaseResponse.cookies.set({
             name,
             value,
             ...options,
@@ -39,12 +37,12 @@ export async function updateSession(request: NextRequest) {
             value: '',
             ...options,
           });
-          response = NextResponse.next({
+          supabaseResponse = NextResponse.next({
             request: {
               headers: request.headers,
             },
           });
-          response.cookies.set({
+          supabaseResponse.cookies.set({
             name,
             value: '',
             ...options,
@@ -54,7 +52,24 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  // IMPORTANT: Avoid writing any logic between createServerClient and
+  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
+  // issues with users being randomly logged out.
 
-  return response;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (
+    !user &&
+    !request.nextUrl.pathname.startsWith('/auth') &&
+    request.nextUrl.pathname.startsWith('/private')
+  ) {
+    // no user, potentially respond by redirecting the user to the login page
+    const url = request.nextUrl.clone();
+    url.pathname = '/auth/ingresar';
+    return NextResponse.redirect(url);
+  }
+
+  return supabaseResponse;
 }
