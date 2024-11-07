@@ -9,6 +9,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { unstable_noStore } from 'next/cache';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Sidebar } from './components';
 
 export default async function AdminPageLayout({
@@ -21,9 +22,14 @@ export default async function AdminPageLayout({
   const cookieStore = cookies();
   const supabase = createSupabaseServerClient(cookieStore);
 
-  // Consulto el rol del usuario
   const { data: userData } = await supabase.auth.getUser();
 
+  // Consulto si el usuario está autenticado
+  if (!userData) {
+    return redirect('/auth/ingresar');
+  }
+
+  // Consulto el rol del usuario
   const userRole = (userData?.user?.user_metadata.role_id as number) ?? 4;
 
   return (

@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest
@@ -31,6 +32,8 @@ export async function POST(
         message: 'Error al iniciar sesión.',
       });
     }
+
+    revalidatePath(request.nextUrl.pathname);
 
     return NextResponse.json({ success: true });
   } catch (error) {

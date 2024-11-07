@@ -1,9 +1,24 @@
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { unstable_noStore } from 'next/cache';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MainHeader } from './ui';
 
 export default async function Home() {
+  unstable_noStore();
+
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  const isAuthed = !error && !!user;
+
   return (
     <main className='min-h-screen flex flex-col'>
       <MainHeader />
@@ -32,7 +47,7 @@ export default async function Home() {
 
         <section className='flex gap-4 flex-wrap max-w-6xl mx-auto items-center'>
           <Card className='w-[250px]'>
-            <Link href='/private/admin/receipts'>
+            <Link href={isAuthed ? '/private/admin/receipts' : 'auth/ingresar'}>
               <CardContent className='p-4 py-8 flex flex-col gap-2 items-center'>
                 <Image
                   src='/user-key.png'
