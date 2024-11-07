@@ -6,6 +6,7 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { unstable_noStore } from 'next/cache';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Sidebar } from './components';
@@ -15,6 +16,8 @@ export default async function AdminPageLayout({
 }: {
   children: React.ReactNode;
 }) {
+  unstable_noStore();
+
   const cookieStore = cookies();
   const supabase = createSupabaseServerClient(cookieStore);
 
