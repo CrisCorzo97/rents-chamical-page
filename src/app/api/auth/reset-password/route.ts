@@ -1,9 +1,9 @@
+import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { SupabaseCookie } from '@/types/cookies';
+import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import { SupabaseCookie } from '@/types/cookies';
-import dbSupabase from '@/lib/prisma/prisma';
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID;
 
@@ -12,7 +12,7 @@ export async function POST(
 ): Promise<NextResponse<{ success: boolean; message?: string }>> {
   try {
     const form_data = await request.formData();
-    const cookie_store = cookies();
+    const cookie_store = await cookies();
 
     const new_password = form_data.get('new_password')?.toString();
     const { user }: SupabaseCookie = JSON.parse(
@@ -27,7 +27,7 @@ export async function POST(
       });
     }
 
-    const supabase = createSupabaseServerClient(cookie_store);
+    const supabase = await createSupabaseServerClient();
 
     const hashed_password = await bcrypt.hash(new_password, 7);
 

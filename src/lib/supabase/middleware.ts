@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
@@ -12,42 +12,19 @@ export async function updateSession(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          get(name: string) {
-            return request.cookies.get(name)?.value;
+          getAll() {
+            return request.cookies.getAll();
           },
-          set(name: string, value: string, options: CookieOptions) {
-            request.cookies.set({
-              name,
-              value,
-              ...options,
-            });
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              request.cookies.set(name, value)
+            );
             supabaseResponse = NextResponse.next({
-              request: {
-                headers: request.headers,
-              },
+              request,
             });
-            supabaseResponse.cookies.set({
-              name,
-              value,
-              ...options,
-            });
-          },
-          remove(name: string, options: CookieOptions) {
-            request.cookies.set({
-              name,
-              value: '',
-              ...options,
-            });
-            supabaseResponse = NextResponse.next({
-              request: {
-                headers: request.headers,
-              },
-            });
-            supabaseResponse.cookies.set({
-              name,
-              value: '',
-              ...options,
-            });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            );
           },
         },
       }
@@ -57,10 +34,19 @@ export async function updateSession(request: NextRequest) {
     // supabase.auth.getUser(). A simple mistake could make it very hard to debug
     // issues with users being randomly logged out.
 
-    const user = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (request.nextUrl.pathname.startsWith('/private') && user.error) {
-      return NextResponse.redirect(new URL('/auth/ingresar', request.url));
+    if (
+      !user &&
+      !request.nextUrl.pathname.startsWith('/auth') &&
+      request.nextUrl.pathname.startsWith('/private')
+    ) {
+      // no user, potentially respond by redirecting the user to the login page
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/ingresar';
+      return NextResponse.redirect(url);
     }
 
     return supabaseResponse;

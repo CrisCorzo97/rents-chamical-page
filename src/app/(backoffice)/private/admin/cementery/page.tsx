@@ -15,15 +15,15 @@ import { CementeryPageClient } from './page.client';
 export default async function CementeryPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: number;
     limit?: number;
     sort_by?: string;
     sort_direction?: string;
     filter?: string;
-  };
+  }>;
 }) {
-  const { page, limit, sort_by, sort_direction, filter } = searchParams;
+  const { page, limit, sort_by, sort_direction, filter } = await searchParams;
 
   let order_by;
 

@@ -1,6 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
@@ -8,8 +7,7 @@ export async function POST(
 ): Promise<NextResponse<{ success: boolean; message?: string }>> {
   try {
     const form_data = await request.formData();
-    const cookie_store = cookies();
-    const supabase = createSupabaseServerClient(cookie_store);
+    const supabase = await createSupabaseServerClient();
 
     // type-casting here for convenience
     // in practice, you should validate your inputs
@@ -33,7 +31,7 @@ export async function POST(
       });
     }
 
-    revalidatePath(request.nextUrl.pathname);
+    revalidatePath(request.nextUrl.pathname, 'layout');
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/navigation-menu';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { unstable_noStore } from 'next/cache';
-import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Sidebar } from './components';
@@ -19,18 +18,15 @@ export default async function AdminPageLayout({
 }) {
   unstable_noStore();
 
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = await createSupabaseServerClient();
 
-  const { data: userData } = await supabase.auth.getUser();
-
-  // Consulto si el usuario está autenticado
-  if (!userData) {
-    return redirect('/auth/ingresar');
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    redirect('/auth/ingresar');
   }
 
   // Consulto el rol del usuario
-  const userRole = (userData?.user?.user_metadata.role_id as number) ?? 4;
+  const userRole = (data?.user?.user_metadata.role_id as number) ?? 4;
 
   return (
     <main className='min-h-screen flex'>
