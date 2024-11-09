@@ -1,13 +1,10 @@
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { unstable_noStore } from 'next/cache';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MainHeader } from './ui';
 
 export default async function Home() {
-  unstable_noStore();
-
   const supabase = await createSupabaseServerClient();
 
   const {
