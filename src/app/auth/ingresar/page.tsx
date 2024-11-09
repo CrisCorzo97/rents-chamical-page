@@ -49,7 +49,7 @@ export default function LoginPage() {
         if (!data.success) {
           messageApi.error(data.message, 5);
         } else {
-          replace('/private/admin/receipts');
+          replace('/auth/callback');
         }
       });
     } catch (error) {
