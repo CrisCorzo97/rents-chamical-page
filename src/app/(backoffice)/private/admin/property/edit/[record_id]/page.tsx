@@ -18,11 +18,11 @@ import { EditPropertyRecordForm } from './editForm';
 export default async function EditRecordPage({
   params,
 }: {
-  params: {
+  params: Promise<{
     record_id: string;
-  };
+  }>;
 }) {
-  const record = await getPropertyRecordById(params.record_id);
+  const record = await getPropertyRecordById((await params).record_id);
   const neighborhoods = await getNeighborhoods();
   const citySections = await getCitySections();
 

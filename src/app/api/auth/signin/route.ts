@@ -31,7 +31,7 @@ export async function POST(
       });
     }
 
-    revalidatePath(request.nextUrl.pathname);
+    revalidatePath(request.nextUrl.pathname, 'layout');
 
     return NextResponse.json({ success: true });
   } catch (error) {

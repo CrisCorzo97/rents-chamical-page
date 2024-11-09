@@ -1,11 +1,13 @@
 import { ChangePasswordComponent } from './page.client';
 
-export default function ChangePasswordPage({
-  searchParams: { prev_password },
+export default async function ChangePasswordPage({
+  searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     prev_password: string;
-  };
+  }>;
 }) {
+  const { prev_password } = await searchParams;
+
   return <ChangePasswordComponent prevPassword={prev_password} />;
 }

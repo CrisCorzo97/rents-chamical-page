@@ -19,11 +19,11 @@ import { EditCementeryRecordForm } from './editForm';
 export default async function EditRecordPage({
   params,
 }: {
-  params: {
+  params: Promise<{
     record_id: string;
-  };
+  }>;
 }) {
-  const record = await getCementeryRecordById(params.record_id);
+  const record = await getCementeryRecordById((await params).record_id);
   const neighborhoods = await getNeighborhoods();
   const burialTypes = await getBurialTypes();
   const cementeryPlaces = await getCementeryPlaces();

@@ -20,15 +20,13 @@ export default async function AdminPageLayout({
 
   const supabase = await createSupabaseServerClient();
 
-  const { data: userData } = await supabase.auth.getUser();
-
-  // Consulto si el usuario está autenticado
-  if (!userData) {
-    return redirect('/auth/ingresar');
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    redirect('/auth/ingresar');
   }
 
   // Consulto el rol del usuario
-  const userRole = (userData?.user?.user_metadata.role_id as number) ?? 4;
+  const userRole = (data?.user?.user_metadata.role_id as number) ?? 4;
 
   return (
     <main className='min-h-screen flex'>
