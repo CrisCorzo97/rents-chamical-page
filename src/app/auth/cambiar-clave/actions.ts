@@ -1,7 +1,6 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import bcrypt from 'bcryptjs';
-import { cookies } from 'next/headers';
 
 export const verifyPassword = async ({
   user_id,
@@ -42,8 +41,7 @@ export const changePassword = async (input: {
       return;
     }
 
-    const cookie_store = cookies();
-    const supabase = createSupabaseServerClient(cookie_store);
+    const supabase = await createSupabaseServerClient();
 
     const hashed_password = await bcrypt.hash(new_password, 7);
 

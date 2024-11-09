@@ -2,7 +2,6 @@ import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { user } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -24,8 +23,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const cookieStore = cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    const supabase = await createSupabaseServerClient();
 
     const hashedPassword = await bcrypt.hash(password, 7);
 

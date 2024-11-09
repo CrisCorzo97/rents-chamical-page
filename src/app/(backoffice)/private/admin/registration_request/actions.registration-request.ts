@@ -7,7 +7,6 @@ import { Prisma, registration_request, role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import dayjs from 'dayjs';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 
@@ -90,8 +89,7 @@ export const confirmRequest = async (
   registration_request: registration_request
 ): Promise<{ success: boolean; message?: string }> => {
   try {
-    const cookieStore = cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    const supabase = await createSupabaseServerClient();
 
     const { id, first_name, last_name, email, cuil, role_id } =
       registration_request;

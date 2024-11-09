@@ -1,6 +1,5 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
@@ -32,8 +31,7 @@ export async function POST(
       });
     }
 
-    const cookie_store = cookies();
-    const supabase = createSupabaseServerClient(cookie_store);
+    const supabase = await createSupabaseServerClient();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.PROJECT_URL}/auth/recuperar-clave`,

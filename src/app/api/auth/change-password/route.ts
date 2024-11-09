@@ -1,6 +1,6 @@
 import dbSupabase from '@/lib/prisma/prisma';
-import { SupabaseCookie } from '@/types/cookies';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { SupabaseCookie } from '@/types/cookies';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -34,7 +34,7 @@ export async function POST(
 ): Promise<NextResponse<{ success: boolean; message?: string }>> {
   try {
     const form_data = await request.formData();
-    const cookie_store = cookies();
+    const cookie_store = await cookies();
 
     const { user }: SupabaseCookie = JSON.parse(
       cookie_store.get(`sb-${PROJECT_ID}-auth-token`)?.value ?? ''
@@ -60,7 +60,7 @@ export async function POST(
       });
     }
 
-    const supabase = createSupabaseServerClient(cookie_store);
+    const supabase = await createSupabaseServerClient();
 
     const hashed_password = await bcrypt.hash(new_password.toString(), 7);
 

@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/navigation-menu';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { unstable_noStore } from 'next/cache';
-import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Sidebar } from './components';
@@ -19,8 +18,7 @@ export default async function AdminPageLayout({
 }) {
   unstable_noStore();
 
-  const cookieStore = cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
+  const supabase = await createSupabaseServerClient();
 
   const { data: userData } = await supabase.auth.getUser();
 
