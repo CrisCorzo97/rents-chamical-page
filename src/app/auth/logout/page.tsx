@@ -1,17 +1,14 @@
-'use client';
-import { createSupabaseClient } from '@/lib/supabase/client';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
-export default function LogoutPage() {
-  const supabase = createSupabaseClient();
-  const router = useRouter();
+export default async function LogoutPage() {
+  const supabase = await createSupabaseServerClient();
 
-  supabase.auth.signOut().then(({ error }) => {
-    if (!error) {
-      router.replace('/');
-    }
-  });
+  const { error } = await supabase.auth.signOut();
+  if (!error) {
+    return redirect('/');
+  }
 
   return (
     <div

@@ -134,6 +134,7 @@ export const Sidebar = ({ userRole }: { userRole: number }) => {
                 <Link
                   href={item.href}
                   className={sidebarListStyles.li.a.className}
+                  prefetch={false}
                 >
                   {item.icon}
                   <span
