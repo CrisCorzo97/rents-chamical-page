@@ -88,7 +88,7 @@ export const getConfirmedReceipts = async (input: {
       limit_per_page: inputQuery.take ?? 5,
     };
   } catch (error) {
-    console.error({ error });
+    console?.error({ error });
 
     response.success = false;
     response.error =

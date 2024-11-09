@@ -1,26 +1,14 @@
-'use client';
-import { createSupabaseClient } from '@/lib/supabase/client';
-import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function AuthCallback() {
-  const supabase = createSupabaseClient();
-  const router = useRouter();
+export default async function AuthCallback() {
+  const supabase = await createSupabaseServerClient();
 
-  supabase.auth.getUser().then(({ data, error }) => {
-    if (error || !data.user) {
-      router.replace('/auth/ingresar');
-    }
+  const { data, error } = await supabase.auth.getUser();
 
-    router.replace('/private/admin/receipts');
-  });
+  if (error || !data.user) {
+    return redirect('/auth/ingresar');
+  }
 
-  return (
-    <div
-      style={{ minHeight: '100vh' }}
-      className='w-full flex items-center justify-center'
-    >
-      <Loader2 size={24} className='animate-spin text-primary' />
-    </div>
-  );
+  return redirect('/private/admin/receipts');
 }

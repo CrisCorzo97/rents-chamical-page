@@ -32,7 +32,7 @@ export default async function Home() {
 
         <section className='flex gap-4 flex-wrap max-w-6xl mx-auto items-center'>
           <Card className='w-[250px]'>
-            <Link href='/auth/callback'>
+            <Link href='/auth/callback' prefetch={false}>
               <CardContent className='p-4 py-8 flex flex-col gap-2 items-center'>
                 <Image
                   src='/user-key.png'
