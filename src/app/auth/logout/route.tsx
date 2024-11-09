@@ -1,9 +1,8 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { revalidatePath, unstable_noStore } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function GET() {
-  unstable_noStore();
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.signOut();
@@ -12,6 +11,7 @@ export async function GET() {
     throw error;
   }
 
-  revalidatePath('/');
+  revalidatePath('/', 'page');
+  revalidatePath('/private/admin', 'layout');
   redirect('/');
 }

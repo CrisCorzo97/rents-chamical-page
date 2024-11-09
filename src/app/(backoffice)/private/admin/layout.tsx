@@ -6,7 +6,6 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { unstable_noStore } from 'next/cache';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Sidebar } from './components';
@@ -16,8 +15,6 @@ export default async function AdminPageLayout({
 }: {
   children: React.ReactNode;
 }) {
-  unstable_noStore();
-
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase.auth.getUser();
