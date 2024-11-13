@@ -101,7 +101,7 @@ export const GeneratePropertyReceiptClientPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href={`/private/admin/property/create`}>
+            <Link href={`/private/admin/property/create?from_receipt=true`}>
               <Button variant='outline' className='flex gap-3 transition-all'>
                 <FilePlus2 size={20} />
                 Crear nuevo registro

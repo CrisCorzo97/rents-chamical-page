@@ -315,7 +315,9 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
 
               <div className='mt-6 flex gap-3 self-end'>
                 <FormItem>
-                  <Link href={`/private/admin/property/edit/${record.id}`}>
+                  <Link
+                    href={`/private/admin/property/edit/${record.id}?from_receipt=true`}
+                  >
                     <Button variant='outline'>Editar</Button>
                   </Link>
                 </FormItem>
