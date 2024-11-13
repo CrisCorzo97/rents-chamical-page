@@ -291,6 +291,10 @@ export function PropertyPageClient({
                 {recordDetails.city_section?.name ?? '-'}
               </span>
               <span className='font-light text-sm'>
+                <Label className='font-semibold'>Mts de frente:</Label>{' '}
+                {recordDetails?.front_length ?? '-'}
+              </span>
+              <span className='font-light text-sm'>
                 <Label className='font-semibold'>Último año abonado:</Label>{' '}
                 {recordDetails?.last_year_paid ?? '-'}
               </span>
