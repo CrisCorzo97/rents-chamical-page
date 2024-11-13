@@ -98,7 +98,7 @@ export const GenerateCementeryReceiptPageClient = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href={`/private/admin/cementery/create`}>
+            <Link href={`/private/admin/cementery/create?from_receipt=true`}>
               <Button variant='outline' className='flex gap-3 transition-all'>
                 <FilePlus2 size={20} />
                 Crear nuevo registro
