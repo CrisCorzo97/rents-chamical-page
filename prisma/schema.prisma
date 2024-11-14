@@ -645,26 +645,37 @@ model receipt {
 }
 
 model commercial_enablement {
-  id                                String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tax_id                            String?       @db.VarChar
-  taxpayer                          String?       @db.VarChar
-  company_name                      String?       @db.VarChar
-  commercial_enablement_category_id BigInt?
-  address                           String?
-  address_number                    BigInt?
-  neightborhood_id                  BigInt?
-  city_section_id                   BigInt?
-  block                             String?       @db.VarChar
-  parcel                            String?       @db.VarChar
-  created_at                        DateTime      @default(now()) @db.Timestamptz(6)
-  registration_receipt              String?       @db.VarChar
-  cancellation_date                 DateTime?     @db.Timestamptz(6)
-  cancellation_receipt              String?       @db.VarChar
-  gross_income_rate                 String?       @db.VarChar
-  last_year_paid                    BigInt?
-  registration_date                 DateTime?     @db.Timestamptz(6)
-  city_section                      city_section? @relation(fields: [city_section_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  neighborhood                      neighborhood? @relation(fields: [neightborhood_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                     String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tax_id                 String?              @db.VarChar
+  taxpayer               String?              @db.VarChar
+  company_name           String?              @db.VarChar
+  commercial_activity_id BigInt?
+  address                String?
+  address_number         BigInt?
+  neightborhood_id       BigInt?
+  city_section_id        BigInt?
+  block                  String?              @db.VarChar
+  parcel                 String?              @db.VarChar
+  created_at             DateTime             @default(now()) @db.Timestamptz(6)
+  registration_receipt   String?              @db.VarChar
+  cancellation_date      DateTime?            @db.Timestamptz(6)
+  cancellation_receipt   String?              @db.VarChar
+  gross_income_rate      String?              @db.VarChar
+  last_year_paid         BigInt?
+  registration_date      DateTime?            @db.Timestamptz(6)
+  city_section           city_section?        @relation(fields: [city_section_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  commercial_activity    commercial_activity? @relation(fields: [commercial_activity_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  neighborhood           neighborhood?        @relation(fields: [neightborhood_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model commercial_activity {
+  id                    BigInt                  @id @default(autoincrement())
+  activity              String?                 @db.VarChar
+  aliquot               Float?
+  commercial_enablement commercial_enablement[]
 
   @@schema("public")
 }

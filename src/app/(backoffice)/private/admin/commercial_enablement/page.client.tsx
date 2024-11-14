@@ -69,10 +69,9 @@ export function CommercialEnablementClient({
       id: 'company_name',
       accessorKey: 'company_name',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='MATRÍCULA' />
+        <DataTableColumnHeader column={column} title='RAZÓN SOCIAL' />
       ),
       cell: ({ row }) => formatName(row.original.company_name ?? '') ?? '-',
-      enableSorting: false,
     },
     {
       id: 'commercial_enablement_category_id',
@@ -81,7 +80,6 @@ export function CommercialEnablementClient({
         <DataTableColumnHeader column={column} title='RUBRO' />
       ),
       cell: ({ row }) => 'lógica para el rubro',
-      sortDescFirst: false,
     },
     {
       id: 'address',
@@ -213,7 +211,7 @@ export function CommercialEnablementClient({
           </Link>
         </div>
         <CustomDataTable<CommercialEnablementWithRelations>
-          tableTitle='Registros de inmuebles'
+          tableTitle='Registros de habilitación comercial'
           columns={columns}
           table={table}
           pagination={data.pagination as Pagination}
@@ -256,7 +254,7 @@ export function CommercialEnablementClient({
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Rubro:</Label>{' '}
-                {recordDetails.commercial_enablement_category_id ?? '-'}
+                {recordDetails.commercial_activity?.activity ?? '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Dirección:</Label>{' '}
@@ -291,8 +289,9 @@ export function CommercialEnablementClient({
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Fecha de baja:</Label>{' '}
-                {dayjs(recordDetails.cancellation_date).format('DD/MM/YYYY') ??
-                  '-'}
+                {recordDetails.cancellation_date
+                  ? dayjs(recordDetails.cancellation_date).format('DD/MM/YYYY')
+                  : '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Nro comprobante baja:</Label>{' '}

@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from 'next/link';
 import {
   getCitySections,
+  getCommercialActivities,
   getNeighborhoods,
 } from '../actions.commercial_enablement';
 import { CreateCommercialEnablementForm } from './page.client';
@@ -17,6 +18,7 @@ import { CreateCommercialEnablementForm } from './page.client';
 export default async function CreateCommercialEnablementPage() {
   const neighborhoods = await getNeighborhoods();
   const citySections = await getCitySections();
+  const commercialActivities = await getCommercialActivities();
 
   return (
     <ScrollArea className='mx-6 h-admin-scroll-area'>
@@ -58,6 +60,7 @@ export default async function CreateCommercialEnablementPage() {
         <CreateCommercialEnablementForm
           citySections={citySections}
           neighborhoods={neighborhoods}
+          commercialActivities={commercialActivities}
         />
       </article>
     </ScrollArea>

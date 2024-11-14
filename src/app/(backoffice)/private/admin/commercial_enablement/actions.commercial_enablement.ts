@@ -3,6 +3,7 @@ import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import {
   city_section,
+  commercial_activity,
   commercial_enablement,
   neighborhood,
   Prisma,
@@ -19,6 +20,7 @@ export const getCommercialEnablementById = async (
       include: {
         city_section: true,
         neighborhood: true,
+        commercial_activity: true,
       },
     });
 
@@ -64,6 +66,7 @@ export const getComercialEnablements = async (input: {
         include: {
           city_section: true,
           neighborhood: true,
+          commercial_activity: true,
         },
       });
 
@@ -164,5 +167,19 @@ export const getNeighborhoods = async (): Promise<neighborhood[]> => {
     console.error(error);
 
     throw new Error('Error al obtener los barrios');
+  }
+};
+
+export const getCommercialActivities = async (): Promise<
+  commercial_activity[]
+> => {
+  try {
+    const commercial_activity = await dbSupabase.commercial_activity.findMany();
+
+    return commercial_activity;
+  } catch (error) {
+    console.error(error);
+
+    throw new Error('Error al obtener los rubros comerciales');
   }
 };
