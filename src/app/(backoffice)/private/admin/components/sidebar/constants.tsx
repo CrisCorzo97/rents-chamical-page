@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   LogOut,
   ReceiptText,
+  Store,
   UserRoundCheck,
 } from 'lucide-react';
 
@@ -44,6 +45,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         label: 'Cementerio',
         href: '/private/admin/cementery',
       },
+      {
+        id: 'commercial_enablement',
+        icon: <Store />,
+        label: 'Habilitación comercial',
+        href: '/private/admin/commercial_enablement',
+      },
     ],
     bottom: [
       {
@@ -80,6 +87,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         label: 'Cementerio',
         href: '/private/admin/cementery',
       },
+      {
+        id: 'commercial_enablement',
+        icon: <Store />,
+        label: 'Habilitación comercial',
+        href: '/private/admin/commercial_enablement',
+      },
     ],
     bottom: [
       {
@@ -110,6 +123,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         label: 'Cementerio',
         href: '/private/admin/cementery',
       },
+      {
+        id: 'commercial_enablement',
+        icon: <Store />,
+        label: 'Habilitación comercial',
+        href: '/private/admin/commercial_enablement',
+      },
     ],
     bottom: [
       {
@@ -139,6 +158,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         icon: <Church />,
         label: 'Cementerio',
         href: '/private/admin/cementery',
+      },
+      {
+        id: 'commercial_enablement',
+        icon: <Store />,
+        label: 'Habilitación comercial',
+        href: '/private/admin/commercial_enablement',
       },
     ],
     bottom: [
