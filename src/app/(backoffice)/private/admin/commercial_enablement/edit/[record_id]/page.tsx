@@ -10,8 +10,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from 'next/link';
 import {
   getCitySections,
+  getCommercialActivities,
+  getCommercialEnablementById,
   getNeighborhoods,
-  getPropertyRecordById,
 } from '../../actions.commercial_enablement';
 import { EditPropertyRecordForm } from './editForm';
 
@@ -22,9 +23,10 @@ export default async function EditRecordPage({
     record_id: string;
   }>;
 }) {
-  const record = await getPropertyRecordById((await params).record_id);
+  const record = await getCommercialEnablementById((await params).record_id);
   const neighborhoods = await getNeighborhoods();
   const citySections = await getCitySections();
+  const commercialActivities = await getCommercialActivities();
 
   return (
     <ScrollArea className='mx-6 h-admin-scroll-area'>
@@ -42,8 +44,8 @@ export default async function EditRecordPage({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href='/private/admin/property' prefetch>
-                Inmueble
+              <Link href='/private/admin/commercial_enablement' prefetch>
+                Habilitación comercial
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -55,7 +57,9 @@ export default async function EditRecordPage({
       </Breadcrumb>
 
       <article className='mb-10'>
-        <h1 className='text-2xl font-bold'>Editar registro de inmueble</h1>
+        <h1 className='text-2xl font-bold'>
+          Editar registro de habilitación comercial
+        </h1>
         <p className='text-gray-500 mt-2'>
           Revise los datos y realice los cambios necesarios.
         </p>
@@ -64,6 +68,7 @@ export default async function EditRecordPage({
           record={record!}
           citySections={citySections}
           neighborhoods={neighborhoods}
+          commercialActivities={commercialActivities}
         />
       </article>
     </ScrollArea>

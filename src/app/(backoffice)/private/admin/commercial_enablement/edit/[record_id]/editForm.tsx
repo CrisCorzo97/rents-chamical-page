@@ -1,6 +1,13 @@
 'use client';
 
-import { Button, Input, Label, Select } from '@/components/ui';
+import {
+  Button,
+  Calendar,
+  Input,
+  Label,
+  Popover,
+  Select,
+} from '@/components/ui';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +24,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
+import { PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   SelectContent,
   SelectItem,
@@ -24,42 +32,70 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Toaster } from '@/components/ui/sonner';
-import { Switch } from '@/components/ui/switch';
-import { formatName } from '@/lib/formatters';
-import { city_section, neighborhood, Prisma } from '@prisma/client';
-import dayjs from 'dayjs';
+import { cn } from '@/lib/cn';
+import { formatCuilInput, formatName } from '@/lib/formatters';
+import {
+  city_section,
+  commercial_activity,
+  neighborhood,
+  Prisma,
+} from '@prisma/client';
+import dayjs, { Dayjs } from 'dayjs';
+import { CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { updateProperty } from '../../actions.commercial_enablement';
-import { PropertyRecordWithRelations } from '../../commercial_enablement.interface';
+import { updateCommercialEnablement } from '../../actions.commercial_enablement';
+import { CommercialEnablementWithRelations } from '../../commercial_enablement.interface';
 
 const formSchema = z.object({
   taxpayer: z.string(),
-  taxpayer_type: z.nullable(z.string()),
-  enrollment: z.nullable(z.string()),
-  is_part: z.boolean(),
+  tax_id: z.string(),
+  company_name: z.string(),
+  commercial_activity_id: z.number(),
   address: z.string(),
-  neighborhood: z.number(),
-  city_section: z.number(),
-  front_length: z.number(),
+  address_number: z.nullable(z.number()),
+  neighborhood_id: z.number(),
+  city_section_id: z.number(),
+  block: z.nullable(z.string()),
+  parcel: z.nullable(z.string()),
+  registration_date: z.string().datetime(),
+  cancellation_date: z.nullable(z.string().datetime()),
+  registration_receipt: z.string(),
+  cancellation_receipt: z.nullable(z.string()),
+  gross_income_rate: z.nullable(z.string()),
   last_year_paid: z.nullable(z.number()),
 });
 
 interface EditPropertyRecordFormProps {
-  record: PropertyRecordWithRelations;
+  record: CommercialEnablementWithRelations;
   neighborhoods: neighborhood[];
   citySections: city_section[];
+  commercialActivities: commercial_activity[];
 }
 
 export const EditPropertyRecordForm = ({
   record,
   citySections,
   neighborhoods,
+  commercialActivities,
 }: EditPropertyRecordFormProps) => {
+  const [taxId, setTaxId] = useState<string>(record.tax_id!);
   const [isMutating, startTransition] = useTransition();
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
+  const [{ registration_date, cancellation_date }, setDates] = useState<{
+    registration_date: Dayjs;
+    cancellation_date: Dayjs | undefined;
+  }>({
+    registration_date: dayjs(record.registration_date),
+    cancellation_date: record.cancellation_date
+      ? dayjs(record.cancellation_date)
+      : undefined,
+  });
+  const [grossIncomeRate, setGrossIncomeRate] = useState<string>(
+    record.gross_income_rate?.toString() ?? ''
+  );
 
   const { back } = useRouter();
 
@@ -67,61 +103,70 @@ export const EditPropertyRecordForm = ({
     startTransition(async () => {
       const formObject = Object.fromEntries(formData.entries());
 
-      const front_length = Number(
-        (formObject.front_length as string).replace(',', '.')
-      );
-
       const parsedData = {
         taxpayer: formObject.taxpayer as string,
-        taxpayer_type: ['', 'none'].includes(formObject.taxpayer_type as string)
-          ? null
-          : (formObject.taxpayer_type as string),
-        enrollment:
-          (formObject.enrollment as string) === ''
-            ? null
-            : (formObject.enrollment as string),
-        is_part: formObject.is_part === 'on',
+        tax_id: formObject.tax_id as string,
+        company_name: formObject.company_name as string,
+        commercial_activity_id: Number(
+          formObject.commercial_activity_id as string
+        ),
         address: formObject.address as string,
-        neighborhood: Number(formObject.neighborhood as string),
-        city_section: Number(formObject.city_section as string),
-        front_length,
-        last_year_paid:
-          (formObject.last_year_paid as string) === ''
-            ? null
-            : Number(formObject.last_year_paid as string),
+        address_number: formObject.address_number
+          ? Number(formObject.address_number)
+          : null,
+        neighborhood_id: Number(formObject.neighborhood_id as string),
+        city_section_id: Number(formObject.city_section_id as string),
+        block: formObject.block ? (formObject.block as string) : null,
+        parcel: formObject.parcel ? (formObject.parcel as string) : null,
+        registration_date: registration_date.toISOString(),
+        cancellation_date: cancellation_date?.toISOString() ?? null,
+        registration_receipt: formObject.registration_receipt as string,
+        cancellation_receipt: formObject.cancellation_receipt
+          ? (formObject.cancellation_receipt as string)
+          : null,
+        gross_income_rate: formObject.gross_income_rate
+          ? (formObject.gross_income_rate as string)
+          : null,
+        last_year_paid: formObject.last_year_paid
+          ? Number(formObject.last_year_paid as string)
+          : null,
       };
 
       try {
         formSchema.parse(parsedData);
 
         try {
-          const missing_fields = [];
-
-          if (!parsedData.enrollment) missing_fields.push('enrollment');
-
-          const updatedData: Prisma.propertyUpdateArgs = {
+          const updatedData: Prisma.commercial_enablementUpdateArgs = {
             where: { id: record.id },
             data: {
               taxpayer: parsedData.taxpayer.toUpperCase(),
-              taxpayer_type: parsedData.taxpayer_type,
-              enrollment: parsedData.enrollment,
-              is_part: parsedData.is_part,
+              tax_id: parsedData.tax_id,
+              company_name: parsedData.company_name.toUpperCase(),
+              commercial_activity: {
+                connect: { id: parsedData.commercial_activity_id },
+              },
               address: parsedData.address,
+              address_number: parsedData.address_number,
               neighborhood: {
-                connect: { id: parsedData.neighborhood },
+                connect: { id: parsedData.neighborhood_id },
               },
               city_section: {
-                connect: { id: parsedData.city_section },
+                connect: { id: parsedData.city_section_id },
               },
-              front_length: parsedData.front_length,
+              block: parsedData.block,
+              parcel: parsedData.parcel,
+              registration_date: parsedData.registration_date,
+              cancellation_date: parsedData.cancellation_date,
+              registration_receipt: parsedData.registration_receipt,
+              cancellation_receipt: parsedData.cancellation_receipt,
+              gross_income_rate: parsedData.gross_income_rate,
               last_year_paid: parsedData.last_year_paid,
-              missing_fields: !missing_fields.length
-                ? null
-                : JSON.stringify(missing_fields),
             },
           };
 
-          const { success, data, error } = await updateProperty(updatedData);
+          const { success, data, error } = await updateCommercialEnablement(
+            updatedData
+          );
 
           if (!success || !data) {
             throw new Error(error ?? '');
@@ -132,7 +177,7 @@ export const EditPropertyRecordForm = ({
           console.error(error);
 
           toast.error(
-            'Error al editar el registro de propiedad. Revise los datos ingresados e intente nuevamente.',
+            'Error al editar el registro de habilitación comercial. Revise los datos ingresados e intente nuevamente.',
             {
               duration: 5000,
             }
@@ -152,7 +197,7 @@ export const EditPropertyRecordForm = ({
         <AlertDialogContent>
           <AlertDialogTitle>Registro editado</AlertDialogTitle>
           <AlertDialogDescription>
-            El registro de propiedad se ha editado correctamente.
+            El registro de habilitación comercial se ha editado correctamente.
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogAction asChild>
@@ -172,7 +217,9 @@ export const EditPropertyRecordForm = ({
       <Card className='w-full max-w-3xl mt-6'>
         <CardHeader>
           <CardTitle>Editar registro</CardTitle>
-          <CardDescription>Datos del registro de inmueble</CardDescription>
+          <CardDescription>
+            Datos del registro de habilitación comercial
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={handleSubmit} className='w-full flex flex-col gap-3'>
@@ -184,48 +231,62 @@ export const EditPropertyRecordForm = ({
                 <Input
                   name='taxpayer'
                   required
-                  defaultValue={formatName(record.taxpayer)}
+                  defaultValue={formatName(record.taxpayer!)}
                 />
               </FormItem>
               <FormItem className='w-1/3'>
-                <Label>Tipo de contribuyente</Label>
-                <Select
-                  name='taxpayer_type'
-                  defaultValue={record.taxpayer_type ?? ''}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Seleccione un tipo' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem key={1} value={'none'}>
-                      Seleccione un tipo
-                    </SelectItem>
-                    <SelectItem key={2} value={'Persona física'}>
-                      Persona física
-                    </SelectItem>
-                    <SelectItem key={3} value={'Persona jurídica'}>
-                      Persona jurídica
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>
+                  CUIT <span className='text-red-500'>*</span>
+                </Label>
+                <Input
+                  name='tax_id'
+                  required
+                  value={taxId}
+                  onChange={(e) => setTaxId(formatCuilInput(e.target.value))}
+                />
               </FormItem>
             </div>
 
             <div className='flex gap-2 w-full'>
-              <FormItem className='w-1/2'>
-                <Label>Matrícula</Label>
+              <FormItem className='flex-1'>
+                <Label>
+                  Razón social <span className='text-red-500'>*</span>
+                </Label>
                 <Input
-                  name='enrollment'
-                  defaultValue={record.enrollment ?? ''}
+                  name='company_name'
+                  required
+                  defaultValue={record.company_name!}
                 />
               </FormItem>
-              <FormItem>
-                <Label>¿Es parte?</Label>
-                <Switch
-                  name='is_part'
-                  className='block'
-                  defaultValue={record.is_part ? 'on' : ''}
-                />
+              <FormItem className='flex-1'>
+                <Label>
+                  Actividad o rubro <span className='text-red-500'>*</span>
+                </Label>
+                <Select
+                  name='commercial_activity_id'
+                  required
+                  onValueChange={(value) =>
+                    setGrossIncomeRate(
+                      commercialActivities[Number(value)].aliquot?.toString() ??
+                        ''
+                    )
+                  }
+                  defaultValue={record.commercial_activity_id!.toString()}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Seleccione un rubro' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {commercialActivities.map((commercial_act) => (
+                      <SelectItem
+                        key={commercial_act.id}
+                        value={`${commercial_act.id}`}
+                      >
+                        {commercial_act.activity}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             </div>
 
@@ -234,24 +295,29 @@ export const EditPropertyRecordForm = ({
                 <Label>
                   Dirección <span className='text-red-500'>*</span>
                 </Label>
+                <Input name='address' required defaultValue={record.address!} />
+              </FormItem>
+              <FormItem className='flex-1'>
+                <Label>Nro</Label>
                 <Input
-                  name='address'
-                  required
-                  defaultValue={record.address ?? ''}
+                  type='number'
+                  name='address_number'
+                  min={0}
+                  defaultValue={
+                    record.address_number
+                      ? Number(record.address_number)
+                      : undefined
+                  }
                 />
               </FormItem>
-              <FormItem className='w-1/3'>
+              <FormItem className='flex-1'>
                 <Label>
                   Barrio <span className='text-red-500'>*</span>
                 </Label>
                 <Select
-                  name='neighborhood'
+                  name='neighborhood_id'
                   required
-                  defaultValue={
-                    record.id_neighborhood
-                      ? `${Number(record.id_neighborhood)}`
-                      : ''
-                  }
+                  defaultValue={record.neightborhood_id!.toString()}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder='Seleccione un barrio' />
@@ -276,13 +342,9 @@ export const EditPropertyRecordForm = ({
                   Sección <span className='text-red-500'>*</span>
                 </Label>
                 <Select
-                  name='city_section'
+                  name='city_section_id'
                   required
-                  defaultValue={
-                    record.id_city_section
-                      ? `${Number(record.id_city_section)}`
-                      : ''
-                  }
+                  defaultValue={record.city_section_id!.toString()}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder='Seleccione una sección' />
@@ -297,14 +359,118 @@ export const EditPropertyRecordForm = ({
                 </Select>
               </FormItem>
               <FormItem className='flex-1'>
+                <Label>Manzana</Label>
+                <Input name='block' defaultValue={record.block ?? undefined} />
+              </FormItem>
+              <FormItem className='flex-1'>
+                <Label>Parcela</Label>
+                <Input
+                  name='parcel'
+                  defaultValue={record.parcel ?? undefined}
+                />
+              </FormItem>
+            </div>
+
+            <div className='flex gap-2 w-full'>
+              <FormItem className='flex-1'>
                 <Label>
-                  Mts de frente <span className='text-red-500'>*</span>
+                  Fecha de alta <span className='text-red-500'>*</span>
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={'outline'}
+                      className={cn(
+                        'w-[280px] justify-start text-left font-normal',
+                        !registration_date && 'text-muted-foreground'
+                      )}
+                    >
+                      <CalendarIcon className='mr-2 h-4 w-4' />
+                      {registration_date ? (
+                        dayjs(registration_date).format('DD/MM/YYYY')
+                      ) : (
+                        <span>Seleccione una fecha</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-auto p-0'>
+                    <Calendar
+                      mode='single'
+                      selected={dayjs(registration_date).toDate()}
+                      onSelect={(date) =>
+                        setDates({
+                          registration_date: dayjs(date),
+                          cancellation_date,
+                        })
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </FormItem>
+              <FormItem className='flex-1'>
+                <Label>Fecha de baja</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={'outline'}
+                      className={cn(
+                        'w-[280px] justify-start text-left font-normal',
+                        !cancellation_date && 'text-muted-foreground'
+                      )}
+                    >
+                      <CalendarIcon className='mr-2 h-4 w-4' />
+                      {cancellation_date ? (
+                        dayjs(cancellation_date).format('DD/MM/YYYY')
+                      ) : (
+                        <span>Seleccione una fecha</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-auto p-0'>
+                    <Calendar
+                      mode='single'
+                      selected={dayjs(cancellation_date).toDate()}
+                      onSelect={(date) =>
+                        setDates({
+                          cancellation_date: dayjs(date),
+                          registration_date,
+                        })
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </FormItem>
+            </div>
+
+            <div className='flex gap-2 w-full'>
+              <FormItem className='flex-1'>
+                <Label>
+                  Nro de comprobante de alta{' '}
+                  <span className='text-red-500'>*</span>
                 </Label>
                 <Input
-                  type='text'
-                  name='front_length'
+                  name='registration_receipt'
                   required
-                  defaultValue={`${record.front_length}`}
+                  defaultValue={record.registration_receipt!}
+                />
+              </FormItem>
+              <FormItem className='flex-1'>
+                <Label>Nro de comprobante de baja</Label>
+                <Input
+                  name='cancellation_receipt'
+                  defaultValue={record.cancellation_receipt ?? undefined}
+                />
+              </FormItem>
+            </div>
+
+            <div className='flex gap-2 w-full'>
+              <FormItem className='flex-1'>
+                <Label>Alícuota de IIBB</Label>
+                <Input
+                  name='gross_income_rate'
+                  defaultValue={grossIncomeRate}
                 />
               </FormItem>
               <FormItem className='flex-1'>
@@ -313,6 +479,11 @@ export const EditPropertyRecordForm = ({
                   type='number'
                   name='last_year_paid'
                   max={dayjs().year()}
+                  defaultValue={
+                    record.last_year_paid
+                      ? Number(record.last_year_paid)
+                      : undefined
+                  }
                 />
               </FormItem>
             </div>
