@@ -335,9 +335,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
 
               <div className='mt-6 flex gap-3 self-end'>
                 <FormItem>
-                  <Link
-                    href={`/private/admin/cementery/edit/${record.id}?from_receipt=true`}
-                  >
+                  <Link href={`/private/admin/cementery/edit/${record.id}`}>
                     <Button variant='outline'>Editar</Button>
                   </Link>
                 </FormItem>
