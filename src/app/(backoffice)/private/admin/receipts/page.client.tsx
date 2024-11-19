@@ -9,12 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
@@ -37,10 +31,8 @@ import {
 } from '@tanstack/react-table';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { CirclePlus, FileText } from 'lucide-react';
-import Link from 'next/link';
+import { FileText } from 'lucide-react';
 import { useState } from 'react';
-import { ConfirmModal } from './components';
 
 interface ReceiptClientPageProps {
   data: Envelope<receipt[]>;
@@ -192,64 +184,6 @@ export const ReceiptClientPage = ({
   return (
     <section className='w-full mb-10 flex flex-wrap gap-3'>
       <div className='w-full flex-1'>
-        <Card className='mt-6 flex flex-col items-center justify-center border-dashed bg-neutral-100'>
-          <CardHeader>
-            <CardTitle className='text-lg font-semibold'>
-              Acciones rápidas
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='flex gap-2 mt-4'>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size='lg' className='flex gap-2'>
-                  <CirclePlus size={18} />
-                  Crear
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className='w-full'>
-                <DropdownMenuItem>
-                  <Link
-                    href='/private/admin/receipts/create-various-rates-receipt'
-                    prefetch
-                    className='w-full'
-                  >
-                    Tasas diversas
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link
-                    href='/private/admin/receipts/create-cementery-receipt'
-                    prefetch
-                    className='w-full'
-                  >
-                    Cementerio
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link
-                    href='/private/admin/receipts/create-property-receipt'
-                    prefetch
-                    className='w-full'
-                  >
-                    Inmueble
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link
-                    href='/private/admin/receipts/create-patent-receipt'
-                    prefetch
-                    className='w-full'
-                  >
-                    Patente
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <ConfirmModal />
-          </CardContent>
-        </Card>
-
         <div className='flex items-center justify-between mb-4 mt-6'>
           <Input
             placeholder='Filtrar por contribuyente'

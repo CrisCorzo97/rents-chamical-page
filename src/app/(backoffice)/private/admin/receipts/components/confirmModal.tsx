@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -92,7 +93,7 @@ export function ConfirmModal() {
           });
         }
       } catch (error) {
-        console.error(error);
+        console.log(error);
         toast({
           title: 'Ocurrió un error',
           description: 'Hubo un error al confirmar el pago.',

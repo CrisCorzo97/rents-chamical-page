@@ -95,43 +95,51 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
         // Validar los datos usando el esquema de Zod
         formSchema.parse(parsedDataObject);
 
-        const createData: Omit<Prisma.receiptCreateInput, 'id'> = {
-          created_at: parsedDataObject.created_at,
-          taxpayer: parsedDataObject.taxpayer.toUpperCase(),
-          amount: parsedDataObject.amount,
-          tax_type: 'TASAS DIVERSAS',
-          other_data: {
-            observations: parsedDataObject.observations,
-          },
-        };
+        try {
+          const createData: Omit<Prisma.receiptCreateInput, 'id'> = {
+            created_at: parsedDataObject.created_at,
+            taxpayer: parsedDataObject.taxpayer.toUpperCase(),
+            amount: parsedDataObject.amount,
+            tax_type: 'TASAS DIVERSAS',
+            other_data: {
+              observations: parsedDataObject.observations,
+              tax_or_contribution:
+                taxesOrContributions[
+                  parsedDataObject.tax_or_contribution_id
+                ].name.toUpperCase(),
+            },
+          };
 
-        const response: Envelope<receipt> = await createReceipt({
-          data: createData,
-        });
+          const { data, error }: Envelope<receipt> = await createReceipt({
+            data: createData,
+          });
 
-        if (!response.success || !response.data) {
+          if (!data || !!error) {
+            throw new Error(error ?? '');
+          }
+
+          // Actualizar el contenido del diálogo con los datos del comprobante
+          setContentDialog({
+            receiptId: data?.id ?? '',
+            taxpayer: parsedDataObject.taxpayer,
+            taxOrContibution:
+              taxesOrContributions.find(
+                (toc) =>
+                  Number(toc.id) === parsedDataObject.tax_or_contribution_id
+              )?.name ?? '',
+            observations: parsedDataObject.observations ?? '',
+            amount: parsedDataObject.amount,
+          });
+
+          // Mostrar el diálogo de confirmación
+          setOpenDialog(true);
+        } catch (error) {
+          console.log(error);
           toast.error(
             'Error al generar el comprobante de tasas diversas. Intente nuevamente.',
             { duration: 5000 }
           );
-          console.error(response.error);
         }
-
-        // Actualizar el contenido del diálogo con los datos del comprobante
-        setContentDialog({
-          receiptId: response.data?.id ?? '',
-          taxpayer: parsedDataObject.taxpayer,
-          taxOrContibution:
-            taxesOrContributions.find(
-              (toc) =>
-                Number(toc.id) === parsedDataObject.tax_or_contribution_id
-            )?.name ?? '',
-          observations: parsedDataObject.observations ?? '',
-          amount: parsedDataObject.amount,
-        });
-
-        // Mostrar el diálogo de confirmación
-        setOpenDialog(true);
       } catch (error) {
         console.log({ error });
         if (error instanceof z.ZodError) {

@@ -680,6 +680,18 @@ model commercial_activity {
   @@schema("public")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model daily_box_report {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  date         DateTime @db.Date
+  total_amount Float
+  details      Json     @default("{}")
+  other_data   Json?
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
 enum aal_level {
   aal1
   aal2

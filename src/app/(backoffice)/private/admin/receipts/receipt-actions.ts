@@ -3,7 +3,7 @@
 import { generateReceiptCode } from '@/lib/code-generator';
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
-import { Prisma, receipt } from '@prisma/client';
+import { daily_box_report, Prisma, receipt } from '@prisma/client';
 import dayjs from 'dayjs';
 
 export const getReceiptById = async (input: { id: string }) => {
@@ -88,8 +88,6 @@ export const getConfirmedReceipts = async (input: {
       limit_per_page: inputQuery.take ?? 5,
     };
   } catch (error) {
-    console?.error({ error });
-
     response.success = false;
     response.error =
       'Hubo un error al buscar los comprobantes de pago confirmados';
@@ -233,6 +231,8 @@ export const confirmReceipt = async (input: { data: receipt }) => {
 };
 
 const createNextReceiptCode = async () => {
+  let new_code: string | null = null;
+
   try {
     const lastReceipt = await dbSupabase.receipt.findFirst({
       orderBy: {
@@ -244,18 +244,99 @@ const createNextReceiptCode = async () => {
     });
 
     if (!lastReceipt) {
-      return null;
-    }
-
-    const new_code = generateReceiptCode(lastReceipt.id);
-
-    if (!new_code) {
-      return null;
-    }
-
-    return new_code;
+      new_code = generateReceiptCode();
+    } else new_code = generateReceiptCode(lastReceipt.id);
   } catch (error) {
-    console.error({ error });
-    return null;
+    console.log({ error });
+  } finally {
+    return new_code;
+  }
+};
+
+export const generateDailyBoxReport = async () => {
+  const response: Envelope<daily_box_report> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  let dailyBoxReport: daily_box_report | null = null;
+
+  try {
+    const confirmedReceipts = await dbSupabase.receipt.findMany({
+      where: {
+        confirmed_at: { not: null },
+        created_at: {
+          gte: dayjs().startOf('day').toISOString(),
+          lte: dayjs().endOf('day').toISOString(),
+        },
+      },
+    });
+
+    if (!confirmedReceipts) {
+      throw new Error('Error getting confirmed receipts');
+    }
+
+    let total_amount = 0;
+    const details: Record<string, number> = {};
+
+    for (const receipt of confirmedReceipts) {
+      total_amount += receipt.amount;
+
+      if (receipt.tax_type === 'CEMENTERIO') {
+        if (details['CEMENTERIO']) {
+          details['CEMENTERIO'] += receipt.amount;
+        } else {
+          details['CEMENTERIO'] = receipt.amount;
+        }
+      } else if (receipt.tax_type === 'INMUEBLE') {
+        if (details['INMUEBLE']) {
+          details['INMUEBLE'] += receipt.amount;
+        } else {
+          details['INMUEBLE'] = receipt.amount;
+        }
+      } else if (receipt.tax_type === 'PATENTE') {
+        if (details['PATENTE']) {
+          details['PATENTE'] += receipt.amount;
+        } else {
+          details['PATENTE'] = receipt.amount;
+        }
+      } else {
+        const otherData = receipt.other_data as Prisma.JsonObject;
+        const taxOrContribution = (
+          otherData['tax_or_contribution'] as string
+        ).toUpperCase();
+        if (details[taxOrContribution]) {
+          details[taxOrContribution] += receipt.amount;
+        } else {
+          details[taxOrContribution] = receipt.amount;
+        }
+      }
+    }
+
+    try {
+      dailyBoxReport = await dbSupabase.daily_box_report.create({
+        data: {
+          date: dayjs().toDate(),
+          total_amount,
+          details,
+          other_data: {
+            confirmed_receipts: confirmedReceipts.length,
+          },
+        },
+      });
+    } catch (error) {
+      console.error({ error });
+      throw new Error('Error creating daily box report');
+    }
+
+    response.data = dailyBoxReport;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+    response.error = 'Hubo un error al generar el reporte de caja diaria';
+  } finally {
+    return response;
   }
 };

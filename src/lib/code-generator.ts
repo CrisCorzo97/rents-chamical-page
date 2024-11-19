@@ -6,8 +6,13 @@ import dayjs from 'dayjs';
 // Ejemplo: 2024-000001
 // Ejemplo de funcionaiento:
 // Si el último código de comprobante es 2024-000001, la función debe devolver 2024-000002
-export function generateReceiptCode(lastCode: string) {
-  if (!lastCode || !validateReceiptCode(lastCode)) {
+export function generateReceiptCode(lastCode?: string) {
+  if (!lastCode) {
+    const initialNumber = '00000001';
+    return `${dayjs().year()}-${initialNumber}`;
+  }
+
+  if(!validateReceiptCode(lastCode)) {
     return null;
   }
 
