@@ -1,11 +1,7 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { SupabaseCookie } from '@/types/cookies';
 import bcrypt from 'bcryptjs';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-
-const PROJECT_ID = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID;
 
 const verifyPassword = async ({
   user_id,
@@ -33,12 +29,19 @@ export async function POST(
   request: Request
 ): Promise<NextResponse<{ success: boolean; message?: string }>> {
   try {
+    const supabase = await createSupabaseServerClient();
     const form_data = await request.formData();
-    const cookie_store = await cookies();
 
-    const { user }: SupabaseCookie = JSON.parse(
-      cookie_store.get(`sb-${PROJECT_ID}-auth-token`)?.value ?? ''
-    );
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({
+        success: false,
+        message: 'Usuario no encontrado.',
+      });
+    }
 
     const user_id = user.id;
     const old_password = form_data.get('old_password');
@@ -60,16 +63,11 @@ export async function POST(
       });
     }
 
-    const supabase = await createSupabaseServerClient();
-
     const hashed_password = await bcrypt.hash(new_password.toString(), 7);
 
-    const { data, error } = await supabase.auth.admin.updateUserById(
-      user_id.toString(),
-      {
-        password: new_password.toString(),
-      }
-    );
+    const { data, error } = await supabase.auth.updateUser({
+      password: new_password.toString(),
+    });
 
     if (error || !data) {
       console.log({ error });
