@@ -160,7 +160,11 @@ export const getCitySections = async (): Promise<city_section[]> => {
 
 export const getNeighborhoods = async (): Promise<neighborhood[]> => {
   try {
-    const neighborhoods = await dbSupabase.neighborhood.findMany();
+    const neighborhoods = await dbSupabase.neighborhood.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    });
 
     return neighborhoods;
   } catch (error) {
