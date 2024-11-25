@@ -2,7 +2,7 @@
 
 import { Button, Popover } from '@/components/ui';
 import { PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { daily_box_report } from '@prisma/client';
+import { receipt } from '@prisma/client';
 import { FileChartColumnIncreasing } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
@@ -12,7 +12,7 @@ export const DailyBoxReport = () => {
   const [isMutating, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [contentDialog, setContentDialog] = useState<daily_box_report>();
+  const [contentDialog, setContentDialog] = useState<receipt[]>();
 
   const handleClick = () => {
     startTransition(async () => {

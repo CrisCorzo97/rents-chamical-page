@@ -3,7 +3,7 @@
 import { generateReceiptCode } from '@/lib/code-generator';
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
-import { daily_box_report, Prisma, receipt } from '@prisma/client';
+import { Prisma, receipt } from '@prisma/client';
 import dayjs from 'dayjs';
 
 export const getReceiptById = async (input: { id: string }) => {
@@ -254,14 +254,12 @@ const createNextReceiptCode = async () => {
 };
 
 export const generateDailyBoxReport = async () => {
-  const response: Envelope<daily_box_report> = {
+  const response: Envelope<receipt[]> = {
     success: true,
     data: null,
     error: null,
     pagination: null,
   };
-
-  let dailyBoxReport: daily_box_report | null = null;
 
   try {
     const confirmedReceipts = await dbSupabase.receipt.findMany({
@@ -316,7 +314,7 @@ export const generateDailyBoxReport = async () => {
     }
 
     try {
-      dailyBoxReport = await dbSupabase.daily_box_report.create({
+      await dbSupabase.daily_box_report.create({
         data: {
           date: dayjs().toDate(),
           total_amount,
@@ -331,7 +329,7 @@ export const generateDailyBoxReport = async () => {
       throw new Error('Error creating daily box report');
     }
 
-    response.data = dailyBoxReport;
+    response.data = confirmedReceipts;
   } catch (error) {
     console.error(error);
     response.success = false;
