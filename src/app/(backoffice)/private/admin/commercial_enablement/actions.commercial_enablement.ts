@@ -21,6 +21,10 @@ export const getCommercialEnablementById = async (
         city_section: true,
         neighborhood: true,
         commercial_activity: true,
+        commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity:
+          true,
+        commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
+          true,
       },
     });
 
@@ -67,6 +71,10 @@ export const getComercialEnablements = async (input: {
           city_section: true,
           neighborhood: true,
           commercial_activity: true,
+          commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity:
+            true,
+          commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
+            true,
         },
       });
 

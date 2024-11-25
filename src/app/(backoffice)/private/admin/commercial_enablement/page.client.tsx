@@ -253,8 +253,20 @@ export function CommercialEnablementClient({
                 {formatName(recordDetails.company_name ?? '') ?? '-'}
               </span>
               <span className='font-light text-sm'>
-                <Label className='font-semibold'>Rubro:</Label>{' '}
+                <Label className='font-semibold'>Rubro principal:</Label>{' '}
                 {recordDetails.commercial_activity?.activity ?? '-'}
+              </span>
+              <span className='font-light text-sm'>
+                <Label className='font-semibold'>Rubro secundario:</Label>{' '}
+                {recordDetails
+                  .commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity
+                  ?.activity ?? '-'}
+              </span>
+              <span className='font-light text-sm'>
+                <Label className='font-semibold'>Rubro terciario:</Label>{' '}
+                {recordDetails
+                  .commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity
+                  ?.activity ?? '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Dirección:</Label>{' '}
