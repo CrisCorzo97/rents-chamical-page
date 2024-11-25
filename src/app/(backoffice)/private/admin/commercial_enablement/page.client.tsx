@@ -79,7 +79,9 @@ export function CommercialEnablementClient({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='RUBRO' />
       ),
-      cell: ({ row }) => 'lógica para el rubro',
+      cell: ({ row }) => {
+        return row.original.commercial_activity?.activity ?? '-';
+      },
     },
     {
       id: 'address',
