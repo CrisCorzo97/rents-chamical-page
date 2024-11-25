@@ -53,6 +53,8 @@ const formSchema = z.object({
   tax_id: z.string(),
   company_name: z.string(),
   commercial_activity_id: z.number(),
+  second_commercial_activity_id: z.nullable(z.number()),
+  third_commercial_activity_id: z.nullable(z.number()),
   address: z.string(),
   address_number: z.nullable(z.number()),
   neighborhood_id: z.number(),
@@ -101,6 +103,12 @@ export const CreateCommercialEnablementForm = ({
         commercial_activity_id: Number(
           formObject.commercial_activity_id as string
         ),
+        second_commercial_activity_id: formObject.second_commercial_activity_id
+          ? Number(formObject.second_commercial_activity_id as string)
+          : null,
+        third_commercial_activity_id: formObject.third_commercial_activity_id
+          ? Number(formObject.third_commercial_activity_id as string)
+          : null,
         address: formObject.address as string,
         address_number: formObject.address_number
           ? Number(formObject.address_number)
@@ -134,6 +142,18 @@ export const CreateCommercialEnablementForm = ({
             commercial_activity: {
               connect: { id: parsedData.commercial_activity_id },
             },
+            commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity:
+              parsedData.second_commercial_activity_id
+                ? {
+                    connect: { id: parsedData.second_commercial_activity_id },
+                  }
+                : undefined,
+            commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
+              parsedData.third_commercial_activity_id
+                ? {
+                    connect: { id: parsedData.third_commercial_activity_id },
+                  }
+                : undefined,
             address: parsedData.address,
             address_number: parsedData.address_number,
             neighborhood: {
@@ -235,7 +255,8 @@ export const CreateCommercialEnablementForm = ({
               </FormItem>
               <FormItem className='flex-1'>
                 <Label>
-                  Actividad o rubro <span className='text-red-500'>*</span>
+                  Actividad o rubro principal{' '}
+                  <span className='text-red-500'>*</span>
                 </Label>
                 <Select
                   name='commercial_activity_id'
@@ -246,6 +267,63 @@ export const CreateCommercialEnablementForm = ({
                         ''
                     )
                   }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Seleccione un rubro' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {commercialActivities.map((commercial_act) => (
+                      <SelectItem
+                        key={commercial_act.id}
+                        value={`${commercial_act.id}`}
+                      >
+                        {commercial_act.activity}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            </div>
+
+            <div className='flex gap-2 w-full'>
+              <FormItem className='flex-1'>
+                <Label>Actividad o rubro secundario</Label>
+                <Select
+                  name='second_commercial_activity_id'
+                  onValueChange={(value) => {
+                    const aliquot = Math.max(
+                      commercialActivities[Number(value)].aliquot ?? 0,
+                      Number(grossIncomeRate)
+                    );
+                    setGrossIncomeRate(aliquot.toString());
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Seleccione un rubro' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {commercialActivities.map((commercial_act) => (
+                      <SelectItem
+                        key={commercial_act.id}
+                        value={`${commercial_act.id}`}
+                      >
+                        {commercial_act.activity}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+              <FormItem className='flex-1'>
+                <Label>Actividad o rubro terciario</Label>
+                <Select
+                  name='third_commercial_activity_id'
+                  onValueChange={(value) => {
+                    const aliquot = Math.max(
+                      commercialActivities[Number(value)].aliquot ?? 0,
+                      Number(grossIncomeRate)
+                    );
+                    setGrossIncomeRate(aliquot.toString());
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder='Seleccione un rubro' />
