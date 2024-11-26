@@ -112,6 +112,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         href: '/private/admin/dashboard',
       },
       {
+        id: 'receipts',
+        icon: <ReceiptText />,
+        label: 'Comprobantes',
+        href: '/private/admin/receipts',
+      },
+      {
         id: 'property',
         icon: <Building2 />,
         label: 'Inmueble',
@@ -146,6 +152,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         icon: <LayoutDashboard />,
         label: 'Dashboard',
         href: '/private/admin/dashboard',
+      },
+      {
+        id: 'receipts',
+        icon: <ReceiptText />,
+        label: 'Comprobantes',
+        href: '/private/admin/receipts',
       },
       {
         id: 'property',
