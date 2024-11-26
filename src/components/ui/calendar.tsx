@@ -7,6 +7,7 @@ import { DayPicker } from 'react-day-picker';
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
+import dayjs from 'dayjs';
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -19,13 +20,27 @@ function Calendar({
   return (
     <DayPicker
       locale={es}
+      captionLayout='dropdown-buttons'
+      fromYear={dayjs().year() - 30}
+      toYear={dayjs().year()}
+      labels={{
+        labelMonthDropdown: () => '',
+        labelYearDropdown: () => '',
+      }}
+      fixedWeeks
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
       classNames={{
-        months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-        month: 'space-y-4',
-        caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-sm font-medium',
+        // months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
+        // month: 'space-y-4',
+        // caption: 'flex justify-center pt-1 relative items-center',
+        // caption_label: 'text-sm font-medium',
+        caption: 'flex justify-center py-2 relative items-center',
+        caption_label: 'hidden',
+        caption_dropdowns:
+          'flex items-center text-sm font-medium text-muted-foreground select-none',
+        dropdown: 'bg-card rounded-md p-1 cursor-pointer hover:bg-accent',
+        vhidden: 'sr-only',
         nav: 'space-x-1 flex items-center',
         nav_button: cn(
           buttonVariants({ variant: 'outline' }),
