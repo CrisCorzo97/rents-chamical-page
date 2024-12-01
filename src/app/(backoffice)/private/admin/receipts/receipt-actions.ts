@@ -88,8 +88,6 @@ export const getConfirmedReceipts = async (input: {
       limit_per_page: inputQuery.take ?? 5,
     };
   } catch (error) {
-    console?.error({ error });
-
     response.success = false;
     response.error =
       'Hubo un error al buscar los comprobantes de pago confirmados';
@@ -233,6 +231,8 @@ export const confirmReceipt = async (input: { data: receipt }) => {
 };
 
 const createNextReceiptCode = async () => {
+  let new_code: string | null = null;
+
   try {
     const lastReceipt = await dbSupabase.receipt.findFirst({
       orderBy: {
@@ -244,18 +244,137 @@ const createNextReceiptCode = async () => {
     });
 
     if (!lastReceipt) {
-      return null;
-    }
-
-    const new_code = generateReceiptCode(lastReceipt.id);
-
-    if (!new_code) {
-      return null;
-    }
-
-    return new_code;
+      new_code = generateReceiptCode();
+    } else new_code = generateReceiptCode(lastReceipt.id);
   } catch (error) {
-    console.error({ error });
-    return null;
+    console.log({ error });
+  } finally {
+    return new_code;
+  }
+};
+
+export const generateDailyBoxReport = async () => {
+  const response: Envelope<{
+    total_amount_collected: number;
+    total_receipts: number;
+    page_data: {
+      page: number;
+      subtotal: number;
+      receipts: receipt[];
+      total_items: number;
+    }[];
+  }> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const confirmedReceipts = await dbSupabase.receipt.findMany({
+      where: {
+        confirmed_at: {
+          not: null,
+          gte: dayjs().startOf('day').toISOString(),
+          lte: dayjs().endOf('day').toISOString(),
+        },
+      },
+      orderBy: {
+        confirmed_at: 'asc',
+      },
+    });
+
+    if (!confirmedReceipts) {
+      throw new Error('Error getting confirmed receipts');
+    }
+
+    let total_amount = 0;
+    const details: Record<string, number> = {};
+
+    for (const receipt of confirmedReceipts) {
+      total_amount += receipt.amount;
+
+      if (receipt.tax_type === 'CEMENTERIO') {
+        if (details['CEMENTERIO']) {
+          details['CEMENTERIO'] += receipt.amount;
+        } else {
+          details['CEMENTERIO'] = receipt.amount;
+        }
+      } else if (receipt.tax_type === 'INMUEBLE') {
+        if (details['INMUEBLE']) {
+          details['INMUEBLE'] += receipt.amount;
+        } else {
+          details['INMUEBLE'] = receipt.amount;
+        }
+      } else if (receipt.tax_type === 'PATENTE') {
+        if (details['PATENTE']) {
+          details['PATENTE'] += receipt.amount;
+        } else {
+          details['PATENTE'] = receipt.amount;
+        }
+      } else {
+        const otherData = receipt.other_data as Prisma.JsonObject;
+        const taxOrContribution = (
+          otherData['tax_or_contribution'] as string
+        ).toUpperCase();
+        if (details[taxOrContribution]) {
+          details[taxOrContribution] += receipt.amount;
+        } else {
+          details[taxOrContribution] = receipt.amount;
+        }
+      }
+    }
+
+    const pageData: {
+      page: number;
+      subtotal: number;
+      receipts: receipt[];
+      total_items: number;
+    }[] = [];
+
+    confirmedReceipts.forEach((receipt, index) => {
+      if (index % 30 === 0) {
+        pageData.push({
+          page: pageData.length + 1,
+          subtotal: receipt.amount,
+          receipts: [receipt],
+          total_items: 1,
+        });
+      } else {
+        const lastPage = pageData.find((p) => p.page === pageData.length);
+        lastPage!.subtotal += receipt.amount;
+        lastPage!.receipts.push(receipt);
+        lastPage!.total_items += 1;
+      }
+    });
+
+    try {
+      await dbSupabase.daily_box_report.create({
+        data: {
+          date: dayjs().toDate(),
+          total_amount,
+          details,
+          other_data: {
+            confirmed_receipts: confirmedReceipts.length,
+          },
+        },
+      });
+    } catch (error) {
+      console.error({ error });
+      throw new Error('Error creating daily box report');
+    }
+
+    response.data = {
+      total_amount_collected: total_amount,
+      total_receipts: confirmedReceipts.length,
+      page_data: pageData,
+    };
+    console.log({ data: confirmedReceipts });
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+    response.error = 'Hubo un error al generar el reporte de caja diaria';
+  } finally {
+    return response;
   }
 };

@@ -11,7 +11,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Rentas Web',
+  title: 'Rentas Digital',
   description: 'Rentas Municipal de Chamical',
 };
 

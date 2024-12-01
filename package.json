@@ -38,7 +38,7 @@
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.2",
     "@radix-ui/react-tooltip": "^1.1.2",
-    "@react-pdf/renderer": "^3.4.4",
+    "@react-pdf/renderer": "^4.1.4",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.46.1",
     "@tanstack/react-table": "^8.19.2",
@@ -50,7 +50,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
-    "lucide-react": "^0.399.0",
+    "lucide-react": "^0.460.0",
     "next": "^15.0.3",
     "next-themes": "^0.3.0",
     "nodemailer": "^6.9.13",
@@ -81,6 +81,7 @@
     "typescript": "^5.3.3"
   },
   "trustedDependencies": [
+    "@parcel/watcher",
     "@prisma/client",
     "@prisma/engines",
     "prisma",
