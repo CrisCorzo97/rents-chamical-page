@@ -254,7 +254,16 @@ const createNextReceiptCode = async () => {
 };
 
 export const generateDailyBoxReport = async () => {
-  const response: Envelope<receipt[]> = {
+  const response: Envelope<{
+    total_amount_collected: number;
+    total_receipts: number;
+    page_data: {
+      page: number;
+      subtotal: number;
+      receipts: receipt[];
+      total_items: number;
+    }[];
+  }> = {
     success: true,
     data: null,
     error: null,
@@ -264,11 +273,14 @@ export const generateDailyBoxReport = async () => {
   try {
     const confirmedReceipts = await dbSupabase.receipt.findMany({
       where: {
-        confirmed_at: { not: null },
-        created_at: {
+        confirmed_at: {
+          not: null,
           gte: dayjs().startOf('day').toISOString(),
           lte: dayjs().endOf('day').toISOString(),
         },
+      },
+      orderBy: {
+        confirmed_at: 'asc',
       },
     });
 
@@ -313,6 +325,29 @@ export const generateDailyBoxReport = async () => {
       }
     }
 
+    const pageData: {
+      page: number;
+      subtotal: number;
+      receipts: receipt[];
+      total_items: number;
+    }[] = [];
+
+    confirmedReceipts.forEach((receipt, index) => {
+      if (index % 30 === 0) {
+        pageData.push({
+          page: pageData.length + 1,
+          subtotal: receipt.amount,
+          receipts: [receipt],
+          total_items: 1,
+        });
+      } else {
+        const lastPage = pageData.find((p) => p.page === pageData.length);
+        lastPage!.subtotal += receipt.amount;
+        lastPage!.receipts.push(receipt);
+        lastPage!.total_items += 1;
+      }
+    });
+
     try {
       await dbSupabase.daily_box_report.create({
         data: {
@@ -329,7 +364,12 @@ export const generateDailyBoxReport = async () => {
       throw new Error('Error creating daily box report');
     }
 
-    response.data = confirmedReceipts;
+    response.data = {
+      total_amount_collected: total_amount,
+      total_receipts: confirmedReceipts.length,
+      page_data: pageData,
+    };
+    console.log({ data: confirmedReceipts });
   } catch (error) {
     console.error(error);
     response.success = false;
