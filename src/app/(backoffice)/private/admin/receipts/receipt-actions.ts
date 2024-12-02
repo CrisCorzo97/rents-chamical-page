@@ -5,6 +5,7 @@ import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { Prisma, receipt } from '@prisma/client';
 import dayjs from 'dayjs';
+import { revalidatePath } from 'next/cache';
 
 export const getReceiptById = async (input: { id: string }) => {
   const response: Envelope<receipt> = {
@@ -153,7 +154,14 @@ export const confirmReceipt = async (input: { data: receipt }) => {
     });
 
     if (!ReceiptFound) {
+      response.error = 'No se encontró el comprobante de pago';
       throw new Error('Receipt not found');
+    }
+
+    if (ReceiptFound.confirmed_at) {
+      response.error =
+        'El comprobante de pago ya fue confirmado con anterioridad';
+      throw new Error('Receipt already confirmed');
     }
 
     if (['INMUEBLE', 'CEMENTERIO'].includes(tax_type)) {
@@ -224,8 +232,11 @@ export const confirmReceipt = async (input: { data: receipt }) => {
   } catch (error) {
     console.error({ error });
     response.success = false;
-    response.error = 'Hubo un error al confirmar el comprobante de pago';
+    if (!response.error)
+      response.error = 'Hubo un error al confirmar el comprobante de pago';
   } finally {
+    revalidatePath('/admin/receipts');
+
     return response;
   }
 };

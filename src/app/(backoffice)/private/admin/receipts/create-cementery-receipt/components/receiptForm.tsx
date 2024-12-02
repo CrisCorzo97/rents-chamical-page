@@ -22,7 +22,6 @@ import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -81,8 +80,6 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
     observations: '',
     amount: 0,
   });
-
-  const pathname = usePathname();
 
   const handleSubmit = (formData: FormData) => {
     startMutatingTransition(async () => {

@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -18,20 +19,20 @@ import { validateReceiptCode } from '@/lib/code-generator';
 import { receipt } from '@prisma/client';
 import dayjs from 'dayjs';
 import { CircleCheckBig, Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { z } from 'zod';
 import { confirmReceipt, getReceiptById } from '../receipt-actions';
 
 export function ConfirmModal() {
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const [receiptId, setReceiptId] = useState<string>();
   const [receiptData, setReceiptData] = useState<receipt | null>(null);
   const [error, setError] = useState<string>('');
   const [isSearching, startTransition] = useTransition();
   const [isMutating, startMutation] = useTransition();
 
   const { toast } = useToast();
-
-  const { refresh } = useRouter();
 
   const handleSearch = (formData: FormData) => {
     startTransition(async () => {
@@ -78,25 +79,24 @@ export function ConfirmModal() {
       try {
         const receipt = await confirmReceipt({ data: receiptData! });
 
+        if (!receipt.success && receipt.error) {
+          throw new Error(receipt.error);
+        }
+
         if (receipt.success) {
           toast({
             title: 'Pago confirmado',
             description: 'El pago se ha confirmado correctamente.',
-            action: (
-              <ToastAction
-                altText='Por favor, recarga la página para ver los cambios'
-                onClick={refresh}
-              >
-                Recargar
-              </ToastAction>
-            ),
           });
         }
-      } catch (error) {
-        console.log(error);
+
+        setOpenDialog(false);
+      } catch (error: any) {
         toast({
           title: 'Ocurrió un error',
-          description: 'Hubo un error al confirmar el pago.',
+          description:
+            error?.message ??
+            'Hubo un error al confirmar el comprobante de pago.',
           action: (
             <ToastAction altText='Vuelve a intentarlo más tarde'>
               Entendido
@@ -108,19 +108,26 @@ export function ConfirmModal() {
   };
 
   return (
-    <Dialog onOpenChange={() => setReceiptData(null)}>
-      <DialogTrigger asChild>
+    <Dialog
+      onOpenChange={() => {
+        setReceiptData(null);
+        setReceiptId('');
+      }}
+      open={openDialog}
+    >
+      <DialogTrigger asChild onClick={() => setOpenDialog(true)}>
         <Button size='lg' variant='outline' className='flex gap-2'>
           <CircleCheckBig size={18} />
           Confirmar
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent className='sm:max-w-lg' hiddenCloseButton>
         <DialogHeader>
           <DialogTitle>Confirmar el pago de un comprobante</DialogTitle>
           <DialogDescription>
             Ingresa el número del comprobante para confirmar el pago.
           </DialogDescription>
+          <DialogClose />
         </DialogHeader>
 
         <div className='flex flex-col mt-6 '>
@@ -132,9 +139,13 @@ export function ConfirmModal() {
                 <Input
                   type='text'
                   name='receipt_id'
-                  placeholder='2024-000000'
+                  placeholder='2024-00000001'
                   required
-                  onChange={() => setError('')}
+                  value={receiptId}
+                  onChange={(e) => {
+                    setError('');
+                    setReceiptId(e.target.value);
+                  }}
                 />
                 <Button type='submit' loading={isSearching}>
                   <Search size={24} color='#FFF' />
@@ -188,6 +199,13 @@ export function ConfirmModal() {
           )}
 
           <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => setOpenDialog(false)}
+            >
+              Cerrar
+            </Button>
             <Button type='submit' loading={isMutating} disabled={!receiptData}>
               Confirmar
             </Button>
