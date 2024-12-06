@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/card';
 import { FormItem } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
-import { formatCurrency, formatName } from '@/lib/formatters';
+import { formatCuilInput, formatCurrency, formatName } from '@/lib/formatters';
 import { Prisma } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
@@ -205,7 +205,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
     <section>
       <Toaster />
       {record ? (
-        <Card className='mt-6 max-w-3xl'>
+        <Card className='mt-6 max-w-4xl'>
           <CardHeader>
             <CardTitle>Comprobante de habilitación comercial</CardTitle>
             <CardDescription>
@@ -231,7 +231,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                   <Input
                     type='text'
                     name='tax_id'
-                    value={formatName(record?.tax_id ?? '')}
+                    value={formatCuilInput(record?.tax_id ?? '')}
                     readOnly
                     className='cursor-not-allowed'
                   />
@@ -254,7 +254,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                   <Input
                     type='text'
                     name='taxpayer'
-                    value={record?.taxpayer ?? ''}
+                    value={formatName(record?.taxpayer ?? '') ?? ''}
                     readOnly
                     className='cursor-not-allowed'
                   />
@@ -264,7 +264,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                   <Input
                     type='text'
                     name='company_name'
-                    value={record.company_name ?? ''}
+                    value={formatName(record.company_name ?? '')}
                     readOnly
                     className='cursor-not-allowed'
                   />
@@ -272,12 +272,14 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
               </div>
 
               <div className='w-full flex gap-3'>
-                <FormItem className='flex-1'>
+                <FormItem className='flex-none'>
                   <Label>Rubro</Label>
                   <Input
                     type='text'
                     name='commercial_activity'
-                    value={record.commercial_activity?.activity ?? ''}
+                    value={formatName(
+                      record.commercial_activity?.activity ?? ''
+                    )}
                     readOnly
                     className='cursor-not-allowed'
                   />
@@ -292,7 +294,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
-                <FormItem className='flex-1'>
+                <FormItem className='flex-none'>
                   <Label>Nro</Label>
                   <Input
                     type='number'
@@ -306,19 +308,19 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
+              </div>
+
+              <div className='w-full flex gap-3'>
                 <FormItem className='flex-1'>
                   <Label>Barrio</Label>
                   <Input
                     type='text'
                     name='neighborhood'
-                    value={record.neighborhood?.name ?? ''}
+                    value={formatName(record.neighborhood?.name ?? '')}
                     readOnly
                     className='cursor-not-allowed'
                   />
                 </FormItem>
-              </div>
-
-              <div className='w-full flex gap-3'>
                 <FormItem className='flex-1'>
                   <Label>Sección</Label>
                   <Input
@@ -329,7 +331,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
-                <FormItem className='flex-none'>
+                <FormItem className='flex-1'>
                   <Label>Manzana</Label>
                   <Input
                     type='text'
@@ -339,7 +341,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                     className='cursor-not-allowed'
                   />
                 </FormItem>
-                <FormItem className='flex-none'>
+                <FormItem className='flex-1'>
                   <Label>Parcela</Label>
                   <Input
                     type='text'
@@ -432,12 +434,11 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
                   <Label>Observaciones</Label>
                   <Input type='text' name='observations' maxLength={50} />
                 </FormItem>
-                <FormItem className='flex-1'>
+                <FormItem className='flex-none'>
                   <Label>Importe</Label>
                   <Input
                     type='text'
                     name='amount'
-                    className='flex-1'
                     value={amountValue}
                     onChange={(e) =>
                       setAmountValue(formatCurrency(e.target.value))
@@ -448,7 +449,9 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
 
               <div className='mt-6 flex gap-3 self-end'>
                 <FormItem>
-                  <Link href={`/private/admin/cementery/edit/${record.id}`}>
+                  <Link
+                    href={`/private/admin/commercial_enablement/edit/${record.id}`}
+                  >
                     <Button variant='outline'>Editar</Button>
                   </Link>
                 </FormItem>

@@ -109,6 +109,15 @@ export default async function ReceiptPage({
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link
+                    href='/private/admin/receipts/create-commercial-enablement-receipt'
+                    prefetch
+                    className='w-full'
+                  >
+                    Habilitación comercial
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link
                     href='/private/admin/receipts/create-cementery-receipt'
                     prefetch
                     className='w-full'

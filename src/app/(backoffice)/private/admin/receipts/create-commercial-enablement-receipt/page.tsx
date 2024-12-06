@@ -41,10 +41,10 @@ export default async function GenerateCommercialEnablementReceipt() {
 
       <article className='mb-10'>
         <h1 className='text-2xl font-bold'>
-          Crear comprobante de Habilitación comercial
+          Crear comprobante de habilitación comercial
         </h1>
         <p className='text-gray-500 mt-2'>
-          Complete el formulario para generar un comprobante de Habilitación
+          Complete el formulario para generar un comprobante de habilitación
           comercial.
         </p>
 

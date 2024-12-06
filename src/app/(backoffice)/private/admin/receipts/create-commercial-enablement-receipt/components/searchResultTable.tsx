@@ -103,7 +103,7 @@ export const SearchResultTable = ({
   return (
     <div>
       <CustomDataTable<CommercialEnablementWithRelations>
-        tableTitle='Registros de Habilitación Comercial'
+        tableTitle='Registros de habilitación comercial'
         columns={columns}
         table={table}
         onRecordClick={() => {}}

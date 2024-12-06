@@ -61,9 +61,9 @@ export const GenerateCommercialEnablementReceiptClient = () => {
     <>
       <Toaster />
       <section className='flex gap-3'>
-        <Card className='mt-6 w-full max-w-3xl'>
+        <Card className='mt-6 w-full max-w-4xl'>
           <CardHeader>
-            <CardTitle>Buscar registro de Habilitación comercial</CardTitle>
+            <CardTitle>Buscar registro de habilitación comercial</CardTitle>
             <CardDescription>
               Ingrese el nombre del contribuyente o razón social para buscar el
               registro de la habilitación comercial.
@@ -108,7 +108,7 @@ export const GenerateCommercialEnablementReceiptClient = () => {
         </Card>
       </section>
 
-      <section className='mt-6 max-w-3xl scroll-smooth'>
+      <section className='mt-6 max-w-4xl scroll-smooth'>
         <SearchResultTable
           data={searchResult}
           onSelect={(record) => {
