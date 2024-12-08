@@ -86,7 +86,11 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
   const [contentDialog, setContentDialog] = useState<ReceiptPDFProps['data']>({
     receiptId: '',
     taxpayer: '',
+    taxId: '',
+    commercialActivity: '',
+    companyName: '',
     address: '',
+    addressNumber: 0,
     neighborhood: '',
     yearToPay: 0,
     observations: '',
@@ -179,7 +183,11 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
           setContentDialog({
             receiptId: data.id,
             taxpayer: parsedDataObject.taxpayer,
+            taxId: parsedDataObject.tax_id,
+            commercialActivity: parsedDataObject.commercial_activity,
+            companyName: parsedDataObject.company_name,
             address: parsedDataObject.address,
+            addressNumber: parsedDataObject.address_number ?? 0,
             neighborhood: record?.neighborhood?.name ?? '',
             yearToPay: parsedDataObject.year_to_pay,
             observations: parsedDataObject.observations ?? '',

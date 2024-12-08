@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/alt-text */
+import { formatCuilInput, formatName } from '@/lib/formatters';
 import {
   Document,
   Image,
@@ -98,12 +99,12 @@ const styles = StyleSheet.create({
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    gap: '2px',
     alignItems: 'center',
   },
   bottomReceiptText: {
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 8,
     color: '#000000',
   },
   bottomReceiptCutLine: {
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
     height: '1px',
     borderTop: '1px',
     borderStyle: 'dashed',
-    marginTop: '4px',
+    marginTop: '2px',
   },
 });
 
@@ -119,7 +120,11 @@ export interface ReceiptPDFProps {
   data: {
     receiptId: string;
     taxpayer: string;
+    taxId: string;
+    commercialActivity: string;
+    companyName: string;
     address: string;
+    addressNumber: number;
     neighborhood: string;
     yearToPay: number;
     observations: string;
@@ -172,7 +177,11 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
   const {
     receiptId,
     taxpayer,
+    taxId,
+    commercialActivity,
+    companyName,
     address,
+    addressNumber,
     neighborhood,
     yearToPay,
     observations,
@@ -223,7 +232,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
               fontWeight: 'bold',
             }}
           >
-            HABILITACIÓN COMERCIAL
+            ACTIVIDAD COMERCIAL
           </Text>
           <View
             style={{
@@ -258,7 +267,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
         </View>
       </View>
       <View style={styles.bodyReceipt}>
-        <Text style={styles.bodyTitle}>PAGO DE HABILITACIÓN COMERCIAL</Text>
+        <Text style={styles.bodyTitle}>PAGO DE ACTIVIDAD COMERCIAL</Text>
         <View style={styles.bodyLine}>
           <View
             style={{
@@ -281,11 +290,100 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
             </Text>
             <Text
               style={{
-                flex: '1 1 80%',
+                flex: '1 1 75%',
+                borderBottom: '1px dashed black',
+                maxLines: 1,
+              }}
+            >
+              {formatName(taxpayer)}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: '1 1 80%',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              Rubro:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 85%',
+                borderBottom: '1px dashed black',
+                maxLines: 1,
+              }}
+            >
+              {formatName(commercialActivity)}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.bodyLine}>
+          <View
+            style={{
+              flex: '1 1 40%',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              CUIT / CUIL:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 60%',
                 borderBottom: '1px dashed black',
               }}
             >
-              {taxpayer}
+              {formatCuilInput(taxId)}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: '1 1 auto',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              Razón social:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 50%',
+                borderBottom: '1px dashed black',
+                maxLines: 1,
+              }}
+            >
+              {formatName(companyName)}
             </Text>
           </View>
         </View>
@@ -311,8 +409,9 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
             </Text>
             <Text
               style={{
-                flex: '1 1 90%',
+                flex: '1 1 80%',
                 borderBottom: '1px dashed black',
+                maxLines: 1,
               }}
             >
               {address}
@@ -320,7 +419,35 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
           </View>
           <View
             style={{
-              flex: '1 1 80%',
+              flex: '1 1 35%',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              Altura:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 70%',
+                borderBottom: '1px dashed black',
+              }}
+            >
+              {addressNumber}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: '1 1 70%',
               display: 'flex',
               flexDirection: 'row',
               gap: '8px',
@@ -341,9 +468,10 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
               style={{
                 flex: '1 1 90%',
                 borderBottom: '1px dashed black',
+                maxLines: 1,
               }}
             >
-              {neighborhood}
+              {formatName(neighborhood)}
             </Text>
           </View>
         </View>
@@ -369,7 +497,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
             </Text>
             <Text
               style={{
-                flex: '1 1 40%',
+                flex: '1 1 50%',
                 borderBottom: '1px dashed black',
               }}
             >
@@ -399,13 +527,14 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
               style={{
                 flex: '1 1 90%',
                 borderBottom: '1px dashed black',
+                maxLines: 1,
               }}
             >
               {observations}
             </Text>
           </View>
         </View>
-        <View style={{ ...styles.bodyLine, width: '60%' }}>
+        <View style={{ ...styles.bodyLine, width: '50%' }}>
           <View
             style={{
               flex: '1 1 auto',
@@ -522,6 +651,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '4px',
                 padding: '4px',
                 backgroundColor: '#FFFFFF',
@@ -531,6 +661,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
               <Text
                 style={{
                   fontSize: 14,
+                  textAlign: 'right',
                 }}
               >
                 {amount.toLocaleString('es-AR', { maximumFractionDigits: 2 })}
