@@ -974,6 +974,7 @@ const styles = StyleSheet.create({
 
 export interface ReceiptPDFProps {
   data: {
+    date: string;
     total_amount_collected: number;
     total_receipts: number;
     page_data: {
@@ -994,9 +995,10 @@ export const DailyBoxReportPDF = ({ data }: ReceiptPDFProps) => {
       subject='Rentas Municipal'
       language='es'
     >
-      {data.page_data.map((page) => (
+      {data.page_data?.length ? data.page_data.map((page) => (
         <PageComponent
           key={page.page}
+          date={data.date}
           page={page.page}
           subtotal={page.subtotal}
           receipts={page.receipts}
@@ -1004,12 +1006,24 @@ export const DailyBoxReportPDF = ({ data }: ReceiptPDFProps) => {
           totalPages={data.page_data.length}
           totalAmountCollected={data.total_amount_collected}
         />
-      ))}
+      )) : (
+        <PageComponent
+          key='empty-page'
+          date={data.date}
+          page={1}
+          subtotal={0}
+          receipts={[]}
+          total_items={data.total_receipts}
+          totalPages={1}
+          totalAmountCollected={data.total_amount_collected}
+        />
+      )}
     </Document>
   );
 };
 
 const PageComponent = (details: {
+  date: string;
   page: number;
   subtotal: number;
   receipts: receipt[];
@@ -1044,7 +1058,7 @@ const PageComponent = (details: {
       </View>
       <View style={styles.content}>
         <Text style={styles.contentTitle}>
-          RESUMEN DE CAJA DIARIA {dayjs().format('DD/MM/YYYY')}
+          RESUMEN DE CAJA DIARIA {dayjs(details.date).format('DD/MM/YYYY')}
         </Text>
         <View style={styles.contentTable}>
           <View style={styles.contentTableHeader}>
@@ -1070,7 +1084,7 @@ const PageComponent = (details: {
             </Text>
           </View>
           <View>
-            {details.receipts.map((item, index) => (
+            {details.receipts?.length ? details.receipts.map((item, index) => (
               <View
                 key={index}
                 style={{
@@ -1093,10 +1107,10 @@ const PageComponent = (details: {
                   {formatName(item.taxpayer)}
                 </Text>
                 <Text style={{ ...styles.contentTableBodyCell, width: '30%' }}>
-                  {formatName(
+                  {item.tax_type === 'TASAS DIVERSAS' ? formatName(
                     (item.other_data as JsonObject)!
                       .tax_or_contribution as string
-                  )}
+                  ) : formatName(item.tax_type)}
                 </Text>
                 <Text style={{ ...styles.contentTableBodyCell, width: '15%' }}>
                   $
@@ -1106,7 +1120,7 @@ const PageComponent = (details: {
                   })}
                 </Text>
               </View>
-            ))}
+            )) : <Text style={{ ...styles.contentTableBodyCell }}>No hay comprabantes confirmados en esta fecha.</Text>}
           </View>
         </View>
       </View>

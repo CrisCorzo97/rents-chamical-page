@@ -264,7 +264,7 @@ const createNextReceiptCode = async () => {
   }
 };
 
-export const generateDailyBoxReport = async () => {
+export const generateDailyBoxReport = async (date: string) => {
   const response: Envelope<{
     total_amount_collected: number;
     total_receipts: number;
@@ -286,8 +286,8 @@ export const generateDailyBoxReport = async () => {
       where: {
         confirmed_at: {
           not: null,
-          gte: dayjs().startOf('day').toISOString(),
-          lte: dayjs().endOf('day').toISOString(),
+          gte: dayjs(date).startOf('day').toISOString(),
+          lte: dayjs(date).endOf('day').toISOString(),
         },
       },
       orderBy: {
@@ -299,29 +299,27 @@ export const generateDailyBoxReport = async () => {
       throw new Error('Error getting confirmed receipts');
     }
 
+    if(confirmedReceipts.length === 0) {
+      response.data = {
+        total_amount_collected: 0,
+        total_receipts: 0,
+        page_data: [],
+      };
+
+      return response
+    }
+
     let total_amount = 0;
     const details: Record<string, number> = {};
 
     for (const receipt of confirmedReceipts) {
       total_amount += receipt.amount;
 
-      if (receipt.tax_type === 'CEMENTERIO') {
-        if (details['CEMENTERIO']) {
-          details['CEMENTERIO'] += receipt.amount;
+      if (receipt.tax_type !== 'TASAS DIVERSAS') {
+        if (details[receipt.tax_type]) {
+          details[receipt.tax_type] += receipt.amount;
         } else {
-          details['CEMENTERIO'] = receipt.amount;
-        }
-      } else if (receipt.tax_type === 'INMUEBLE') {
-        if (details['INMUEBLE']) {
-          details['INMUEBLE'] += receipt.amount;
-        } else {
-          details['INMUEBLE'] = receipt.amount;
-        }
-      } else if (receipt.tax_type === 'PATENTE') {
-        if (details['PATENTE']) {
-          details['PATENTE'] += receipt.amount;
-        } else {
-          details['PATENTE'] = receipt.amount;
+          details[receipt.tax_type] = receipt.amount;
         }
       } else {
         const otherData = receipt.other_data as Prisma.JsonObject;
@@ -344,7 +342,7 @@ export const generateDailyBoxReport = async () => {
     }[] = [];
 
     confirmedReceipts.forEach((receipt, index) => {
-      if (index % 30 === 0) {
+      if (index % 35 === 0) {
         pageData.push({
           page: pageData.length + 1,
           subtotal: receipt.amount,
@@ -380,7 +378,6 @@ export const generateDailyBoxReport = async () => {
       total_receipts: confirmedReceipts.length,
       page_data: pageData,
     };
-    console.log({ data: confirmedReceipts });
   } catch (error) {
     console.error(error);
     response.success = false;

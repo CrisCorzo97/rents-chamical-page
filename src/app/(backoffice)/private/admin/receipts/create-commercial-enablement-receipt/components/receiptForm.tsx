@@ -148,7 +148,7 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
             created_at: parsedDataObject.created_at,
             taxpayer: parsedDataObject.taxpayer.toUpperCase(),
             amount: parsedDataObject.amount,
-            tax_type: 'HABILITACIÓN COMERCIAL',
+            tax_type: 'ACTIVIDAD COMERCIAL',
             id_tax_reference: record?.id,
             other_data: {
               company_name: parsedDataObject.company_name.toUpperCase(),

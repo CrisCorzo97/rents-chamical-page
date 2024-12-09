@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Popover } from '@/components/ui';
+import { Button, Calendar, Label, Popover } from '@/components/ui';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,15 +14,19 @@ import { PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { receipt } from '@prisma/client';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { PDFViewer } from '@react-pdf/renderer';
-import { FileChartColumnIncreasing } from 'lucide-react';
-import { useState, useTransition } from 'react';
+import { CalendarIcon, FileChartColumnIncreasing } from 'lucide-react';
+import { useEffect, useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
 import { generateDailyBoxReport } from '../receipt-actions';
 import { DailyBoxReportPDF } from './dailyBoxReportPDF';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { FormItem } from '@/components/ui/form';
+import { cn } from '@/lib/cn';
+import dayjs from 'dayjs';
 
 export const DailyBoxReport = () => {
   const [isMutating, startTransition] = useTransition();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [dateToGenerate, setDateToGenerate] = useState<string>(dayjs().toISOString());
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [contentDialog, setContentDialog] = useState<{
     total_amount_collected: number;
@@ -39,10 +43,14 @@ export const DailyBoxReport = () => {
     page_data: [],
   });
 
+  useEffect(() => {
+    console.log({contentDialog})
+  }, [contentDialog]);
+
   const handleClick = () => {
     startTransition(async () => {
       try {
-        const { data, error } = await generateDailyBoxReport();
+        const { data, error } = await generateDailyBoxReport(dateToGenerate);
 
         if (error || !data) {
           throw new Error(error ?? '');
@@ -59,40 +67,67 @@ export const DailyBoxReport = () => {
           { duration: 5000 }
         );
         console.log({ error });
-      } finally {
-        setIsOpen(false);
       }
     });
   };
 
   return (
-    <>
+    <div>
       <Toaster />
-      <Popover>
-        <PopoverTrigger asChild>
+      <Dialog>
+        <DialogTrigger asChild>
           <Button size='lg' variant='outline' className='flex gap-2'>
             <FileChartColumnIncreasing size={18} />
             Caja diaria
           </Button>
-        </PopoverTrigger>
-        <PopoverContent>
-          {/* Mostrar un mensaje de advertencia antes de realizar la acción */}
-          <div className='flex flex-col gap-2'>
-            <p className='text-sm text-gray-600'>
-              Al generar el reporte de caja diaria se cerrará la caja actual.
-              <br /> ¿Desea continuar?
-            </p>
+        </DialogTrigger>
+        <DialogContent>
+            <DialogTitle>Generar reporte de caja diaria</DialogTitle>
+            <DialogDescription>{'Para generar el reporte de caja diaria, elija una fecha y después haga clic en el botón "Generar".'}</DialogDescription>
+
+
+            <FormItem className='mb-4 mt-2'>
+              <Label className='block'>Fecha del reporte</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={'outline'}
+                    className={cn(
+                      'w-[280px] justify-start text-left font-normal',
+                      !dateToGenerate && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className='mr-2 h-4 w-4' />
+                    {dateToGenerate ? (
+                      dayjs(dateToGenerate).format('DD/MM/YYYY')
+                    ) : (
+                      <span>Seleccione una fecha</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className='w-auto p-0'>
+                  <Calendar
+                    mode='single'
+                    selected={dayjs(dateToGenerate).toDate()}
+                    onSelect={(date) =>
+                      setDateToGenerate(dayjs(date).toISOString())
+                    }
+                    initialFocus
+                    disabled={{after: dayjs().toDate()}}
+                  />
+                </PopoverContent>
+              </Popover>
+            </FormItem>
 
             <div className='flex gap-2 justify-end'>
-              <PopoverClose asChild>
+              <DialogClose asChild>
                 <Button
                   size='sm'
                   variant='outline'
-                  onClick={() => setIsOpen(false)}
                 >
-                  No
+                  Cancelar
                 </Button>
-              </PopoverClose>
+              </DialogClose>
               <AlertDialog open={openDialog}>
                 <AlertDialogTrigger asChild>
                   <Button
@@ -101,7 +136,7 @@ export const DailyBoxReport = () => {
                     onClick={handleClick}
                     loading={isMutating}
                   >
-                    Si
+                    Generar
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
@@ -113,7 +148,7 @@ export const DailyBoxReport = () => {
                     descargarlo a continuación.
                   </AlertDialogDescription>
                   <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                    <DailyBoxReportPDF data={contentDialog} />
+                    <DailyBoxReportPDF data={{...contentDialog, date: dateToGenerate}} />
                   </PDFViewer>
                   <AlertDialogFooter className='flex-none'>
                     <AlertDialogAction onClick={() => setOpenDialog(false)}>
@@ -123,9 +158,8 @@ export const DailyBoxReport = () => {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
