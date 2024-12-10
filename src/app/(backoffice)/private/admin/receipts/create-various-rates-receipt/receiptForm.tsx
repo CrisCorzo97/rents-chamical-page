@@ -104,9 +104,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
             other_data: {
               observations: parsedDataObject.observations,
               tax_or_contribution:
-                taxesOrContributions[
-                  parsedDataObject.tax_or_contribution_id
-                ].name.toUpperCase(),
+                taxesOrContributions.find(tax => Number(tax.id) === parsedDataObject.tax_or_contribution_id)?.name.toUpperCase(),
             },
           };
 
