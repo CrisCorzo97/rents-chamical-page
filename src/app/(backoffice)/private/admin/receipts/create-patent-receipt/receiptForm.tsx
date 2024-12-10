@@ -37,6 +37,7 @@ import { z } from 'zod';
 import { createReceipt } from '../receipt-actions';
 import { PatentReceiptData } from './page';
 import { ReceiptPDF, ReceiptPDFProps } from './receiptPDF';
+import Link from 'next/link';
 
 dayjs.extend(customParseFormat);
 
@@ -302,9 +303,15 @@ export const ReceiptForm = () => {
                       <ReceiptPDF data={contentDialog} />
                     </PDFViewer>
                     <AlertDialogFooter className='flex-none'>
-                      <AlertDialogAction onClick={() => setOpenDialog(false)}>
-                        Continuar
-                      </AlertDialogAction>
+                      <Link
+                        href='/private/admin/receipts'
+                        passHref
+                        legacyBehavior
+                      >
+                        <AlertDialogAction onClick={() => setOpenDialog(false)}>
+                          Continuar
+                        </AlertDialogAction>
+                      </Link>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

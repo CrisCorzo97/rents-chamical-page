@@ -340,9 +340,17 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
                         <ReceiptPDF data={contentDialog} />
                       </PDFViewer>
                       <AlertDialogFooter className='flex-none'>
-                        <AlertDialogAction onClick={() => setOpenDialog(false)}>
-                          Continuar
-                        </AlertDialogAction>
+                        <Link
+                          href='/private/admin/receipts'
+                          passHref
+                          legacyBehavior
+                        >
+                          <AlertDialogAction
+                            onClick={() => setOpenDialog(false)}
+                          >
+                            Continuar
+                          </AlertDialogAction>
+                        </Link>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>

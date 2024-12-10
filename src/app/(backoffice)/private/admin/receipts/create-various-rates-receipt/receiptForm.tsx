@@ -32,6 +32,7 @@ import { Prisma, receipt, tax_or_contribution } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -103,8 +104,12 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
             tax_type: 'TASAS DIVERSAS',
             other_data: {
               observations: parsedDataObject.observations,
-              tax_or_contribution:
-                taxesOrContributions.find(tax => Number(tax.id) === parsedDataObject.tax_or_contribution_id)?.name.toUpperCase(),
+              tax_or_contribution: taxesOrContributions
+                .find(
+                  (tax) =>
+                    Number(tax.id) === parsedDataObject.tax_or_contribution_id
+                )
+                ?.name.toUpperCase(),
             },
           };
 
@@ -240,9 +245,15 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
                       <ReceiptPDF data={contentDialog} />
                     </PDFViewer>
                     <AlertDialogFooter className='flex-none'>
-                      <AlertDialogAction onClick={() => setOpenDialog(false)}>
-                        Continuar
-                      </AlertDialogAction>
+                      <Link
+                        href='/private/admin/receipts'
+                        passHref
+                        legacyBehavior
+                      >
+                        <AlertDialogAction onClick={() => setOpenDialog(false)}>
+                          Continuar
+                        </AlertDialogAction>
+                      </Link>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
