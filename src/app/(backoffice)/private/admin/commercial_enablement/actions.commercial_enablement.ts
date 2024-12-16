@@ -186,7 +186,11 @@ export const getCommercialActivities = async (): Promise<
   commercial_activity[]
 > => {
   try {
-    const commercial_activity = await dbSupabase.commercial_activity.findMany();
+    const commercial_activity = await dbSupabase.commercial_activity.findMany({
+      orderBy: {
+        activity: 'asc',
+      },
+    });
 
     return commercial_activity;
   } catch (error) {

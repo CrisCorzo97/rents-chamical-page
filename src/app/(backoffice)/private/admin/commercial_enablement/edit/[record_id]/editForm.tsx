@@ -286,12 +286,14 @@ export const EditPropertyRecordForm = ({
                 <Select
                   name='commercial_activity_id'
                   required
-                  onValueChange={(value) =>
-                    setGrossIncomeRate(
-                      commercialActivities[Number(value)].aliquot?.toString() ??
-                        ''
-                    )
-                  }
+                  onValueChange={(value) => {
+                    const foundAct = commercialActivities.find(
+                      (act) => Number(act.id) === Number(value)
+                    );
+                    const aliquot = foundAct?.aliquot ?? 0;
+
+                    setGrossIncomeRate(aliquot.toString());
+                  }}
                   defaultValue={record.commercial_activity_id!.toString()}
                 >
                   <SelectTrigger>
@@ -317,10 +319,14 @@ export const EditPropertyRecordForm = ({
                 <Select
                   name='second_commercial_activity_id'
                   onValueChange={(value) => {
+                    const foundAct = commercialActivities.find(
+                      (act) => Number(act.id) === Number(value)
+                    );
                     const aliquot = Math.max(
-                      commercialActivities[Number(value)].aliquot ?? 0,
+                      foundAct?.aliquot ?? 0,
                       Number(grossIncomeRate)
                     );
+
                     setGrossIncomeRate(aliquot.toString());
                   }}
                 >
@@ -344,10 +350,14 @@ export const EditPropertyRecordForm = ({
                 <Select
                   name='third_commercial_activity_id'
                   onValueChange={(value) => {
+                    const foundAct = commercialActivities.find(
+                      (act) => Number(act.id) === Number(value)
+                    );
                     const aliquot = Math.max(
-                      commercialActivities[Number(value)].aliquot ?? 0,
+                      foundAct?.aliquot ?? 0,
                       Number(grossIncomeRate)
                     );
+
                     setGrossIncomeRate(aliquot.toString());
                   }}
                 >
