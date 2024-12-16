@@ -98,12 +98,12 @@ const styles = StyleSheet.create({
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    gap: '2px',
     alignItems: 'center',
   },
   bottomReceiptText: {
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 8,
     color: '#000000',
   },
   bottomReceiptCutLine: {
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     height: '1px',
     borderTop: '1px',
     borderStyle: 'dashed',
-    marginTop: '4px',
+    marginTop: '2px',
   },
 });
 
@@ -119,6 +119,7 @@ export interface ReceiptPDFProps {
   data: {
     receiptId: string;
     taxpayer: string;
+    taxId: string;
     taxOrContibution: string;
     observations: string;
     amount: number;
@@ -167,7 +168,8 @@ export const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
 };
 
 const Receipt = ({ data }: ReceiptPDFProps) => {
-  const { receiptId, taxpayer, taxOrContibution, observations, amount } = data;
+  const { receiptId, taxpayer, taxId, taxOrContibution, observations, amount } =
+    data;
 
   const fullDate = dayjs().locale('es').format('DD-MMMM-YYYY');
 
@@ -254,7 +256,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
         <View style={styles.bodyLine}>
           <View
             style={{
-              flex: '1 1 100%',
+              flex: '1 1 auto',
               display: 'flex',
               flexDirection: 'row',
               gap: '8px',
@@ -273,11 +275,39 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
             </Text>
             <Text
               style={{
-                flex: '1 1 70%',
+                flex: '1 1 60%',
                 borderBottom: '1px dashed black',
               }}
             >
               {taxpayer}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: '1 1 30%',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '8px',
+              fontSize: '10px',
+              fontWeight: 'normal',
+            }}
+          >
+            <Text
+              style={{
+                flex: '1 1 auto',
+                fontSize: '10px',
+                fontWeight: 'bold',
+              }}
+            >
+              D.N.I:
+            </Text>
+            <Text
+              style={{
+                flex: '1 1 90%',
+                borderBottom: '1px dashed black',
+              }}
+            >
+              {taxId}
             </Text>
           </View>
         </View>
@@ -311,7 +341,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
             </Text>
           </View>
         </View>
-        <View style={{ ...styles.bodyLine, width: '60%' }}>
+        <View style={{ ...styles.bodyLine, width: '50%' }}>
           <View
             style={{
               flex: '1 1 auto',
@@ -428,6 +458,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '4px',
                 padding: '4px',
                 backgroundColor: '#FFFFFF',

@@ -98,12 +98,12 @@ const styles = StyleSheet.create({
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    gap: '2px',
     alignItems: 'center',
   },
   bottomReceiptText: {
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 8,
     color: '#000000',
   },
   bottomReceiptCutLine: {
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     height: '1px',
     borderTop: '1px',
     borderStyle: 'dashed',
-    marginTop: '4px',
+    marginTop: '2px',
   },
 });
 
@@ -465,7 +465,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
             </Text>
           </View>
         </View>
-        <View style={{ ...styles.bodyLine, width: '60%' }}>
+        <View style={{ ...styles.bodyLine, width: '50%' }}>
           <View
             style={{
               flex: '1 1 auto',
@@ -582,6 +582,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '4px',
                 padding: '4px',
                 backgroundColor: '#FFFFFF',

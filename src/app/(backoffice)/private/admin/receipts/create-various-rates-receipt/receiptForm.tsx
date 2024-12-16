@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Toaster } from '@/components/ui/sonner';
-import { formatCurrency } from '@/lib/formatters';
+import { formatCurrency, formatDni } from '@/lib/formatters';
 import { Envelope } from '@/types/envelope';
 import { Prisma, receipt, tax_or_contribution } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
@@ -45,6 +45,7 @@ const formSchema = z.object({
   created_at: z.string().datetime(),
   tax_or_contribution_id: z.number(),
   taxpayer: z.string(),
+  tax_id: z.string(),
   observations: z.string().optional(),
   amount: z.number(),
 });
@@ -53,6 +54,7 @@ interface VariousRatesReceiptData {
   created_at: string;
   tax_or_contribution_id: number;
   taxpayer: string;
+  tax_id: string;
   observations?: string;
   amount: number;
 }
@@ -63,11 +65,13 @@ interface ReceiptFormProps {
 
 export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
   const [amountValue, setAmountValue] = useState<string>('');
+  const [taxId, setTaxId] = useState<string>('');
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
   const [contentDialog, setContentDialog] = useState<ReceiptPDFProps['data']>({
     receiptId: '',
     taxpayer: '',
+    taxId: '',
     taxOrContibution: '',
     observations: '',
     amount: 0,
@@ -83,6 +87,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
           formDataObject.tax_or_contribution_id as string
         ),
         taxpayer: formDataObject.taxpayer as string,
+        tax_id: formDataObject.tax_id as string,
         observations: formDataObject.observations as string,
         amount: Number(
           (formDataObject.amount as string)
@@ -103,6 +108,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
             amount: parsedDataObject.amount,
             tax_type: 'TASAS DIVERSAS',
             other_data: {
+              tax_id: parsedDataObject.tax_id,
               observations: parsedDataObject.observations,
               tax_or_contribution: taxesOrContributions
                 .find(
@@ -125,6 +131,7 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
           setContentDialog({
             receiptId: data?.id ?? '',
             taxpayer: parsedDataObject.taxpayer,
+            taxId: parsedDataObject.tax_id,
             taxOrContibution:
               taxesOrContributions.find(
                 (toc) =>
@@ -198,10 +205,24 @@ export const ReceiptForm = ({ taxesOrContributions }: ReceiptFormProps) => {
               </FormItem>
             </div>
 
-            <FormItem className='flex-1'>
-              <Label>Apellido y nombre del contribuyente</Label>
-              <Input type='text' name='taxpayer' required />
-            </FormItem>
+            <div className='w-full flex flex-wrap gap-3'>
+              <FormItem className='flex-1'>
+                <Label>Apellido y nombre del contribuyente</Label>
+                <Input type='text' name='taxpayer' required />
+              </FormItem>
+              <FormItem className='flex-none'>
+                <Label>D.N.I.</Label>
+                <Input
+                  type='text'
+                  name='tax_id'
+                  required
+                  value={taxId}
+                  onChange={(val) => {
+                    setTaxId(formatDni(val.target.value));
+                  }}
+                />
+              </FormItem>
+            </div>
 
             <div className='w-full flex gap-3'>
               <FormItem className='flex-1'>
