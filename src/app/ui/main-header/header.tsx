@@ -23,30 +23,46 @@ export const MainHeader = () => {
     {
       label: 'Organismo',
       key: 'organism',
-      href: '#',
+      href: '/organismo',
       subItems: [
-        { label: 'Sobre Rentas', key: 'about', href: '#' },
-        { label: 'Autoridades', key: 'authorities', href: '#' },
-        { label: 'Visión y Misión', key: 'vision-mision', href: '#' },
-        { label: 'Funciones', key: 'functions', href: '#' },
+        {
+          label: 'Sobre Rentas',
+          key: 'about',
+          href: '/sobre-rentas',
+        },
+        {
+          label: 'Autoridades',
+          key: 'authorities',
+          href: '/autoridades',
+        },
+        {
+          label: 'Visión y Misión',
+          key: 'vision-mision',
+          href: '/vision-y-mision',
+        },
+        { label: 'Funciones', key: 'functions', href: '/funciones' },
       ],
     },
     {
       label: 'Trámites',
       key: 'formalities',
-      href: '#',
-      subItems: [{ label: 'Consultas', key: 'queries', href: '#' }],
+      href: '/tramites',
+      subItems: [{ label: 'Consultas', key: 'queries', href: '/consultas' }],
     },
     {
       label: 'Información',
       key: 'information',
-      href: '#',
+      href: '/información',
       subItems: [
-        { label: 'Impuestos', key: 'taxes', href: '#' },
+        {
+          label: 'Tasas / Contribuciones',
+          key: 'taxes',
+          href: '/tasas-contribuciones',
+        },
         {
           label: 'Información fiscal',
           key: 'fiscal-info',
-          href: '#',
+          href: '/informacion-fiscal',
           subItems: [
             { label: 'Leyes', key: 'laws', href: '#' },
             { label: 'Decretos', key: 'decrees', href: '#' },
@@ -54,20 +70,27 @@ export const MainHeader = () => {
             { label: 'Ordenanzas', key: 'ordinances', href: '#' },
           ],
         },
-        { label: 'Novedades', key: 'news', href: '#' },
+        { label: 'Novedades', key: 'news', href: '/novedades' },
       ],
     },
     {
       label: 'Centro de Ayuda',
       key: 'help-center',
-      href: '#',
+      href: '/centro-de-ayuda',
       subItems: [
-        { label: 'Contacto', key: 'contact', href: '#' },
-        { label: 'Preguntas Frequentes', key: 'faq', href: '#' },
-        { label: 'Instructivos / Tutoriales', key: 'tutorials', href: '#' },
+        { label: 'Contacto', key: 'contact', href: '/contacto' },
+        {
+          label: 'Preguntas Frecuentes',
+          key: 'faq',
+          href: '/preguntas-frecuentes',
+        },
+        {
+          label: 'Instructivos / Tutoriales',
+          key: 'tutorials',
+          href: '/instructivos-tutoriales',
+        },
       ],
     },
-    // { label: 'Salir', key: 'exit', href: '/' }, // cambiar esto por la url a redireccionar
   ];
 
   return (
@@ -102,7 +125,7 @@ export const MainHeader = () => {
                           <ListItem
                             key={subItem.key}
                             title={subItem.label}
-                            href={subItem.href}
+                            href={`${item.href}${subItem.href}`}
                           >
                             {subItem.subItems ? (
                               <div className='flex flex-col'>
