@@ -4,11 +4,15 @@ import theme from '@/theme/themeConfig';
 import { Analytics } from '@vercel/analytics/react';
 import { ConfigProvider } from 'antd';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const poppins = Poppins({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
+});
 
 export const metadata: Metadata = {
   title: 'Rentas Digital',
@@ -33,7 +37,7 @@ export default function RootLayout({
           defer
         ></Script>
       </head>
-      <body className={inter.className}>
+      <body className={`${poppins.variable} font-sans`}>
         <StyledComponentsRegistry>
           <ConfigProvider theme={theme}>
             {children}
