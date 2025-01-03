@@ -245,7 +245,7 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
                   <Input
                     type='text'
                     name='id_neighborhood'
-                    value={'Centro'}
+                    value={record.neighborhood?.name ?? ''}
                     readOnly
                     className='cursor-not-allowed'
                   />
@@ -255,7 +255,7 @@ export const ReceiptForm = ({ record }: ReceiptFormProps) => {
                   <Input
                     type='text'
                     name='id_city_section'
-                    value={'A2'}
+                    value={record.city_section?.name ?? ''}
                     readOnly
                     className='cursor-not-allowed'
                   />
