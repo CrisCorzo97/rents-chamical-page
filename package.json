@@ -1,6 +1,6 @@
 {
   "name": "rents-chamical-page",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "private": true,
   "engines": {
     "pnpm": "^8.6.11"
