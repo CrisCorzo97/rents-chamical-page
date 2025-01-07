@@ -245,14 +245,23 @@ const createNextReceiptCode = async () => {
   let new_code: string | null = null;
 
   try {
-    const lastReceipt = await dbSupabase.receipt.findFirst({
+    const lastReceipts = await dbSupabase.receipt.findMany({
       orderBy: {
         created_at: 'desc',
       },
+      take: 3,
       select: {
         id: true,
       },
     });
+
+    const idOrder = lastReceipts.map((r) => r.id.split('-')[1]);
+
+    const lastReceiptNumber = Math.max(...idOrder.map((id) => +id));
+
+    const lastReceipt = lastReceipts.find((r) =>
+      r.id.includes(lastReceiptNumber.toString())
+    );
 
     if (!lastReceipt) {
       new_code = generateReceiptCode();
@@ -299,14 +308,14 @@ export const generateDailyBoxReport = async (date: string) => {
       throw new Error('Error getting confirmed receipts');
     }
 
-    if(confirmedReceipts.length === 0) {
+    if (confirmedReceipts.length === 0) {
       response.data = {
         total_amount_collected: 0,
         total_receipts: 0,
         page_data: [],
       };
 
-      return response
+      return response;
     }
 
     let total_amount = 0;
