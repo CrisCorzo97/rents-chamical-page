@@ -17,8 +17,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import Link from 'next/link';
-import Script from 'next/script';
-import { createAssessment } from '../actions';
 
 declare global {
   interface Window {
@@ -26,21 +24,21 @@ declare global {
   }
 }
 
-const G_RECAPTCHA_SITE_KEY =
-  process.env.G_RECAPTCHA_SITE_KEY ??
-  '6LfuwjQqAAAAABoQBWXBvhveIlOKKw5Rpt17xWi2';
-const G_RECAPTCHA_PROJECT_ID =
-  process.env.G_RECAPTCHA_PROJECT_ID ?? 'municipalidad-ch-1725278195483';
+// const G_RECAPTCHA_SITE_KEY =
+//   process.env.G_RECAPTCHA_SITE_KEY ??
+//   '6LfuwjQqAAAAABoQBWXBvhveIlOKKw5Rpt17xWi2';
+// const G_RECAPTCHA_PROJECT_ID =
+//   process.env.G_RECAPTCHA_PROJECT_ID ?? 'municipalidad-ch-1725278195483';
 
 export default function PropertyPage() {
-  const onloadCallback = () => {
-    globalThis.window?.grecaptcha?.enterprise?.ready(() => {
-      globalThis.window?.grecaptcha?.enterprise?.render('g_recaptcha', {
-        sitekey: G_RECAPTCHA_SITE_KEY,
-        action: 'test',
-      });
-    });
-  };
+  // const onloadCallback = () => {
+  //   globalThis.window?.grecaptcha?.enterprise?.ready(() => {
+  //     globalThis.window?.grecaptcha?.enterprise?.render('g_recaptcha', {
+  //       sitekey: G_RECAPTCHA_SITE_KEY,
+  //       action: 'test',
+  //     });
+  //   });
+  // };
 
   return (
     <>
@@ -78,15 +76,15 @@ export default function PropertyPage() {
 
       <section className='max-w-6xl mx-auto flex gap-4 flex-wrap'>
         <form
-          action={(formData) => {
-            const token = formData.get('g_recaptcha')?.toString();
-            createAssessment({
-              projectID: G_RECAPTCHA_PROJECT_ID,
-              recaptchaKey: G_RECAPTCHA_SITE_KEY,
-              token,
-              recaptchaAction: 'test',
-            });
-          }}
+          // action={(formData) => {
+          //   const token = formData.get('g_recaptcha')?.toString();
+          //   createAssessment({
+          //     projectID: G_RECAPTCHA_PROJECT_ID,
+          //     recaptchaKey: G_RECAPTCHA_SITE_KEY,
+          //     token,
+          //     recaptchaAction: 'test',
+          //   });
+          // }}
           id='property-form'
         >
           <Card className='max-w-2xl'>
@@ -100,13 +98,13 @@ export default function PropertyPage() {
             </CardHeader>
             <CardContent className='flex flex-col gap-4'>
               <Input name='HOLAA' type='text' />
-              <div id='g_recaptcha'></div>
+              {/* <div id='g_recaptcha'></div>
               <Script
                 src='https://www.google.com/recaptcha/enterprise.js?render=explicit'
                 onLoad={onloadCallback}
                 async
                 defer
-              ></Script>
+              ></Script> */}
             </CardContent>
             <CardFooter className='border-t px-6 py-4'>
               <Button form='property-form' type='submit'>

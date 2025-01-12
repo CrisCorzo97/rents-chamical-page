@@ -1,71 +1,140 @@
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
-import Image from 'next/image';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from '@/components/ui/card';
 import Link from 'next/link';
 import { MainHeader } from './ui';
+import { ChevronRight, Info, KeyRound } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default async function Home() {
   return (
     <main className='min-h-screen flex flex-col'>
       <MainHeader />
-      <section className='grow p-4'>
+      <section className='grow p-4 mb-8'>
         <div className='h-12' />
 
-        <section className='max-w-6xl mx-auto mb-8'>
-          <h1 className='text-4xl font-bold pb-4'>
-            ¡Bienvenido a Rentas Digital!
+        <article className='max-w-6xl mx-auto mb-8'>
+          <h1 className='text-4xl font-semibold pb-4'>
+            ¡Bienvenido a la Dirección de Rentas Municipales!
           </h1>
-          <p className='text-lg text-gray-500 pb-4 max-w-2xl'>
-            Rentas Digital es una plataforma que te permite realizar trámites
-            relacionados con la Dirección General de Rentas de la Municipalidad
-            de Chamical de manera rápida y sencilla.
+          <p className='text-lg font-light pb-4'>
+            Este sistema ha sido diseñado para ofrecerte información clara,
+            precisa y accesible sobre tus trámites y contribuciones tributarias.
+            Desde aquí, podrás explorar todas las opciones disponibles,
+            consultar el estado de tus tasas y acceder a novedades importantes.
           </p>
-          <p className='text-lg text-gray-500 pb-4 max-w-2xl'>
-            Desde Rentas Digital podrás realizar trámites como la impresión de
-            la boleta de pago de tus impuestos, la consulta de deudas, la
-            generación de certificados de libre deuda y la realización de pagos
-            en línea. ¡Todo desde la comodidad de tu hogar!
+          <p className='text-lg font-light pb-4'>
+            Elige una de las siguientes opciones para comenzar:
           </p>
-          <p className='text-lg text-gray-500'>
-            Para comenzar, selecciona una de las siguientes opciones:
-          </p>
-        </section>
 
-        <section className='flex gap-4 flex-wrap max-w-6xl mx-auto items-center'>
-          <Card className='w-[250px]'>
-            <Link href='/auth/callback' prefetch={false}>
-              <CardContent className='p-4 py-8 flex flex-col gap-2 items-center'>
-                <Image
-                  src='/user-key.png'
-                  alt='Acceso con clave'
-                  height={100}
-                  width={100}
-                  className='aspect-square rounded-md object-cover'
-                />
-                <CardTitle className='px-4 text-xl text-gray-500 text-center hover:text-primary'>
-                  Portal de administración
-                </CardTitle>
-              </CardContent>
+          <div className='mb-8 flex flex-wrap gap-4'>
+            <Link href='/tramites/consultas' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
+                    <CardTitle className='text-xl'>Consulta</CardTitle>
+                    <CardDescription>
+                      Verifica el estado impositivo de tus tasas y
+                      contribuciones. Simplemente ingresa el identificador
+                      correspondiente para acceder a la información de tus
+                      obligaciones tributarias.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8 text-primary' />
+                </CardContent>
+              </Card>
             </Link>
-          </Card>
-          <Card className='w-[250px]'>
-            <Link href='/portal-ciudadano' prefetch>
-              <CardContent className='p-4 py-8 flex flex-col gap-2 items-center'>
-                <Image
-                  src='/user.png'
-                  alt='Acceso sin clave'
-                  height={100}
-                  width={100}
-                  className='aspect-square rounded-md object-cover'
-                />
-                <CardTitle className='px-4 text-xl text-gray-500 text-center hover:text-primary'>
-                  Portal del ciudadano
-                </CardTitle>
-              </CardContent>
+            <Link href='/organismo/sobre-rentas' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
+                    <CardTitle className='text-xl'>Sobre Rentas</CardTitle>
+                    <CardDescription>
+                      Aprende más sobre la Dirección de Rentas, incluyendo su
+                      historia, visión, misión y funciones clave.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8 text-primary' />
+                </CardContent>
+              </Card>
             </Link>
-          </Card>
-        </section>
+            <Link href='/informacion/tasas-contribuciones' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
+                    <CardTitle className='text-xl'>
+                      Tasas y Contribuciones
+                    </CardTitle>
+                    <CardDescription>
+                      Encuentra información detallada sobre las tasas
+                      municipales y sus periodos de pago, así como las
+                      normativas asociadas.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8 text-primary' />
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href='/centro-de-ayuda/contacto' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
+                    <CardTitle className='text-xl'>Contacto</CardTitle>
+                    <CardDescription>
+                      ¿Tienes preguntas o necesitas ayuda? Comunícate con
+                      nosotros a través de los distintos canales disponibles o
+                      consulta las respuestas a las preguntas frecuentes.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8 text-primary' />
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+
+          <h3 className='text-2xl font-semibold pb-4'>Acceso Administrativo</h3>
+          <Alert className='mb-8 w-full bg-blue-100 border-blue-500'>
+            <Info className='w-4 h-4' />
+            <AlertTitle>
+              Zona Exclusiva para Usuarios Administrativos
+            </AlertTitle>
+            <AlertDescription>
+              Este espacio está reservado para el personal autorizado de la
+              Dirección de Rentas. Si eres un usuario administrativo, ingresa
+              tus credenciales para acceder al sistema de backoffice.
+            </AlertDescription>
+          </Alert>
+
+          {/* <Card className='mb-8 p-4 w-full bg-blue-100 border-blue-500'>
+            <CardContent className='p-0 flex items-center gap-4'>
+              <Info className='w-8 h-8 text-blue-500' />
+              <p className='text-lg font-light'>
+                Este espacio está reservado para el personal autorizado de la
+                Dirección de Rentas. Si eres un usuario administrativo, ingresa
+                tus credenciales para acceder al sistema de backoffice.
+              </p>
+            </CardContent>
+          </Card> */}
+
+          <Link href='/auth/callback' prefetch={false}>
+            <Card className='w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+              <CardContent className='w-full p-4 py-4 flex gap-4 items-center justify-between'>
+                <KeyRound className='w-12 h-12' />
+                <div className='w-full flex gap-4'>
+                  <CardTitle className='text-xl'>
+                    Panel administrativo
+                  </CardTitle>
+                </div>
+                <ChevronRight className='w-8 h-8 text-primary' />
+              </CardContent>
+            </Card>
+          </Link>
+        </article>
       </section>
-      <footer className='w-full h-28 bg-slate-200 grow-0 mt-8' />
+      {/* <footer className='w-full h-28 bg-slate-200 grow-0 mt-8' /> */}
     </main>
   );
 }
