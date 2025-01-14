@@ -28,6 +28,8 @@ import { z } from 'zod';
 import { CommercialEnablementWithRelations } from '../../../commercial_enablement/commercial_enablement.interface';
 import { createReceipt } from '../../receipt-actions';
 import { ReceiptPDF, ReceiptPDFProps } from './receiptPDF';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 const formSchema = z.object({
   created_at: z.string(),
@@ -115,10 +117,16 @@ export const ReceiptForm = ({ record }: CardResultProps) => {
         block: (formDataObject?.block as string) ?? '',
         parcel: (formDataObject?.parcel as string) ?? '',
         registration_date: formDataObject?.registration_date
-          ? dayjs(formDataObject.registration_date as string).toISOString()
+          ? dayjs(
+              formDataObject.registration_date as string,
+              'DD/MM/YYYY'
+            ).toISOString()
           : '',
         cancellation_date: formDataObject?.cancellation_date
-          ? dayjs(formDataObject.cancellation_date as string).toISOString()
+          ? dayjs(
+              formDataObject.cancellation_date as string,
+              'DD/MM/YYYY'
+            ).toISOString()
           : null,
         registration_receipt:
           (formDataObject?.registration_receipt as string) ?? '',
