@@ -312,6 +312,7 @@ export const EditPropertyRecordForm = ({
                 <Input
                   type='number'
                   name='last_year_paid'
+                  defaultValue={Number(record.last_year_paid)}
                   max={dayjs().year()}
                 />
               </FormItem>
