@@ -10,8 +10,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-const G_RECAPTCHA_SITE_KEY = process.env.G_RECAPTCHA_SITE_KEY!;
-
 export const PropertyQueryForm = () => {
   return (
     <section className='max-w-6xl mx-auto flex gap-4 flex-wrap'>
