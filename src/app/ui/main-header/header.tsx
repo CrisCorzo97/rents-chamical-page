@@ -52,7 +52,7 @@ export const MainHeader = () => {
     {
       label: 'Información',
       key: 'information',
-      href: '/información',
+      href: '/informacion',
       subItems: [
         {
           label: 'Tasas / Contribuciones',

@@ -44,13 +44,13 @@ export default function About() {
           transparente y moderna de los recursos, para promover el desarrollo de
           nuestra comunidad.
         </p>
-        <p className='mb-16 font-light'>
+        <p className='mb-12 font-light'>
           Desde la Dirección de Rentas, nos enfocamos en proporcionar servicios
           accesibles y prácticos para los ciudadanos, adaptándonos a las nuevas
           tecnologías y respondiendo a las necesidades de los contribuyentes.
         </p>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           ¿Qué es la Dirección de Rentas?
         </h3>
         <p className='mb-2 font-light'>
@@ -74,7 +74,7 @@ export default function About() {
           </li>
         </ul>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           ¿Por qué es importante cumplir con las obligaciones tributarias?
         </h3>
         <p className='mb-2 font-light'>
@@ -93,7 +93,7 @@ export default function About() {
           </li>
         </ul>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Compromiso con los Ciudadanos
         </h3>
         <p className='mb-2 font-light'>
@@ -127,7 +127,7 @@ export default function About() {
           </li>
         </ol>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Servicios de Rentas
         </h3>
         <p className='mb-2 font-light'>

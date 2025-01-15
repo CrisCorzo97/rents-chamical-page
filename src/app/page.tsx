@@ -43,7 +43,7 @@ export default async function Home() {
                       obligaciones tributarias.
                     </CardDescription>
                   </div>
-                  <ChevronRight className='w-8 h-8 text-primary' />
+                  <ChevronRight className='w-8 h-8' />
                 </CardContent>
               </Card>
             </Link>
@@ -57,7 +57,7 @@ export default async function Home() {
                       historia, visión, misión y funciones clave.
                     </CardDescription>
                   </div>
-                  <ChevronRight className='w-8 h-8 text-primary' />
+                  <ChevronRight className='w-8 h-8' />
                 </CardContent>
               </Card>
             </Link>
@@ -74,7 +74,7 @@ export default async function Home() {
                       normativas asociadas.
                     </CardDescription>
                   </div>
-                  <ChevronRight className='w-8 h-8 text-primary' />
+                  <ChevronRight className='w-8 h-8' />
                 </CardContent>
               </Card>
             </Link>
@@ -89,7 +89,7 @@ export default async function Home() {
                       consulta las respuestas a las preguntas frecuentes.
                     </CardDescription>
                   </div>
-                  <ChevronRight className='w-8 h-8 text-primary' />
+                  <ChevronRight className='w-8 h-8' />
                 </CardContent>
               </Card>
             </Link>
@@ -108,17 +108,6 @@ export default async function Home() {
             </AlertDescription>
           </Alert>
 
-          {/* <Card className='mb-8 p-4 w-full bg-blue-100 border-blue-500'>
-            <CardContent className='p-0 flex items-center gap-4'>
-              <Info className='w-8 h-8 text-blue-500' />
-              <p className='text-lg font-light'>
-                Este espacio está reservado para el personal autorizado de la
-                Dirección de Rentas. Si eres un usuario administrativo, ingresa
-                tus credenciales para acceder al sistema de backoffice.
-              </p>
-            </CardContent>
-          </Card> */}
-
           <Link href='/auth/callback' prefetch={false}>
             <Card className='w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
               <CardContent className='w-full p-4 py-4 flex gap-4 items-center justify-between'>
@@ -128,7 +117,7 @@ export default async function Home() {
                     Panel administrativo
                   </CardTitle>
                 </div>
-                <ChevronRight className='w-8 h-8 text-primary' />
+                <ChevronRight className='w-8 h-8' />
               </CardContent>
             </Card>
           </Link>

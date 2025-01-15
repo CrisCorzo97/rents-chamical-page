@@ -46,7 +46,7 @@ export default function Functions() {
           contribuyentes.
         </p>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Principales Funciones de la Dirección de Rentas
         </h3>
         <ol className='list-decimal list-inside'>
@@ -132,7 +132,7 @@ export default function Functions() {
           </li>
         </ol>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Compromiso con la Comunidad
         </h3>
         <p className='mb-2 font-light'>
@@ -141,7 +141,7 @@ export default function Functions() {
           traduzcan en beneficios tangibles para la comunidad.
         </p>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Colaboración Interinstitucional
         </h3>
         <p className='mb-2 font-light'>

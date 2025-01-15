@@ -46,7 +46,7 @@ export default function Authorities() {
           normativas fiscales.
         </p>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Estructura de la Dirección de Rentas
         </h3>
         <p className='mb-2 font-light'>
@@ -68,7 +68,7 @@ export default function Authorities() {
           </li>
         </ol>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Dirección General de Rentas
         </h3>
         <p className='mb-2 font-light'>
@@ -78,7 +78,7 @@ export default function Authorities() {
           para garantizar el correcto funcionamiento de la entidad.
         </p>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Datos del Director/a General del Área
         </h3>
         <p className='mb-2 font-light'>
@@ -117,7 +117,7 @@ export default function Authorities() {
           </li>
         </ul>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           Mensaje del Director/a General
         </h3>
         <p className='mb-2 font-light'>

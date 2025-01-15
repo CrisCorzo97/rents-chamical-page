@@ -38,7 +38,7 @@ export default function Organism() {
           a los ciudadanos.
         </p>
 
-        <h3 className='text-2xl font-semibold mt-16 mb-4'>
+        <h3 className='text-2xl font-semibold mt-12 mb-4'>
           ¿Qué encontrarás en esta sección?
         </h3>
         <ol className='list-decimal list-inside font-light'>
