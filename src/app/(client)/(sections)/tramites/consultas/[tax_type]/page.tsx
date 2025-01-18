@@ -7,8 +7,8 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import Link from 'next/link';
-import SearchPoperty from './components/searchPoperty';
-import SearchCementery from './components/searchCementery';
+import SearchPoperty from './components/property/searchPoperty';
+import SearchCementery from './components/cementery/searchCementery';
 
 interface TaxQueryProps {
   params: Promise<{
@@ -59,7 +59,7 @@ export default async function TaxQuery({ params }: TaxQueryProps) {
         <h1 className='text-4xl font-bold mb-4'>
           {tax_type === 'inmueble' ? 'Inmueble' : 'Cementerio'}
         </h1>
-        <p className='text-lg max-w-2xl text-gray-500'>
+        <p className='text-lg max-w-2xl font-light'>
           {`
           Para consultar información sobre el estado de tu
           tasa / contribución, por favor introduce tu ${
@@ -70,7 +70,7 @@ export default async function TaxQuery({ params }: TaxQueryProps) {
         </p>
       </section>
 
-      <section className='max-w-6xl mx-auto flex flex-col gap-4 flex-wrap'>
+      <section className='max-w-6xl mx-auto flex flex-wrap'>
         {tax_type === 'inmueble' ? <SearchPoperty /> : <SearchCementery />}
       </section>
     </>
