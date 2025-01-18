@@ -1,8 +1,6 @@
 'use client';
-import { getCementeryRecords } from '@/app/(backoffice)/private/admin/cementery/actions.cementery';
-import { CementeryRecordWithRelations } from '@/app/(backoffice)/private/admin/cementery/cementery.interface';
-import { ReceiptForm } from '@/app/(backoffice)/private/admin/receipts/create-cementery-receipt/components/receiptForm';
-import { SearchResultTable } from '@/app/(backoffice)/private/admin/receipts/create-cementery-receipt/components/searchResultTable';
+import { getProperties } from '@/app/(backoffice)/private/admin/property/actions.property';
+import { PropertyRecordWithRelations } from '@/app/(backoffice)/private/admin/property/property.interface';
 import { Button, Input, Label } from '@/components/ui';
 import {
   Card,
@@ -14,13 +12,15 @@ import {
 import { FormItem } from '@/components/ui/form';
 import { useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
+import PropertyResultTable from './propertyResultTable';
+import ShowPropertyData from './showPropertyData';
 
-function SearchCementery() {
+const SearchPoperty = () => {
   const [searchResult, setSearchResult] = useState<
-    CementeryRecordWithRelations[]
+    PropertyRecordWithRelations[]
   >([]);
   const [selectedRecord, setSelectedRecord] =
-    useState<CementeryRecordWithRelations | null>(null);
+    useState<PropertyRecordWithRelations | null>(null);
   const [isSearching, startSearchTransition] = useTransition();
 
   const handleSearch = (formData: FormData) => {
@@ -29,24 +29,24 @@ function SearchCementery() {
       const search = formData.get('search') as string;
 
       try {
-        const cementeryRecords = await getCementeryRecords({
+        const properties = await getProperties({
           limit: 50,
           filter: {
             OR: [
+              { enrollment: { contains: search?.toUpperCase() ?? '' } },
               { taxpayer: { contains: search?.toUpperCase() ?? '' } },
-              { deceased_name: { contains: search?.toUpperCase() ?? '' } },
             ],
           },
         });
 
-        if (!cementeryRecords.data?.length) {
+        if (!properties.data?.length) {
           toast.error(
-            'No se encontraron registros. Intente nuevamente o agregue un nuevo registro.',
+            'No se encontraron registros. Por favor revise los datos ingresados e intente nuevamente.',
             { duration: 5000 }
           );
         }
 
-        setSearchResult(cementeryRecords.data ?? []);
+        setSearchResult(properties.data ?? []);
       } catch (error) {
         console.error(error);
       }
@@ -54,20 +54,21 @@ function SearchCementery() {
   };
 
   return (
-    <>
-      <Toaster />
-      <section className='flex gap-3'>
-        <Card className='mt-6 w-full max-w-3xl'>
+    <article className='mt-5 w-full flex items-start justify-between gap-3'>
+      <section className='w-full max-w-3xl flex flex-col gap-3'>
+        <Toaster />
+        <Card className='-mt-3 w-full'>
           <CardHeader>
-            <CardTitle>Buscar registro de Cementerio</CardTitle>
+            <CardTitle>Buscar registro de Inmueble</CardTitle>
             <CardDescription>
-              Ingresá tu nombre o el del difunto para buscar el registro.
+              Ingresá tu nombre o tu matrícula catastral para buscar el
+              registro.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
-                <Label>Apellido y Nombre</Label>
+                <Label>Apellido y Nombre o Matrícula</Label>
                 <Input type='text' name='search' required />
               </FormItem>
 
@@ -83,19 +84,21 @@ function SearchCementery() {
             </form>
           </CardContent>
         </Card>
-      </section>
 
-      <section className='mt-6 max-w-3xl scroll-smooth'>
-        <SearchResultTable
+        <PropertyResultTable
           data={searchResult}
-          onSelect={(record) => {
-            setSelectedRecord(record);
+          onSelect={(rec) => {
+            if (rec.id !== selectedRecord?.id) {
+              setSelectedRecord(rec);
+            } else {
+              setSelectedRecord(null);
+            }
           }}
         />
       </section>
 
-      <ReceiptForm record={selectedRecord} />
-    </>
+      <ShowPropertyData record={selectedRecord} />
+    </article>
   );
-}
-export default SearchCementery;
+};
+export default SearchPoperty;
