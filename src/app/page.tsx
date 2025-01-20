@@ -47,6 +47,21 @@ export default async function Home() {
                 </CardContent>
               </Card>
             </Link>
+            <Link href='/informacion/novedades' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
+                    <CardTitle className='text-xl'>Novedades</CardTitle>
+                    <CardDescription>
+                      Entérate de las últimas noticias y actualizaciones
+                      relacionadas con la Dirección de Rentas y sus servicios.
+                      Consulta los comunicados oficiales y novedades destacadas.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8' />
+                </CardContent>
+              </Card>
+            </Link>
             <Link href='/organismo/sobre-rentas' prefetch>
               <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
                 <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
@@ -55,23 +70,6 @@ export default async function Home() {
                     <CardDescription>
                       Aprende más sobre la Dirección de Rentas, incluyendo su
                       historia, visión, misión y funciones clave.
-                    </CardDescription>
-                  </div>
-                  <ChevronRight className='w-8 h-8' />
-                </CardContent>
-              </Card>
-            </Link>
-            <Link href='/informacion/tasas-contribuciones' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
-                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
-                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
-                    <CardTitle className='text-xl'>
-                      Tasas y Contribuciones
-                    </CardTitle>
-                    <CardDescription>
-                      Encuentra información detallada sobre las tasas
-                      municipales y sus periodos de pago, así como las
-                      normativas asociadas.
                     </CardDescription>
                   </div>
                   <ChevronRight className='w-8 h-8' />
