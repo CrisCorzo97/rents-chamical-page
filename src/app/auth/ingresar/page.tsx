@@ -1,21 +1,7 @@
 'use client';
-import theme from '@/theme/themeConfig';
-import {
-  ArrowLeftOutlined,
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import {
-  Alert,
-  Button,
-  Card,
-  Flex,
-  Form,
-  Input,
-  Space,
-  Typography,
-  message,
-} from 'antd';
+import { LoginForm } from '@/components/login-form';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Flex, Space, message } from 'antd';
 import axios, { AxiosError } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -79,7 +65,8 @@ export default function LoginPage() {
         </Button>
       </Link>
       <Flex style={{ minHeight: 'calc(100vh - 84px)' }} align='center'>
-        <Card
+        <LoginForm />
+        {/* <Card
           style={{
             maxWidth: 400,
             margin: '0 auto',
@@ -183,7 +170,7 @@ export default function LoginPage() {
               </Typography.Paragraph>
             </Form>
           </Space>
-        </Card>
+        </Card> */}
       </Flex>
     </Space>
   );
