@@ -6,6 +6,7 @@ import { Envelope } from '@/types/envelope';
 import { Prisma, receipt } from '@prisma/client';
 import dayjs from 'dayjs';
 import { revalidatePath } from 'next/cache';
+import { DailyBoxContent } from './components/dailyBoxReport';
 
 export const getReceiptById = async (input: { id: string }) => {
   const response: Envelope<receipt> = {
@@ -274,16 +275,7 @@ const createNextReceiptCode = async () => {
 };
 
 export const generateDailyBoxReport = async (date: string) => {
-  const response: Envelope<{
-    total_amount_collected: number;
-    total_receipts: number;
-    page_data: {
-      page: number;
-      subtotal: number;
-      receipts: receipt[];
-      total_items: number;
-    }[];
-  }> = {
+  const response: Envelope<DailyBoxContent> = {
     success: true,
     data: null,
     error: null,
@@ -312,6 +304,10 @@ export const generateDailyBoxReport = async (date: string) => {
       response.data = {
         total_amount_collected: 0,
         total_receipts: 0,
+        tax_summary: {
+          add_new_page: false,
+          details: {},
+        },
         page_data: [],
       };
 
@@ -382,9 +378,21 @@ export const generateDailyBoxReport = async (date: string) => {
       throw new Error('Error creating daily box report');
     }
 
+    const tax_summary = {
+      add_new_page: false,
+      details,
+    };
+
+    const availableSpace = 35 - (pageData.at(-1)?.total_items ?? 0);
+
+    if (availableSpace < Object.keys(details).length + 2) {
+      tax_summary.add_new_page = true;
+    }
+
     response.data = {
       total_amount_collected: total_amount,
       total_receipts: confirmedReceipts.length,
+      tax_summary,
       page_data: pageData,
     };
   } catch (error) {

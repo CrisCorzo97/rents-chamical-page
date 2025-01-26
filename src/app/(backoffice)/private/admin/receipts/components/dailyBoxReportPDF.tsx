@@ -12,859 +12,7 @@ import {
 } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
-
-// const mockData: ReceiptPDFProps['data'] = {
-//   total_amount_collected: 64000,
-//   total_receipts: 64,
-//   page_data: [
-//     {
-//       page: 1,
-//       subtotal: 35000,
-//       receipts: [
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//       ],
-//       total_items: 35,
-//     },
-//     {
-//       page: 2,
-//       subtotal: 29000,
-//       receipts: [
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000005',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 2000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'd4090851-cacc-4f2b-a31a-6acf2dee66b5',
-//           created_at: dayjs('2024-11-19T12:40:23.253Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:48:12.000Z').toDate(),
-//           other_data: {
-//             observations: 'Holaaaaa',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//         {
-//           id: '2024-00000004',
-//           taxpayer: 'MENGANO FULANO',
-//           amount: 10000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '61dbbd1f-f09c-48ec-91db-71bf8806c867',
-//           created_at: dayjs('2024-11-19T12:40:12.802Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:46:50.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'APROBACIÓN Y VISACIÓN DE PLANOS',
-//           },
-//         },
-//         {
-//           id: '2024-00000003',
-//           taxpayer: 'JUAN PEREZ',
-//           amount: 5000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'b0e62f91-8e1d-4c32-95a6-93677ee6ea39',
-//           created_at: dayjs('2024-11-19T12:40:03.027Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:11.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'RETENCIONES/VENTAS REM. FERIA',
-//           },
-//         },
-//         {
-//           id: '2024-00000006',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 7900,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: '4923a2a0-a41d-4e82-8fee-dac819ac37e8',
-//           created_at: dayjs('2024-11-19T12:40:32.191Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:35.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'OCUPACIÓN DE LA VÍA PÚBLICA',
-//           },
-//         },
-//         {
-//           id: '2024-00000007',
-//           taxpayer: 'CRISTIAN CORZO',
-//           amount: 20000,
-//           tax_type: 'TASAS DIVERSAS',
-//           id_tax_reference: 'aebd2a4b-6e90-40a7-9bf9-222c3afd94e4',
-//           created_at: dayjs('2024-11-19T12:40:41.433Z').toDate(),
-//           confirmed_at: dayjs('2024-12-01T12:47:42.000Z').toDate(),
-//           other_data: {
-//             observations: '',
-//             tax_or_contribution: 'LIBRETA DE SANIDAD',
-//           },
-//         },
-//       ],
-//       total_items: 29,
-//     },
-//   ],
-// };
+import { DailyBoxContent } from './dailyBoxReport';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -973,16 +121,8 @@ const styles = StyleSheet.create({
 });
 
 export interface ReceiptPDFProps {
-  data: {
+  data: DailyBoxContent & {
     date: string;
-    total_amount_collected: number;
-    total_receipts: number;
-    page_data: {
-      page: number;
-      subtotal: number;
-      receipts: receipt[];
-      total_items: number;
-    }[];
   };
 }
 
@@ -995,26 +135,43 @@ export const DailyBoxReportPDF = ({ data }: ReceiptPDFProps) => {
       subject='Rentas Municipal'
       language='es'
     >
-      {data.page_data?.length ? data.page_data.map((page) => (
-        <PageComponent
-          key={page.page}
-          date={data.date}
-          page={page.page}
-          subtotal={page.subtotal}
-          receipts={page.receipts}
-          total_items={page.total_items}
-          totalPages={data.page_data.length}
-          totalAmountCollected={data.total_amount_collected}
-        />
-      )) : (
+      {data.page_data?.length ? (
+        data.page_data.map((page) => (
+          <PageComponent
+            key={page.page}
+            date={data.date}
+            page={page.page}
+            subtotal={page.subtotal}
+            receipts={page.receipts}
+            tax_summary={data.tax_summary}
+            total_items={page.total_items}
+            totalPages={data.page_data.length}
+            totalAmountCollected={data.total_amount_collected}
+          />
+        ))
+      ) : (
         <PageComponent
           key='empty-page'
           date={data.date}
           page={1}
           subtotal={0}
           receipts={[]}
+          tax_summary={data.tax_summary}
           total_items={data.total_receipts}
           totalPages={1}
+          totalAmountCollected={data.total_amount_collected}
+        />
+      )}
+      {data.tax_summary.add_new_page && (
+        <PageComponent
+          key='tax-summary'
+          date={data.date}
+          page={data.page_data.length + 1}
+          subtotal={0}
+          receipts={[]}
+          tax_summary={data.tax_summary}
+          total_items={data.total_receipts}
+          totalPages={data.page_data.length}
           totalAmountCollected={data.total_amount_collected}
         />
       )}
@@ -1027,10 +184,19 @@ const PageComponent = (details: {
   page: number;
   subtotal: number;
   receipts: receipt[];
+  tax_summary: DailyBoxContent['tax_summary'];
   total_items: number;
   totalPages: number;
   totalAmountCollected: number;
 }) => {
+  const { tax_summary } = details;
+
+  const showTaxSummary = tax_summary.add_new_page
+    ? details.page === details.totalPages + 1
+    : details.page === details.totalPages;
+
+  const taxSummaryItems = Object.entries(tax_summary.details ?? {});
+
   return (
     <Page size='A4' style={styles.page}>
       <View style={styles.header}>
@@ -1061,73 +227,155 @@ const PageComponent = (details: {
           RESUMEN DE CAJA DIARIA {dayjs(details.date).format('DD/MM/YYYY')}
         </Text>
         <View style={styles.contentTable}>
-          <View style={styles.contentTableHeader}>
-            <Text style={{ ...styles.contentTableHeaderCell, width: '10%' }}>
-              Hora
-            </Text>
-            <Text style={{ ...styles.contentTableHeaderCell, width: '15%' }}>
-              Comprobante
-            </Text>
-            <Text
-              style={{
-                ...styles.contentTableHeaderCell,
-                width: '30%',
-              }}
-            >
-              Contribuyente
-            </Text>
-            <Text style={{ ...styles.contentTableHeaderCell, width: '30%' }}>
-              Tasa
-            </Text>
-            <Text style={{ ...styles.contentTableHeaderCell, width: '15%' }}>
-              Importe
-            </Text>
-          </View>
-          <View>
-            {details.receipts?.length ? details.receipts.map((item, index) => (
-              <View
-                key={index}
-                style={{
-                  ...styles.contentTableBodyRow,
-                  backgroundColor: index % 2 === 0 ? 'white' : '#f6f6f6',
-                }}
-              >
-                <Text style={{ ...styles.contentTableBodyCell, width: '10%' }}>
-                  {dayjs(item.confirmed_at).format('HH:mm')}hs
+          {(!tax_summary.add_new_page || !showTaxSummary) && (
+            <View>
+              <View style={styles.contentTableHeader}>
+                <Text
+                  style={{ ...styles.contentTableHeaderCell, width: '10%' }}
+                >
+                  Hora
                 </Text>
-                <Text style={{ ...styles.contentTableBodyCell, width: '15%' }}>
-                  {item.id}
+                <Text
+                  style={{ ...styles.contentTableHeaderCell, width: '15%' }}
+                >
+                  Comprobante
                 </Text>
                 <Text
                   style={{
-                    ...styles.contentTableBodyCell,
+                    ...styles.contentTableHeaderCell,
                     width: '30%',
                   }}
                 >
-                  {formatName(item.taxpayer)}
+                  Contribuyente
                 </Text>
-                <Text style={{ ...styles.contentTableBodyCell, width: '30%' }}>
-                  {item.tax_type === 'TASAS DIVERSAS' ? formatName(
-                    (item.other_data as JsonObject)!
-                      .tax_or_contribution as string
-                  ) : formatName(item.tax_type)}
+                <Text
+                  style={{ ...styles.contentTableHeaderCell, width: '30%' }}
+                >
+                  Tasa
                 </Text>
-                <Text style={{ ...styles.contentTableBodyCell, width: '15%' }}>
-                  $
-                  {item.amount.toLocaleString('es-AR', {
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2,
-                  })}
+                <Text
+                  style={{ ...styles.contentTableHeaderCell, width: '15%' }}
+                >
+                  Importe
                 </Text>
               </View>
-            )) : <Text style={{ ...styles.contentTableBodyCell }}>No hay comprabantes confirmados en esta fecha.</Text>}
-          </View>
+              <View>
+                {details.receipts?.length ? (
+                  details.receipts.map((item, index) => (
+                    <View
+                      key={index}
+                      style={{
+                        ...styles.contentTableBodyRow,
+                        backgroundColor: index % 2 === 0 ? 'white' : '#f6f6f6',
+                      }}
+                    >
+                      <Text
+                        style={{ ...styles.contentTableBodyCell, width: '10%' }}
+                      >
+                        {dayjs(item.confirmed_at).format('HH:mm')}hs
+                      </Text>
+                      <Text
+                        style={{ ...styles.contentTableBodyCell, width: '15%' }}
+                      >
+                        {item.id}
+                      </Text>
+                      <Text
+                        style={{
+                          ...styles.contentTableBodyCell,
+                          width: '30%',
+                        }}
+                      >
+                        {formatName(item.taxpayer)}
+                      </Text>
+                      <Text
+                        style={{ ...styles.contentTableBodyCell, width: '30%' }}
+                      >
+                        {item.tax_type === 'TASAS DIVERSAS'
+                          ? formatName(
+                              (item.other_data as JsonObject)!
+                                .tax_or_contribution as string
+                            )
+                          : formatName(item.tax_type)}
+                      </Text>
+                      <Text
+                        style={{ ...styles.contentTableBodyCell, width: '15%' }}
+                      >
+                        $
+                        {item.amount.toLocaleString('es-AR', {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 2,
+                        })}
+                      </Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={{ ...styles.contentTableBodyCell }}>
+                    No hay comprobantes confirmados en esta fecha.
+                  </Text>
+                )}
+              </View>
+            </View>
+          )}
+
+          {taxSummaryItems.length && showTaxSummary && (
+            <View>
+              <View
+                style={{
+                  ...styles.contentTableHeader,
+                  marginTop: tax_summary.add_new_page ? 0 : 10,
+                }}
+              >
+                <Text
+                  style={{ ...styles.contentTableHeaderCell, width: '85%' }}
+                >
+                  Tasa / Contribución
+                </Text>
+                <Text
+                  style={{ ...styles.contentTableHeaderCell, width: '15%' }}
+                >
+                  Importe
+                </Text>
+              </View>
+              <View>
+                {taxSummaryItems.map(([tax, amount], index) => (
+                  <View
+                    key={tax}
+                    style={{
+                      ...styles.contentTableBodyRow,
+                      backgroundColor: index % 2 === 0 ? 'white' : '#f6f6f6',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        ...styles.contentTableBodyCell,
+                        width: '85%',
+                      }}
+                    >
+                      {formatName(tax)}
+                    </Text>
+                    <Text
+                      style={{
+                        ...styles.contentTableBodyCell,
+                        width: '15%',
+                      }}
+                    >
+                      $
+                      {amount.toLocaleString('es-AR', {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                      })}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
         </View>
       </View>
       <View style={styles.footer}>
         <View>
           <View style={styles.footerBorder}></View>
-          {details.page === details.totalPages && (
+          {showTaxSummary && (
             <View style={styles.footerTotalRow}>
               <Text
                 style={{
@@ -1161,7 +409,11 @@ const PageComponent = (details: {
             textAlign: 'right',
           }}
         >
-          {`Página ${details.page} de ${details.totalPages}`}
+          {`Página ${details.page} de ${
+            tax_summary.add_new_page
+              ? details.totalPages + 1
+              : details.totalPages
+          }`}
         </Text>
       </View>
     </Page>
