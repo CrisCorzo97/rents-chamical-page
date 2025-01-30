@@ -1,7 +1,7 @@
 'use client';
 import { LoginForm } from '@/app/auth/(backoffice)/components/login-form';
 import { Button } from '@/components/ui';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -12,7 +12,7 @@ export default function LoginPage() {
           variant='outline'
           className='absolute top-4 left-4 flex items-center gap-2'
         >
-          <ArrowLeftOutlined />
+          <ChevronLeft />
           Volver al inicio
         </Button>
       </Link>

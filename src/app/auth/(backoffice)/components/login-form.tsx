@@ -74,8 +74,8 @@ export function LoginForm() {
           </Alert>
         </CardHeader>
         <CardContent>
-          <form className='grid gap-6' action={handleAction}>
-            <fieldset disabled={isLoading}>
+          <form action={handleAction}>
+            <fieldset className='grid gap-6' disabled={isLoading}>
               <FormItem>
                 <Label htmlFor='email'>Correo Electrónico</Label>
                 <Input
@@ -107,7 +107,7 @@ export function LoginForm() {
                   <Label htmlFor='password'>Contraseña</Label>
                   <Link
                     href='/auth/solicitar-recupero-clave'
-                    className='ml-auto inline-block text-sm underline'
+                    className='ml-auto inline-block text-sm underline transition-all hover:text-primary'
                   >
                     ¿Olvidaste tu contraseña?
                   </Link>
@@ -162,7 +162,10 @@ export function LoginForm() {
           </form>
           <div className='mt-4 text-center text-sm'>
             ¿No tienes una cuenta?{' '}
-            <Link href='/auth/solicitar-alta' className='underline'>
+            <Link
+              href='/auth/solicitar-alta'
+              className='underline transition-all hover:text-primary'
+            >
               Regístrate
             </Link>
           </div>
