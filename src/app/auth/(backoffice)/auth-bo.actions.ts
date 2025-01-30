@@ -7,6 +7,7 @@ import { MailOptions } from 'nodemailer/lib/json-transport';
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { role } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 export const login = async ({
   email,
@@ -110,6 +111,127 @@ export const requestRegistration = async ({
     }
 
     response.data = { id: request_created.id };
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Ha ocurrido un error, por favor intente nuevamente.';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const verifyPassword = async ({
+  user_id,
+  prev_password,
+}: {
+  user_id: string;
+  prev_password: string;
+}) => {
+  const user = await dbSupabase.user.findUnique({
+    where: {
+      id: user_id,
+    },
+  });
+
+  if (!user) {
+    return false;
+  }
+
+  const isPasswordValid = await bcrypt.compare(prev_password, user.password);
+
+  return isPasswordValid;
+};
+
+export const changePassword = async (input: {
+  user_id: string;
+  old_password: string;
+  new_password: string;
+}): Promise<void> => {
+  const { user_id, old_password, new_password } = input;
+
+  try {
+    const isPasswordValid = await verifyPassword({
+      user_id,
+      prev_password: old_password,
+    });
+
+    if (!isPasswordValid) {
+      return;
+    }
+
+    const supabase = await createSupabaseServerClient();
+
+    const hashed_password = await bcrypt.hash(new_password, 7);
+
+    const { data, error } = await supabase.auth.admin.updateUserById(user_id, {
+      password: hashed_password,
+    });
+
+    if (error || !data) {
+      console.log({ error });
+      return;
+    }
+
+    await dbSupabase.user.update({
+      where: {
+        id: user_id,
+      },
+      data: {
+        password: hashed_password,
+      },
+    });
+
+    return;
+  } catch (error) {
+    console.log({ error });
+    return;
+  }
+};
+
+export const requestPasswordRecovery = async ({
+  email,
+}: {
+  email: string;
+}): Promise<Envelope<null>> => {
+  const response: Envelope<null> = {
+    success: false,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const user = await dbSupabase.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new Error(
+        'Ocurrió un error al intentar recuperar tu contraseña. Por favor, intenta nuevamente.'
+      );
+    }
+
+    const supabase = await createSupabaseServerClient();
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.PROJECT_URL}/auth/recuperar-clave`,
+    });
+
+    if (error) {
+      console.error(error);
+      throw new Error(
+        'Ocurrió un error al intentar recuperar tu contraseña. Por favor, intenta nuevamente.'
+      );
+    }
+
+    response.success = true;
   } catch (error) {
     console.error(error);
     response.success = false;
