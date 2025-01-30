@@ -148,9 +148,9 @@ export function LoginForm() {
                     onClick={togglePasswordVisibility}
                   >
                     {showPassword ? (
-                      <EyeOff className='w-5 h-5' />
+                      <EyeOff className='w-6 h-6 text-gray-600' />
                     ) : (
-                      <Eye className='w-5 h-5' />
+                      <Eye className='w-6 h-6 text-gray-600' />
                     )}
                   </div>
                 </div>

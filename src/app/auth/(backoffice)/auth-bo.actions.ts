@@ -246,6 +246,66 @@ export const requestPasswordRecovery = async ({
   }
 };
 
+export const resetPassword = async ({
+  newPassword,
+}: {
+  newPassword: string;
+}): Promise<Envelope<null>> => {
+  const response: Envelope<null> = {
+    success: false,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error: user_error } = await supabase.auth.getUser();
+
+    if (user_error || !data) {
+      throw new Error(
+        'Ocurrió un error al intentar crear tu nueva contraseña. Por favor, intenta nuevamente.'
+      );
+    }
+
+    const hashed_password = await bcrypt.hash(newPassword, 7);
+
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      console.error(error);
+      throw new Error(
+        'Ocurrió un error al intentar crear tu nueva contraseña. Por favor, intenta nuevamente.'
+      );
+    }
+
+    await dbSupabase.user.update({
+      where: {
+        id: data.user.id,
+      },
+      data: {
+        password: hashed_password,
+      },
+    });
+
+    response.success = true;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Ha ocurrido un error, por favor intente nuevamente.';
+    }
+  } finally {
+    return response;
+  }
+};
+
 export const getRoles = async () => {
   const response: Envelope<role[]> = {
     success: false,
