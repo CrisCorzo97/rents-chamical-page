@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { InfoIcon } from 'lucide-react';
+import { ChevronLeft, InfoIcon } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { z } from 'zod';
 import { toast, Toaster } from 'sonner';
@@ -98,8 +98,18 @@ export function PreRegisterForm({ roles }: PreRegisterFormProps) {
   return (
     <>
       <Toaster />
-      <Card className='mt-16 mx-auto max-w-sm md:max-w-lg md:mt-0'>
+      <Card className='mt-2 mx-auto max-w-sm md:max-w-lg'>
         <CardHeader>
+          <Link href='/' passHref replace prefetch>
+            <Button
+              variant='ghost'
+              className='flex items-center text-sm gap-2 px-2 -ml-2 mb-2'
+              size='sm'
+            >
+              <ChevronLeft className='text-gray-600 h-5 w-5' />
+              Inicio
+            </Button>
+          </Link>
           <CardTitle className='text-2xl'>
             Solicitar acceso a una cuenta
           </CardTitle>

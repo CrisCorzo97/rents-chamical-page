@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FormItem } from '../../../../components/ui/form';
 import { Alert, AlertDescription } from '../../../../components/ui/alert';
-import { Eye, EyeOff, InfoIcon } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, InfoIcon } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { z } from 'zod';
 import { login } from '../auth-bo.actions';
@@ -61,6 +61,16 @@ export function LoginForm() {
       <Toaster />
       <Card className='mx-auto max-w-sm'>
         <CardHeader>
+          <Link href='/' passHref replace prefetch>
+            <Button
+              variant='ghost'
+              className='flex items-center text-sm gap-2 px-2 -ml-2 mb-2'
+              size='sm'
+            >
+              <ChevronLeft className='text-gray-600 h-5 w-5' />
+              Inicio
+            </Button>
+          </Link>
           <CardTitle className='text-2xl'>Iniciar Sesión</CardTitle>
           <CardDescription>
             Ingresa tu correo electrónico a continuación para iniciar sesión en
