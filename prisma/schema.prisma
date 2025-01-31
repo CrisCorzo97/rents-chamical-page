@@ -378,6 +378,7 @@ model rent_tax_or_contribution {
 model role {
   id                   BigInt                 @id(map: "user_role_pkey") @default(autoincrement())
   role                 String                 @db.VarChar
+  label                String?                @db.VarChar
   registration_request registration_request[]
   user                 user[]
 
