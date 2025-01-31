@@ -1,4 +1,4 @@
-import { ChangePasswordComponent } from './page.client';
+import { ChangePassword } from '../components/change-password';
 
 export default async function ChangePasswordPage({
   searchParams,
@@ -9,5 +9,9 @@ export default async function ChangePasswordPage({
 }) {
   const { prev_password } = await searchParams;
 
-  return <ChangePasswordComponent prevPassword={prev_password} />;
+  return (
+    <section className='flex flex-col items-center justify-center h-screen'>
+      <ChangePassword prevPassword={prev_password} />
+    </section>
+  );
 }

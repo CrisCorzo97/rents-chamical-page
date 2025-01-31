@@ -1,7 +1,6 @@
 'use server';
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import nodemailer from 'nodemailer';
 import { MailOptions } from 'nodemailer/lib/json-transport';
 import dbSupabase from '@/lib/prisma/prisma';
@@ -15,33 +14,40 @@ export const login = async ({
 }: {
   email: string;
   password: string;
-}) => {
-  const supabase = await createSupabaseServerClient();
+}): Promise<Envelope<{ redirectUrl: string }>> => {
+  const response: Envelope<{ redirectUrl: string }> = {
+    success: false,
+    data: null,
+    error: null,
+    pagination: null,
+  };
 
   try {
+    const supabase = await createSupabaseServerClient();
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      console.log({ error });
       throw new Error('Error al iniciar sesión. Por favor intente nuevamente.');
     }
 
-    redirect('/auth/callback');
+    response.success = true;
+    response.data = { redirectUrl: '/auth/callback' };
   } catch (error) {
     console.error(error);
-
-    // Si el error es una redirección, lanzarlo nuevamente
-    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-      throw error;
-    }
+    response.success = false;
 
     if (error instanceof Error) {
-      throw new Error(error.message);
+      response.error = error.message;
     } else {
-      throw new Error('Ha ocurrido un error, por favor intente nuevamente.');
+      response.error = 'Ha ocurrido un error, por favor intente nuevamente.';
     }
+  } finally {
+    return response;
   }
 };
 
@@ -147,49 +153,73 @@ export const verifyPassword = async ({
   return isPasswordValid;
 };
 
-export const changePassword = async (input: {
-  user_id: string;
+export const changePassword = async ({
+  old_password,
+  new_password,
+}: {
   old_password: string;
   new_password: string;
-}): Promise<void> => {
-  const { user_id, old_password, new_password } = input;
+}): Promise<Envelope<null>> => {
+  const response: Envelope<null> = {
+    success: false,
+    data: null,
+    error: null,
+    pagination: null,
+  };
 
   try {
+    const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error('No se encontró el usuario.');
+    }
+
     const isPasswordValid = await verifyPassword({
-      user_id,
+      user_id: user.id,
       prev_password: old_password,
     });
 
     if (!isPasswordValid) {
-      return;
+      throw new Error('La contraseña actual es incorrecta.');
     }
-
-    const supabase = await createSupabaseServerClient();
 
     const hashed_password = await bcrypt.hash(new_password, 7);
 
-    const { data, error } = await supabase.auth.admin.updateUserById(user_id, {
-      password: hashed_password,
+    const { data, error } = await supabase.auth.updateUser({
+      password: new_password,
     });
 
     if (error || !data) {
-      console.log({ error });
-      return;
+      throw new Error(
+        'Error al actualizar la contraseña. Por favor intente nuevamente.'
+      );
     }
 
     await dbSupabase.user.update({
       where: {
-        id: user_id,
+        id: user.id,
       },
       data: {
         password: hashed_password,
       },
     });
 
-    return;
+    response.success = true;
   } catch (error) {
-    console.log({ error });
-    return;
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Ha ocurrido un error, por favor intente nuevamente.';
+    }
+  } finally {
+    return response;
   }
 };
 

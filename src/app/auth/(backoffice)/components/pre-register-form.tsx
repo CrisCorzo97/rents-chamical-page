@@ -49,9 +49,7 @@ const formSchema = z.object({
   cuil: z.string().regex(/^\d{2}-\d{8}-\d{1}$/, {
     message: 'El CUIL ingresado no es válido',
   }),
-  role: z.enum(['1', '2', '3'], {
-    errorMap: () => ({ message: 'Por favor selecciona un rol.' }),
-  }),
+  role: z.string().min(1, { message: 'Debes seleccionar un rol' }),
 });
 
 interface PreRegisterFormProps {

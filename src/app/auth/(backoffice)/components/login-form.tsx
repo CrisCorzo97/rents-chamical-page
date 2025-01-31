@@ -17,6 +17,7 @@ import { useState, useTransition } from 'react';
 import { z } from 'zod';
 import { login } from '../auth-bo.actions';
 import { toast, Toaster } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Correo electrónico inválido' }),
@@ -31,6 +32,8 @@ export function LoginForm() {
   const [zodErrors, setZodErrors] = useState<z.ZodIssue[] | null>(null);
   const [isLoading, startTransition] = useTransition();
 
+  const { replace } = useRouter();
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -43,7 +46,15 @@ export function LoginForm() {
       try {
         formSchema.parse({ email, password });
 
-        await login({ email, password });
+        const { error, data } = await login({ email, password });
+
+        if (error) {
+          throw new Error(error);
+        }
+
+        if (data) {
+          replace(data.redirectUrl);
+        }
       } catch (error) {
         if (error instanceof z.ZodError) {
           setZodErrors(error.errors);
