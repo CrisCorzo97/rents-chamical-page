@@ -10,5 +10,9 @@ export default async function AuthCallback() {
     return redirect('/auth/ingresar');
   }
 
+  if (data.user.user_metadata.role_id === 5) {
+    return redirect('/');
+  }
+
   return redirect('/private/admin/receipts');
 }

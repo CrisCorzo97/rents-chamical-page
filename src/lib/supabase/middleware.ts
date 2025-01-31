@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const taxpayerProtectedRoutes = ['/tramites/DDJJ-actividad-comercial'];
+
 export async function updateSession(request: NextRequest) {
   try {
     let supabaseResponse = NextResponse.next({
@@ -34,18 +36,36 @@ export async function updateSession(request: NextRequest) {
     // supabase.auth.getUser(). A simple mistake could make it very hard to debug
     // issues with users being randomly logged out.
 
+    const isAuthRoute = request.nextUrl.pathname.startsWith('/auth');
+    const isAdminRoute = request.nextUrl.pathname.startsWith('/private');
+    const isTaxpayerProtectedRoute = taxpayerProtectedRoutes.includes(
+      request.nextUrl.pathname
+    );
+
+    let url = request.nextUrl.clone();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (
-      !user &&
-      !request.nextUrl.pathname.startsWith('/auth') &&
-      request.nextUrl.pathname.startsWith('/private')
-    ) {
-      // no user, potentially respond by redirecting the user to the login page
-      const url = request.nextUrl.clone();
+    const isLogged = !!user;
+
+    const isTaxpayerUser = isLogged && user.user_metadata.role_id === 5;
+
+    if (!isLogged && (isAdminRoute || isTaxpayerProtectedRoute)) {
+      url.pathname = isAdminRoute
+        ? '/auth/ingresar'
+        : '/auth/portal-contribuyente/ingresar';
+      return NextResponse.redirect(url);
+    }
+
+    if (isLogged && isAdminRoute && isTaxpayerUser) {
       url.pathname = '/auth/ingresar';
+      return NextResponse.redirect(url);
+    }
+
+    if (isLogged && isTaxpayerProtectedRoute && !isTaxpayerUser) {
+      url.pathname = '/auth/portal-contribuyente/ingresar';
       return NextResponse.redirect(url);
     }
 
