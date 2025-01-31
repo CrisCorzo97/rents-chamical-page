@@ -1,8 +1,5 @@
 import { Toaster } from '@/components/ui/toaster';
-import StyledComponentsRegistry from '@/lib/ant-design/AntdRegistry';
-import theme from '@/theme/themeConfig';
 import { Analytics } from '@vercel/analytics/react';
-import { ConfigProvider } from 'antd';
 import type { Metadata } from 'next';
 import { Open_Sans } from 'next/font/google';
 import './globals.css';
@@ -26,12 +23,8 @@ export default function RootLayout({
   return (
     <html lang='es'>
       <body className={`${poppins.variable} font-sans`}>
-        <StyledComponentsRegistry>
-          <ConfigProvider theme={theme}>
-            {children}
-            <Toaster />
-          </ConfigProvider>
-        </StyledComponentsRegistry>
+        {children}
+        <Toaster />
         <Analytics />
       </body>
     </html>
