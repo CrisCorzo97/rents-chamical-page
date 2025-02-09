@@ -75,7 +75,7 @@ export const signup = async ({
 
     const { error, data } = await supabase.auth.signUp({
       email,
-      password: hashedPassword,
+      password,
       options: {
         data: {
           first_name,

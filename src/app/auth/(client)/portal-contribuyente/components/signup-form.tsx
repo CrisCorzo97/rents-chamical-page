@@ -308,7 +308,7 @@ export function SignupForm() {
                   className='w-full md:col-span-4 md:col-start-2'
                   loading={isLoading}
                 >
-                  Enviar
+                  Registrarse
                 </Button>
               </FormItem>
             </fieldset>
