@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,10 +25,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Declaration } from '../types';
+import { formatCurrency } from '@/lib/formatters';
+
+dayjs.locale('es');
 
 const formSchema = z.object({
-  period: z.string().min(1, 'Period is required'),
-  grossAmount: z.string().min(1, 'Gross amount is required').transform(Number),
+  period: z.string().min(1, 'El período es obligatorio'),
+  grossAmount: z.string().min(1, 'El importe bruto es obligatorio'),
 });
 
 interface DeclarationFormProps {
@@ -43,22 +48,24 @@ export default function DeclarationForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       period: '',
-      grossAmount: 0,
+      grossAmount: '0',
     },
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (step === 1) {
+      console.log(values.grossAmount);
       setStep(2);
     } else {
+      console.log(values.grossAmount);
       const declaration: Declaration = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: `new-${dayjs(values.period).format('YYYY-MM')}`,
         period: values.period,
-        grossAmount: values.grossAmount,
-        status: 'pending',
-        dueDate: new Date(new Date().setMonth(new Date().getMonth() + 1))
-          .toISOString()
-          .split('T')[0],
+        grossAmount: Number(
+          values.grossAmount.toString().replace('.', '').replace('$', '')
+        ),
+        status: 'payment_pending',
+        dueDate: dayjs().startOf('month').add(19, 'day').format('YYYY-MM-DD'),
       };
       onSubmit(declaration);
     }
@@ -66,19 +73,13 @@ export default function DeclarationForm({
 
   const getPeriods = () => {
     const periods = [];
-    const currentDate = new Date();
-    for (let i = 0; i < 6; i++) {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() - i,
-        1
-      );
+    const currentDate = dayjs().subtract(1, 'month'); // Start from the previous month
+    for (let i = 0; i < 12; i++) {
+      // Go back 12 months
+      const date = currentDate.subtract(i, 'month');
       periods.push({
-        value: date.toISOString().slice(0, 7),
-        label: new Intl.DateTimeFormat('en-US', {
-          year: 'numeric',
-          month: 'long',
-        }).format(date),
+        value: date.format('MM/YYYY'),
+        label: date.format('MMMM YYYY'),
       });
     }
     return periods;
@@ -88,7 +89,9 @@ export default function DeclarationForm({
     <Card className='max-w-2xl mx-auto'>
       <CardHeader>
         <CardTitle>
-          {step === 1 ? 'New Tax Declaration' : 'Declaration Summary'}
+          {step === 1
+            ? 'Nueva Declaración Jurada'
+            : 'Resumen de la Declaración'}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -104,14 +107,14 @@ export default function DeclarationForm({
                   name='period'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Declaration Period</FormLabel>
+                      <FormLabel>Período a declarar</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select period' />
+                            <SelectValue placeholder='Seleccionar período' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -131,12 +134,19 @@ export default function DeclarationForm({
                   name='grossAmount'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Gross Amount</FormLabel>
+                      <FormLabel>Importe Bruto</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
-                          placeholder='Enter amount'
-                          {...field}
+                          type='text'
+                          placeholder='Ingresar monto'
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(
+                              formatCurrency(
+                                e.target.value.replace(/[^0-9.]/g, '')
+                              )
+                            )
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -147,38 +157,36 @@ export default function DeclarationForm({
             ) : (
               <div className='space-y-4'>
                 <div className='grid grid-cols-2 gap-4 text-sm'>
-                  <div className='font-medium'>Period:</div>
+                  <div className='font-medium'>Período:</div>
                   <div>{form.getValues('period')}</div>
-                  <div className='font-medium'>Gross Amount:</div>
-                  <div>${form.getValues('grossAmount')}</div>
-                  <div className='font-medium'>Tax Amount (10%):</div>
-                  <div>${Number(form.getValues('grossAmount')) * 0.1}</div>
-                </div>
-                <div className='border-t pt-4 mt-4'>
-                  <h3 className='font-medium mb-2'>Payment Instructions</h3>
-                  <p className='text-sm text-gray-600 mb-2'>
-                    Please transfer the amount to the following account:
-                  </p>
-                  <div className='bg-blue-100 p-3 rounded-md text-sm'>
-                    <div>
-                      <strong>Bank:</strong> National Tax Bank
-                    </div>
-                    <div>
-                      <strong>Account:</strong> 000-123456-789
-                    </div>
-                    <div>
-                      <strong>CBU:</strong> 0000000000000000000000
-                    </div>
+                  <div className='font-medium'>Fecha de la presentación:</div>
+                  <div>{dayjs().format('DD/MM/YYYY')}</div>
+                  <div className='font-medium'>Ingresos Brutos declarado:</div>
+                  <div>{form.getValues('grossAmount')}</div>
+                  <hr className='col-span-2' />
+                  <div className='font-medium'>Importe a pagar (10%):</div>
+                  <div className='font-semibold'>
+                    {formatCurrency(
+                      `${
+                        Number(
+                          form
+                            .getValues('grossAmount')
+                            .toString()
+                            .replace('.', '')
+                            .replace('$', '')
+                        ) * 0.1
+                      }`
+                    )}
                   </div>
                 </div>
               </div>
             )}
             <div className='flex justify-end space-x-4'>
               <Button type='button' variant='outline' onClick={onCancel}>
-                Cancel
+                Cancelar
               </Button>
               <Button type='submit'>
-                {step === 1 ? 'Continue' : 'Submit Declaration'}
+                {step === 1 ? 'Continuar' : 'Confirmar'}
               </Button>
             </div>
           </form>

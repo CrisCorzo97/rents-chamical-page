@@ -2,7 +2,12 @@ export interface Declaration {
   id: string;
   period: string;
   grossAmount: number;
-  status: 'pending' | 'submitted' | 'paid';
+  status:
+    | 'payment_pending'
+    | 'payment_review'
+    | 'approved'
+    | 'rejected'
+    | 'defeated';
   dueDate: string;
   submissionDate?: string;
   paymentDate?: string;

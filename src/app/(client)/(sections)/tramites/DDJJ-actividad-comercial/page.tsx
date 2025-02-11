@@ -27,18 +27,35 @@ export default function Home() {
   const [declarations, setDeclarations] = useState<Declaration[]>([
     {
       id: '1',
-      period: '2024-01',
-      grossAmount: 0,
-      status: 'pending',
-      dueDate: '2024-03-15',
+      period: '2024-09',
+      grossAmount: 12000,
+      status: 'approved',
+      dueDate: '2024-10-20',
+      submissionDate: '2024-10-18',
     },
     {
       id: '2',
-      period: '2023-12',
+      period: '2024-10',
       grossAmount: 15000,
-      status: 'submitted',
-      dueDate: '2024-02-15',
-      submissionDate: '2024-02-10',
+      status: 'rejected',
+      dueDate: '2024-11-20',
+      submissionDate: '2024-11-18',
+    },
+    {
+      id: '3',
+      period: '2024-11',
+      grossAmount: 0,
+      status: 'payment_review',
+      dueDate: '2024-12-20',
+      submissionDate: '2024-12-18',
+    },
+    {
+      id: '4',
+      period: '2024-12',
+      grossAmount: 0,
+      status: 'payment_pending',
+      dueDate: '2025-01-20',
+      submissionDate: '2025-01-18',
     },
   ]);
 
@@ -92,7 +109,7 @@ export default function Home() {
                 <h1 className='text-2xl font-bold text-gray-900'>TaxPortal</h1>
               </div>
               <Button onClick={() => setShowDeclarationForm(true)}>
-                New Declaration
+                Nueva Declaración
               </Button>
             </div>
           </div>
@@ -115,23 +132,32 @@ export default function Home() {
           <div className='grid gap-6'>
             <UpcomingDueDates declarations={declarations} />
 
-            <Tabs defaultValue='pending' className='w-full'>
+            <Tabs defaultValue='payment_pending' className='w-full'>
               <TabsList>
-                <TabsTrigger value='pending'>Pending</TabsTrigger>
-                <TabsTrigger value='submitted'>Submitted</TabsTrigger>
+                <TabsTrigger value='payment_pending'>Pendientes</TabsTrigger>
+                <TabsTrigger value='payment_review'>En revisión</TabsTrigger>
+                <TabsTrigger value='finished'>Finalizados</TabsTrigger>
               </TabsList>
-              <TabsContent value='pending'>
+              <TabsContent value='payment_pending'>
                 <DeclarationsList
                   declarations={declarations.filter(
-                    (d) => d.status === 'pending'
+                    (d) => d.status === 'payment_pending'
                   )}
                   onUploadProof={setSelectedDeclaration}
                 />
               </TabsContent>
-              <TabsContent value='submitted'>
+              <TabsContent value='payment_review'>
                 <DeclarationsList
                   declarations={declarations.filter(
-                    (d) => d.status === 'submitted'
+                    (d) => d.status === 'payment_review'
+                  )}
+                  onUploadProof={setSelectedDeclaration}
+                />
+              </TabsContent>
+              <TabsContent value='finished'>
+                <DeclarationsList
+                  declarations={declarations.filter((d) =>
+                    ['approved', 'rejected'].includes(d.status)
                   )}
                   onUploadProof={setSelectedDeclaration}
                 />

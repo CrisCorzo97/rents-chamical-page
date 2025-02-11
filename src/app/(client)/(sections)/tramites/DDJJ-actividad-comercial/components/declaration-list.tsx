@@ -9,10 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Badge, BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { Declaration } from '../types';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
+
+dayjs.locale('es');
 
 interface DeclarationsListProps {
   declarations: Declaration[];
@@ -23,34 +27,59 @@ export default function DeclarationsList({
   declarations,
   onUploadProof,
 }: DeclarationsListProps) {
+  declarations.sort((a, b) => dayjs(b.period).diff(dayjs(a.period)));
+
+  const badgeDictionary: Record<
+    Declaration['status'],
+    { text: string; variant: BadgeProps['variant'] }
+  > = {
+    payment_pending: {
+      text: 'Pendiente de pago',
+      variant: 'outline',
+    },
+    payment_review: {
+      text: 'En revisión',
+      variant: 'default',
+    },
+    approved: {
+      text: 'Aprobado',
+      variant: 'secondary',
+    },
+    rejected: {
+      text: 'Rechazado',
+      variant: 'destructive',
+    },
+    defeated: {
+      text: 'Vencido',
+      variant: 'destructive',
+    },
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Declarations</CardTitle>
+        <CardTitle>Declaraciones</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Period</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead>Gross Amount</TableHead>
-              <TableHead>Tax Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>Período</TableHead>
+              <TableHead>Fecha de Vencimiento</TableHead>
+              <TableHead>Importe Bruto</TableHead>
+              <TableHead>Importe del Impuesto</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {declarations.map((declaration) => (
               <TableRow key={declaration.id}>
                 <TableCell>
-                  {new Date(declaration.period).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                  })}
+                  {dayjs(declaration.period).format('MMMM YYYY')}
                 </TableCell>
                 <TableCell>
-                  {new Date(declaration.dueDate).toLocaleDateString()}
+                  {dayjs(declaration.dueDate).format('DD/MM/YYYY')}
                 </TableCell>
                 <TableCell>
                   ${declaration.grossAmount.toLocaleString()}
@@ -60,17 +89,14 @@ export default function DeclarationsList({
                 </TableCell>
                 <TableCell>
                   <Badge
-                    variant={
-                      declaration.status === 'submitted'
-                        ? 'default'
-                        : 'secondary'
-                    }
+                    className='text-sm'
+                    variant={badgeDictionary[declaration.status].variant}
                   >
-                    {declaration.status}
+                    {badgeDictionary[declaration.status].text}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {declaration.status === 'pending' && (
+                  {declaration.status === 'payment_pending' && (
                     <Button
                       size='sm'
                       variant='outline'
@@ -78,7 +104,7 @@ export default function DeclarationsList({
                       className='flex items-center gap-2'
                     >
                       <Upload className='h-4 w-4' />
-                      Upload Proof
+                      Subir Comprobante
                     </Button>
                   )}
                 </TableCell>
