@@ -58,7 +58,6 @@ export default function DeclarationForm({
     if (step === 1) {
       setStep(2);
     } else {
-      console.log(values.period);
       const declaration: Declaration = {
         id: `new-${values.period}`,
         period: values.period,
@@ -173,8 +172,7 @@ export default function DeclarationForm({
                           form
                             .getValues('grossAmount')
                             .toString()
-                            .replace('.', '')
-                            .replace('$', '')
+                            .replace(/[^0-9]/g, '')
                         ) * 0.1
                       }`
                     )}
