@@ -29,6 +29,8 @@ export default function DeclarationsList({
 }: DeclarationsListProps) {
   declarations.sort((a, b) => dayjs(b.period).diff(dayjs(a.period)));
 
+  console.log({ declarations });
+
   const badgeDictionary: Record<
     Declaration['status'],
     { text: string; variant: BadgeProps['variant'] }

@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { Envelope } from '@/types/envelope';
 import dbSupabase from '@/lib/prisma/prisma';
 import bcrypt from 'bcryptjs';
+import { verifyPassword } from '../../(backoffice)/auth-bo.actions';
 
 export const login = async ({
   email,
@@ -215,6 +216,76 @@ export const resetPassword = async ({
     await dbSupabase.user.update({
       where: {
         id: data.user.id,
+      },
+      data: {
+        password: hashed_password,
+      },
+    });
+
+    response.success = true;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Ha ocurrido un error, por favor intente nuevamente.';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const changePassword = async ({
+  old_password,
+  new_password,
+}: {
+  old_password: string;
+  new_password: string;
+}): Promise<Envelope<null>> => {
+  const response: Envelope<null> = {
+    success: false,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error('No se encontró el usuario.');
+    }
+
+    const isPasswordValid = await verifyPassword({
+      user_id: user.id,
+      prev_password: old_password,
+    });
+
+    if (!isPasswordValid) {
+      throw new Error('La contraseña actual es incorrecta.');
+    }
+
+    const hashed_password = await bcrypt.hash(new_password, 7);
+
+    const { data, error } = await supabase.auth.updateUser({
+      password: new_password,
+    });
+
+    if (error || !data) {
+      throw new Error(
+        'Error al actualizar la contraseña. Por favor intente nuevamente.'
+      );
+    }
+
+    await dbSupabase.user.update({
+      where: {
+        id: user.id,
       },
       data: {
         password: hashed_password,

@@ -22,7 +22,7 @@ import {
   DialogFooter,
 } from '@/components/ui';
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
-import { changePassword } from '../auth-bo.actions';
+import { changePassword } from '../auth-client.actions';
 
 const formSchema = z.object({
   oldPassword: z

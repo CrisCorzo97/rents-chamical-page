@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +29,7 @@ import { Declaration } from '../types';
 import { formatCurrency } from '@/lib/formatters';
 
 dayjs.locale('es');
+dayjs.extend(customParseFormat);
 
 const formSchema = z.object({
   period: z.string().min(1, 'El período es obligatorio'),
@@ -54,12 +56,11 @@ export default function DeclarationForm({
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (step === 1) {
-      console.log(values.grossAmount);
       setStep(2);
     } else {
-      console.log(values.grossAmount);
+      console.log(values.period);
       const declaration: Declaration = {
-        id: `new-${dayjs(values.period).format('YYYY-MM')}`,
+        id: `new-${values.period}`,
         period: values.period,
         grossAmount: Number(
           values.grossAmount.toString().replace('.', '').replace('$', '')
@@ -78,7 +79,7 @@ export default function DeclarationForm({
       // Go back 12 months
       const date = currentDate.subtract(i, 'month');
       periods.push({
-        value: date.format('MM/YYYY'),
+        value: date.format('YYYY-MM'),
         label: date.format('MMMM YYYY'),
       });
     }
@@ -158,7 +159,7 @@ export default function DeclarationForm({
               <div className='space-y-4'>
                 <div className='grid grid-cols-2 gap-4 text-sm'>
                   <div className='font-medium'>Período:</div>
-                  <div>{form.getValues('period')}</div>
+                  <div>{dayjs(form.getValues('period')).format('MM/YYYY')}</div>
                   <div className='font-medium'>Fecha de la presentación:</div>
                   <div>{dayjs().format('DD/MM/YYYY')}</div>
                   <div className='font-medium'>Ingresos Brutos declarado:</div>
