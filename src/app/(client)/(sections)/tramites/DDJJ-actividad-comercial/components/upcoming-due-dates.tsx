@@ -2,50 +2,18 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarClock, AlertTriangle } from 'lucide-react';
-import { Declaration } from '../types';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
+import { PeriodData } from '../../lib';
 dayjs.locale('es');
 
 interface UpcomingDueDatesProps {
-  declarations: Declaration[];
+  upcomingDueDatePeriods: PeriodData[];
 }
 
 export default function UpcomingDueDates({
-  declarations,
+  upcomingDueDatePeriods,
 }: UpcomingDueDatesProps) {
-  const pendingPaymentDeclarations = declarations
-    .filter((d) => d.status === 'payment_pending')
-    .sort((a, b) => dayjs(a.dueDate).diff(b.dueDate))
-    .slice(0, 3);
-
-  const upcomingDeclarations = pendingPaymentDeclarations;
-  const lastDeclaration = declarations
-    .filter(
-      (d) =>
-        d.status === 'payment_pending' ||
-        dayjs(d.period).isBefore(dayjs(), 'month')
-    )
-    .sort((a, b) => dayjs(b.period).diff(a.period))[0];
-
-  if (lastDeclaration) {
-    let nextPeriod = dayjs(lastDeclaration.period).add(1, 'month');
-    while (nextPeriod.isBefore(dayjs(), 'month')) {
-      upcomingDeclarations.push({
-        id: `new-${nextPeriod.format('YYYY-MM')}`,
-        period: nextPeriod.format('YYYY-MM'),
-        dueDate: nextPeriod
-          .add(1, 'month')
-          .startOf('month')
-          .add(19, 'day')
-          .format('YYYY-MM-DD'),
-        status: 'payment_pending',
-        grossAmount: 0,
-      });
-      nextPeriod = nextPeriod.add(1, 'month');
-    }
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -56,18 +24,18 @@ export default function UpcomingDueDates({
       </CardHeader>
       <CardContent>
         <div className='space-y-4'>
-          {upcomingDeclarations.map((declaration) => {
-            const dueDate = dayjs(declaration.dueDate);
+          {upcomingDueDatePeriods.map((p) => {
+            const dueDate = dayjs(p.dueDate);
             const daysUntilDue = dueDate.diff(dayjs(), 'day');
 
             return (
               <div
-                key={declaration.id}
+                key={p.period}
                 className='flex items-center justify-between p-4 bg-blue-100 rounded-lg'
               >
                 <div>
                   <div className='font-medium'>
-                    {dayjs(declaration.period).format('MMMM YYYY')}
+                    {dayjs(p.period).format('MMMM YYYY')}
                   </div>
                   <div className='text-sm text-gray-500'>
                     Vence: {dueDate.format('DD/MM/YYYY')}

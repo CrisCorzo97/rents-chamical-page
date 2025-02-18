@@ -12,15 +12,16 @@ import {
 import { Badge, BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
-import { Declaration } from '../types';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
+import { affidavit, affidavit_status } from '@prisma/client';
+import { formatCurrency } from '@/lib/formatters';
 
 dayjs.locale('es');
 
 interface DeclarationsListProps {
-  declarations: Declaration[];
-  onUploadProof: (declaration: Declaration) => void;
+  declarations: affidavit[];
+  onUploadProof: (declaration: affidavit) => void;
 }
 
 export default function DeclarationsList({
@@ -30,29 +31,14 @@ export default function DeclarationsList({
   declarations.sort((a, b) => dayjs(b.period).diff(dayjs(a.period)));
 
   const badgeDictionary: Record<
-    Declaration['status'],
+    affidavit_status,
     { text: string; variant: BadgeProps['variant'] }
   > = {
-    payment_pending: {
-      text: 'Pendiente de pago',
-      variant: 'outline',
-    },
-    payment_review: {
-      text: 'En revisión',
-      variant: 'default',
-    },
-    approved: {
-      text: 'Aprobado',
-      variant: 'secondary',
-    },
-    rejected: {
-      text: 'Rechazado',
-      variant: 'destructive',
-    },
-    defeated: {
-      text: 'Vencido',
-      variant: 'destructive',
-    },
+    pending_payment: { text: 'Pendiente de Pago', variant: 'outline' },
+    under_review: { text: 'En Revisión', variant: 'default' },
+    approved: { text: 'Aprobado', variant: 'secondary' },
+    refused: { text: 'Rechazado', variant: 'destructive' },
+    defeated: { text: 'Vencido', variant: 'destructive' },
   };
 
   return (
@@ -79,13 +65,13 @@ export default function DeclarationsList({
                   {dayjs(declaration.period).format('MMMM YYYY')}
                 </TableCell>
                 <TableCell>
-                  {dayjs(declaration.dueDate).format('DD/MM/YYYY')}
+                  {dayjs(declaration.due_date).format('DD/MM/YYYY')}
                 </TableCell>
                 <TableCell>
-                  ${declaration.grossAmount.toLocaleString()}
+                  {formatCurrency(`${declaration.declared_amount}`)}
                 </TableCell>
                 <TableCell>
-                  ${(declaration.grossAmount * 0.1).toLocaleString()}
+                  {formatCurrency(`${declaration.fee_amount}`)}
                 </TableCell>
                 <TableCell>
                   <Badge
@@ -96,7 +82,7 @@ export default function DeclarationsList({
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {declaration.status === 'payment_pending' && (
+                  {declaration.status === 'pending_payment' && (
                     <Button
                       size='sm'
                       variant='outline'

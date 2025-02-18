@@ -25,8 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Declaration } from '../types';
 import { formatCurrency } from '@/lib/formatters';
+import { Prisma } from '@prisma/client';
+import { getPeriods } from '../../lib';
 
 dayjs.locale('es');
 dayjs.extend(customParseFormat);
@@ -37,7 +38,7 @@ const formSchema = z.object({
 });
 
 interface DeclarationFormProps {
-  onSubmit: (declaration: Declaration) => void;
+  onSubmit: (declaration: Prisma.affidavitCreateInput) => void;
   onCancel: () => void;
 }
 
@@ -58,31 +59,31 @@ export default function DeclarationForm({
     if (step === 1) {
       setStep(2);
     } else {
-      const declaration: Declaration = {
-        id: `new-${values.period}`,
+      const declaration: Prisma.affidavitCreateInput = {
         period: values.period,
-        grossAmount: Number(
+        fee_amount: Number(
           values.grossAmount.toString().replace('.', '').replace('$', '')
         ),
-        status: 'payment_pending',
-        dueDate: dayjs().startOf('month').add(19, 'day').format('YYYY-MM-DD'),
+        status: 'pending_payment',
+        due_date: dayjs().add(10, 'day').toDate(),
+        declarable_tax: {
+          connect: {
+            id: 'commercial_activity',
+          },
+        },
+        user: {
+          connect: {
+            id: '1',
+          },
+        },
+        tax_id: '1',
+        declared_amount: Number(
+          values.grossAmount.toString().replace('.', '').replace('$', '')
+        ),
+        created_at: dayjs().toDate(),
       };
       onSubmit(declaration);
     }
-  };
-
-  const getPeriods = () => {
-    const periods = [];
-    const currentDate = dayjs().subtract(1, 'month'); // Start from the previous month
-    for (let i = 0; i < 12; i++) {
-      // Go back 12 months
-      const date = currentDate.subtract(i, 'month');
-      periods.push({
-        value: date.format('YYYY-MM'),
-        label: date.format('MMMM YYYY'),
-      });
-    }
-    return periods;
   };
 
   return (
@@ -118,7 +119,7 @@ export default function DeclarationForm({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {getPeriods().map((period) => (
+                          {getPeriods('bimester').map((period) => (
                             <SelectItem key={period.value} value={period.value}>
                               {period.label}
                             </SelectItem>

@@ -4,16 +4,16 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
-import { Declaration } from '../types';
 import { formatCurrency } from '@/lib/formatters';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import { FormItem, Input, Label } from '@/components/ui';
+import { affidavit, Prisma } from '@prisma/client';
 dayjs.locale('es');
 
 interface PaymentProofFormProps {
-  declaration: Declaration;
-  onSubmit: (declaration: Declaration) => void;
+  declaration: Prisma.affidavitCreateInput | affidavit;
+  onSubmit: (declaration: Prisma.affidavitUpdateInput) => void;
   onCancel: () => void;
 }
 
@@ -38,11 +38,11 @@ export default function PaymentProofForm({
       console.log('Enviando correo con el comprobante de pago:', file.name);
 
       // Actualizar el estado de la declaración
-      const updatedDeclaration: Declaration = {
+      const updatedDeclaration: Prisma.affidavitUpdateInput = {
         ...declaration,
-        status: 'payment_review',
-        submissionDate: dayjs().format('YYYY-MM-DD'),
-        paymentProof: file.name,
+        status: 'under_review',
+        updated_at: dayjs().toISOString(),
+        attached_receipt: file.name,
       };
 
       onSubmit(updatedDeclaration);
@@ -68,9 +68,9 @@ export default function PaymentProofForm({
               <div className='font-medium'>Período:</div>
               <div>{dayjs(declaration.period).format('MM/YYYY')}</div>
               <div className='font-medium'>Importe Bruto:</div>
-              <div>{formatCurrency(`${declaration.grossAmount}`)}</div>
+              <div>{formatCurrency(`${declaration.declared_amount}`)}</div>
               <div className='font-medium'>Importe del Impuesto (10%):</div>
-              <div>{formatCurrency(`${declaration.grossAmount * 0.1}`)}</div>
+              <div>{formatCurrency(`${declaration.fee_amount}`)}</div>
               <div className='border-t pt-4 mt-4 col-span-2'>
                 <h3 className='font-medium mb-2'>Instrucciones de Pago</h3>
                 <p className='text-sm text-gray-600 mb-2'>
