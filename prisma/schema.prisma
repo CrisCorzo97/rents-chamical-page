@@ -397,22 +397,24 @@ model tax_or_contribution {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model user {
-  id          String        @id @db.Uuid
-  first_name  String        @default("") @db.VarChar
-  last_name   String        @default("") @db.VarChar
-  email       String        @default("") @db.VarChar
-  cuil        String        @default("") @db.VarChar
-  created_at  DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime?     @default(now()) @db.Timestamptz(6)
-  password    String        @default("")
-  role_id     BigInt
-  article     article[]
-  authorities authorities[]
-  banner      banner[]
-  hero        hero[]
-  rent        rent[]
-  users       users         @relation(fields: [id], references: [id], onDelete: Cascade)
-  role        role          @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_role_fkey")
+  id            String          @id @db.Uuid
+  first_name    String          @default("") @db.VarChar
+  last_name     String          @default("") @db.VarChar
+  email         String          @default("") @db.VarChar
+  cuil          String          @default("") @db.VarChar
+  created_at    DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime?       @default(now()) @db.Timestamptz(6)
+  password      String          @default("")
+  role_id       BigInt
+  affidavit     affidavit[]
+  article       article[]
+  authorities   authorities[]
+  banner        banner[]
+  hero          hero[]
+  rent          rent[]
+  tax_penalties tax_penalties[]
+  users         users           @relation(fields: [id], references: [id], onDelete: Cascade)
+  role          role            @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_role_fkey")
 
   @@schema("public")
 }
@@ -561,76 +563,6 @@ model property {
   @@schema("public")
 }
 
-model tb_barrio {
-  COD_BARRIO_N_3_0 BigInt          @id @default(autoincrement()) @map("COD_BARRIO,N,3,0")
-  DESCRIP_BA_C_100 String          @map("DESCRIP_BA,C,100") @db.VarChar
-  tb_cementerio    tb_cementerio[]
-  tb_inmueble      tb_inmueble[]
-
-  @@schema("public")
-}
-
-model tb_cementerio {
-  COD_PERSON_N_6_0 BigInt            @id @default(autoincrement()) @map("COD_PERSON,N,6,0")
-  NOMBRE_PER_C_100 String            @map("NOMBRE_PER,C,100") @db.VarChar
-  DIRECCION__C_150 String?           @map("DIRECCION_,C,150") @db.VarChar
-  NRO_CASA_C_4     String?           @map("NRO_CASA,C,4") @db.VarChar
-  COD_BARRIO_N_3_0 BigInt?           @map("COD_BARRIO,N,3,0")
-  COD_TIPO_N_2_0   BigInt?           @map("COD_TIPO,N,2,0")
-  SECCION_CO_C_3   String?           @map("SECCION_CO,C,3") @db.VarChar
-  FILA_C_4         String?           @map("FILA,C,4") @db.VarChar
-  NRO_UBICAC_C_6   String?           @map("NRO_UBICAC,C,6") @db.VarChar
-  COD_CEMENT_C_2   BigInt?           @map("COD_CEMENT,C,2")
-  NOM_DIFUNT_C_100 String?           @map("NOM_DIFUNT,C,100") @db.VarChar
-  A_O_DEBE_N_4_0   Decimal?          @map("AÐO_DEBE,N,4,0") @db.Decimal
-  tb_barrio        tb_barrio?        @relation(fields: [COD_BARRIO_N_3_0], references: [COD_BARRIO_N_3_0], onDelete: NoAction, onUpdate: NoAction)
-  tb_lugares       tb_lugares?       @relation(fields: [COD_CEMENT_C_2], references: [COD_CEMENT_C_2], onDelete: NoAction, onUpdate: NoAction)
-  tb_tipo_entierro tb_tipo_entierro? @relation(fields: [COD_TIPO_N_2_0], references: [COD_TIPO_N_2_0], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("public")
-}
-
-model tb_inmueble {
-  COD_INMUEB_N_6_0 BigInt        @id @default(autoincrement()) @map("COD_INMUEB,N,6,0")
-  RAZON_SOCI_C_150 String        @map("RAZON_SOCI,C,150") @db.VarChar
-  MATRICULA_C_50   String?       @map("MATRICULA,C,50") @db.VarChar
-  DIRECCION_C_150  String?       @map("DIRECCION,C,150") @db.VarChar
-  NRO_CASA_C_5     String?       @map("NRO_CASA,C,5") @db.VarChar
-  COD_BARRIO_N_3_0 BigInt?       @map("COD_BARRIO,N,3,0")
-  COD_SECCIO_N_3_0 BigInt?       @map("COD_SECCIO,N,3,0")
-  MTS_FRENTE_N_4_0 Decimal?      @map("MTS_FRENTE,N,4,0") @db.Decimal
-  A_O_PAGADO_N_4_0 BigInt?       @map("AÐO_PAGADO,N,4,0")
-  tb_barrio        tb_barrio?    @relation(fields: [COD_BARRIO_N_3_0], references: [COD_BARRIO_N_3_0], onDelete: NoAction, onUpdate: NoAction)
-  tb_secciones     tb_secciones? @relation(fields: [COD_SECCIO_N_3_0], references: [COD_SECCIO_N_3_0], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("public")
-}
-
-model tb_lugares {
-  COD_CEMENT_C_2   BigInt          @id @default(autoincrement()) @map("COD_CEMENT,C,2")
-  DESCRIP_CE_C_100 String          @map("DESCRIP_CE,C,100") @db.VarChar
-  tb_cementerio    tb_cementerio[]
-
-  @@schema("public")
-}
-
-model tb_secciones {
-  COD_SECCIO_N_3_0 BigInt        @id @default(autoincrement()) @map("COD_SECCIO,N,3,0")
-  DESCRIP_SE_C_4   String        @map("DESCRIP_SE,C,4") @db.VarChar
-  tb_inmueble      tb_inmueble[]
-
-  @@schema("public")
-}
-
-model tb_tipo_entierro {
-  COD_TIPO_N_2_0   BigInt          @id @default(autoincrement()) @map("COD_TIPO,N,2,0")
-  DESCRIP_TI_C_100 String          @map("DESCRIP_TI,C,100") @db.VarChar
-  IMPORTE_TI_N_8_0 Decimal?        @map("IMPORTE_TI,N,8,0") @db.Decimal
-  tb_cementerio    tb_cementerio[]
-
-  @@schema("public")
-}
-
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model receipt {
   id               String    @id(map: "Receipts_pkey") @db.VarChar
@@ -699,6 +631,62 @@ model daily_box_report {
   @@schema("public")
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model affidavit {
+  id                BigInt           @id @default(autoincrement())
+  status            affidavit_status
+  tax_id            String           @db.VarChar
+  declarable_tax_id String           @db.VarChar
+  taxpayer_id       String           @db.Uuid
+  declared_amount   Float
+  fee_amount        Float
+  attached_receipt  String?
+  punitive_interest Float?
+  approved_at       DateTime?        @db.Timestamptz(6)
+  created_at        DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?        @db.Timestamptz(6)
+  period            String           @db.VarChar
+  due_date          DateTime         @db.Timestamptz(6)
+  declarable_tax    declarable_tax   @relation(fields: [declarable_tax_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user              user             @relation(fields: [taxpayer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model declarable_tax {
+  id                       String             @id @db.VarChar
+  name                     String             @db.VarChar
+  description              String?            @db.VarChar
+  calculate_info           Json?
+  periodicity              declaration_period @default(month)
+  valid_since              DateTime?          @db.Timestamptz(6)
+  valid_until              DateTime?          @db.Timestamptz(6)
+  procedure_expiration_day BigInt
+  affidavit                affidavit[]
+  tax_penalties            tax_penalties[]
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tax_penalties {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  taxpayer_id       String         @db.Uuid
+  declarable_tax_id String         @db.VarChar
+  period            String         @db.VarChar
+  amount            Float
+  interest          Float?
+  due_date          DateTime?      @db.Timestamptz(6)
+  payment_date      DateTime?      @db.Timestamptz(6)
+  created_at        DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?      @db.Timestamptz(6)
+  declarable_tax    declarable_tax @relation(fields: [declarable_tax_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user              user           @relation(fields: [taxpayer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
 enum aal_level {
   aal1
   aal2
@@ -738,4 +726,25 @@ enum one_time_token_type {
   phone_change_token
 
   @@schema("auth")
+}
+
+enum affidavit_status {
+  pending_payment @map("pending payment")
+  under_review    @map("under review")
+  approved
+  refused
+  defeated
+
+  @@schema("public")
+}
+
+enum declaration_period {
+  month
+  bimester
+  quarter
+  four_month @map("four-month")
+  semester
+  year
+
+  @@schema("public")
 }
