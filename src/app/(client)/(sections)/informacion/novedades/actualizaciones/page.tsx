@@ -61,12 +61,6 @@ export default function RegulatoryUpdates() {
           description='Esta ordenanza modifica el antigüo código tributario que data desde el año 2008, el cual nunca llegó a estar vigente dado a que estaba incompleto. Esta última modificación dará lugar a la regulación de la actividad comercial de los contribuyentes en base a sus ventas declaradas.'
           downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents/ORDENANZA%20Nro%20540%20TRIBUTARIA%20IMPOSITIVA%202025%20v.final.pdf'
         />
-        <RegulatoryUpdatesCard
-          title='Ordenanza Nro 544 TRIBUTARIA IMPOSITIVA 2025'
-          date='Publicado el 18 de Enero de 2025'
-          description='Esta ordenanza establece la tarifaria aplicada a la actividad comercial. Se podrán encontrar las alícuotas correspondientes como así también las fechas de pago en las que se basará el fisco municipal. El fisco se atribuye el derecho de realizar dicho cobro de forma bimestral o cuatrimestral.'
-          downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents/ORDENANZA%20Nro%20544%20-%20de%20modificacion%20del%20Codigo%20Tributario%20Municipal%20-%20DEM.pdf'
-        />
       </section>
     </>
   );
