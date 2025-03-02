@@ -65,7 +65,7 @@ export default function DeclarationsList({
                   {dayjs(declaration.period).format('MMMM YYYY')}
                 </TableCell>
                 <TableCell>
-                  {dayjs(declaration.due_date).format('DD/MM/YYYY')}
+                  {dayjs(declaration.payment_due_date).format('DD/MM/YYYY')}
                 </TableCell>
                 <TableCell>
                   {formatCurrency(`${declaration.declared_amount}`)}

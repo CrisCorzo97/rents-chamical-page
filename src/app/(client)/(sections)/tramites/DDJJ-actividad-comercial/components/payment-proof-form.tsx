@@ -42,7 +42,6 @@ export default function PaymentProofForm({
         ...declaration,
         status: 'under_review',
         updated_at: dayjs().toISOString(),
-        attached_receipt: file.name,
       };
 
       onSubmit(updatedDeclaration);

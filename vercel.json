@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/automatic-interest-calculation",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

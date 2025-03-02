@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import Link from 'next/link';
 import { CommercialActivityAffidavitClient } from './page.client';
-import { calculateUpcomingDueDates, getAffidavits } from './affidavit.actions';
+import { getUpcomingDueDates, getAffidavits } from './affidavit.actions';
 
 export default async function CommercialActivityAffidavitPage({
   searchParams,
@@ -17,7 +17,7 @@ export default async function CommercialActivityAffidavitPage({
 }) {
   const { page, items_per_page } = await searchParams;
 
-  const upcomingDueDatesPeriods = await calculateUpcomingDueDates();
+  const upcomingDueDatesPeriods = await getUpcomingDueDates();
   const declarations = await getAffidavits({
     page,
     items_per_page,

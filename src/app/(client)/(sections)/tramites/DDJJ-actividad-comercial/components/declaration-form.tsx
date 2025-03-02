@@ -65,7 +65,7 @@ export default function DeclarationForm({
           values.grossAmount.toString().replace('.', '').replace('$', '')
         ),
         status: 'pending_payment',
-        due_date: dayjs().add(10, 'day').toDate(),
+        payment_due_date: dayjs().add(10, 'day').toDate(),
         declarable_tax: {
           connect: {
             id: 'commercial_activity',

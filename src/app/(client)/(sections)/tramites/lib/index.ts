@@ -1,5 +1,6 @@
 import dbSupabase from '@/lib/prisma/prisma';
-import { declarable_tax } from '@prisma/client';
+import { getFirstBusinessDay } from '@/lib/providers';
+import { declaration_period } from '@prisma/client';
 import dayjs from 'dayjs';
 
 export type PeriodData = {
@@ -7,7 +8,7 @@ export type PeriodData = {
   dueDate: string;
 };
 
-const periodMap: Record<declarable_tax['periodicity'], number> = {
+export const PERIOD_MAP: Record<declaration_period, number> = {
   month: 1,
   bimester: 2,
   quarter: 3,
@@ -33,6 +34,9 @@ export const getPendingDeclarations = async (input: {
       throw new Error('No se encontró el impuesto declarable');
     }
 
+    const presentationPeriodicity =
+      PERIOD_MAP[declarableTax.presentation_periodicity];
+
     const startDate = dayjs(declarableTax.valid_since);
     const today = dayjs();
     const endDate = declarableTax.valid_until
@@ -40,7 +44,8 @@ export const getPendingDeclarations = async (input: {
       : null;
 
     // Si aún estamos en el primer período, no hay vencimientos
-    if (today.isBefore(startDate.add(2, 'month'))) return [];
+    if (today.isBefore(startDate.add(presentationPeriodicity, 'month')))
+      return [];
 
     let periods: PeriodData[] = [];
     let periodStart = startDate;
@@ -49,21 +54,24 @@ export const getPendingDeclarations = async (input: {
       periodStart.isBefore(today) &&
       (!endDate || periodStart.isBefore(endDate))
     ) {
-      const periodEnd = periodStart.add(2, 'month').subtract(1, 'day');
-      const dueDate = periodEnd
+      const presentationPeriodEnd = periodStart
+        .add(presentationPeriodicity, 'month')
+        .subtract(1, 'day');
+      const tentativeDueDate = presentationPeriodEnd
         .add(1, 'month')
         .date(Number(declarableTax.procedure_expiration_day));
+      const dueDate = await getFirstBusinessDay(
+        tentativeDueDate.format('YYYY-MM-DD')
+      );
 
-      if (today.isAfter(periodEnd)) {
+      if (today.isAfter(presentationPeriodEnd)) {
         periods.push({
-          period: `${periodStart.format('YYYY-MM')}/${periodEnd.format(
-            'YYYY-MM'
-          )}`,
-          dueDate: dueDate.format('YYYY-MM-DD'),
+          period: `${periodStart.format('YYYY-MM')}`,
+          dueDate,
         });
       }
 
-      periodStart = periodStart.add(2, 'month');
+      periodStart = periodStart.add(presentationPeriodicity, 'month');
     }
 
     const declaredPeriods = await dbSupabase.affidavit.findMany({
@@ -87,7 +95,7 @@ export const getPendingDeclarations = async (input: {
   }
 };
 
-export const getPeriods = (periodicity: declarable_tax['periodicity']) => {
+export const getPeriods = (periodicity: declaration_period) => {
   // Necesito una función que me devuelva los períodos seleccionables para una declaración dentro de un año
   // en base a la periodicidad del impuesto declarable
   // Por ejemplo, si la periodicidad es mensual, debería devolver los últimos 12 meses en formato YYYY-MM
@@ -98,15 +106,15 @@ export const getPeriods = (periodicity: declarable_tax['periodicity']) => {
   const periods = [];
   const currentDate = dayjs();
 
-  for (let i = 0; i < 12 / periodMap[periodicity]; i++) {
+  for (let i = 0; i < 12 / PERIOD_MAP[periodicity]; i++) {
     const periodStart = currentDate.subtract(
-      i * periodMap[periodicity],
+      i * PERIOD_MAP[periodicity],
       'month'
     );
 
     const dates = [];
 
-    for (let j = 0; j < periodMap[periodicity]; j++) {
+    for (let j = 0; j < PERIOD_MAP[periodicity]; j++) {
       dates.push({
         value: periodStart.add(j, 'month').format('YYYY-MM'),
         label: periodStart.add(j, 'month').format('MMMM'),
