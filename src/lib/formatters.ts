@@ -51,6 +51,15 @@ export function formatCurrency(input: string) {
   return value;
 }
 
+export function formatNumberToCurrency(value: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(value);
+}
+
 export function formatDni(input: string): string {
   if (!input.length) {
     return '';

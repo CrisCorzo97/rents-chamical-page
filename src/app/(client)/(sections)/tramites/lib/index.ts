@@ -1,5 +1,3 @@
-import dbSupabase from '@/lib/prisma/prisma';
-import { getFirstBusinessDay } from '@/lib/providers';
 import { declaration_period } from '@prisma/client';
 import dayjs from 'dayjs';
 
@@ -21,70 +19,91 @@ export const getPendingDeclarations = async (input: {
   declarableTaxId: string;
   userId: string;
 }) => {
-  const { declarableTaxId, userId } = input;
+  // const { declarableTaxId, userId } = input;
 
   try {
-    const declarableTax = await dbSupabase.declarable_tax.findFirst({
-      where: {
-        id: declarableTaxId,
+    //   const declarableTax = await dbSupabase.declarable_tax.findFirst({
+    //     where: {
+    //       id: declarableTaxId,
+    //     },
+    //   });
+
+    //   if (!declarableTax) {
+    //     throw new Error('No se encontró el impuesto declarable');
+    //   }
+
+    //   const presentationPeriodicity =
+    //     PERIOD_MAP[declarableTax.presentation_periodicity];
+
+    //   const startDate = dayjs(declarableTax.valid_since);
+    //   const today = dayjs();
+    //   const endDate = declarableTax.valid_until
+    //     ? dayjs(declarableTax.valid_until)
+    //     : null;
+
+    //   // Si aún estamos en el primer período, no hay vencimientos
+    //   if (today.isBefore(startDate.add(presentationPeriodicity, 'month')))
+    //     return [];
+
+    //   let periods: PeriodData[] = [];
+    //   let periodStart = startDate;
+
+    //   while (
+    //     periodStart.isBefore(today) &&
+    //     (!endDate || periodStart.isBefore(endDate))
+    //   ) {
+    //     const presentationPeriodEnd = periodStart
+    //       .add(presentationPeriodicity, 'month')
+    //       .subtract(1, 'day');
+    //     const tentativeDueDate = presentationPeriodEnd
+    //       .add(1, 'month')
+    //       .date(Number(declarableTax.procedure_expiration_day));
+    //     const dueDate = await getFirstBusinessDay(
+    //       tentativeDueDate.format('YYYY-MM-DD')
+    //     );
+
+    //     if (today.isAfter(presentationPeriodEnd)) {
+    //       periods.push({
+    //         period: `${periodStart.format('YYYY-MM')}`,
+    //         dueDate,
+    //       });
+    //     }
+
+    //     periodStart = periodStart.add(presentationPeriodicity, 'month');
+    //   }
+
+    //   const declaredPeriods = await dbSupabase.affidavit.findMany({
+    //     where: {
+    //       user: { id: userId },
+    //       declarable_tax_id: declarableTaxId,
+    //     },
+    //     select: { period: true },
+    //   });
+
+    //   const filteredPeriods = periods.filter(
+    //     (p) => !declaredPeriods.some((d) => d.period === p.period)
+    //   );
+
+    const mockup = [
+      {
+        period: '2025-03',
+        dueDate: '2025-04-20',
       },
-    });
-
-    if (!declarableTax) {
-      throw new Error('No se encontró el impuesto declarable');
-    }
-
-    const presentationPeriodicity =
-      PERIOD_MAP[declarableTax.presentation_periodicity];
-
-    const startDate = dayjs(declarableTax.valid_since);
-    const today = dayjs();
-    const endDate = declarableTax.valid_until
-      ? dayjs(declarableTax.valid_until)
-      : null;
-
-    // Si aún estamos en el primer período, no hay vencimientos
-    if (today.isBefore(startDate.add(presentationPeriodicity, 'month')))
-      return [];
-
-    let periods: PeriodData[] = [];
-    let periodStart = startDate;
-
-    while (
-      periodStart.isBefore(today) &&
-      (!endDate || periodStart.isBefore(endDate))
-    ) {
-      const presentationPeriodEnd = periodStart
-        .add(presentationPeriodicity, 'month')
-        .subtract(1, 'day');
-      const tentativeDueDate = presentationPeriodEnd
-        .add(1, 'month')
-        .date(Number(declarableTax.procedure_expiration_day));
-      const dueDate = await getFirstBusinessDay(
-        tentativeDueDate.format('YYYY-MM-DD')
-      );
-
-      if (today.isAfter(presentationPeriodEnd)) {
-        periods.push({
-          period: `${periodStart.format('YYYY-MM')}`,
-          dueDate,
-        });
-      }
-
-      periodStart = periodStart.add(presentationPeriodicity, 'month');
-    }
-
-    const declaredPeriods = await dbSupabase.affidavit.findMany({
-      where: {
-        user: { id: userId },
-        declarable_tax_id: declarableTaxId,
+      {
+        period: '2025-02',
+        dueDate: '2025-03-20',
       },
-      select: { period: true },
-    });
+      {
+        period: '2025-01',
+        dueDate: '2025-02-20',
+      },
+    ];
 
-    return periods.filter(
-      (p) => !declaredPeriods.some((d) => d.period === p.period)
-    );
+    return mockup;
+
+    // return filteredPeriods.sort((a, b) => {
+    //   return dayjs(a.dueDate).isAfter(dayjs(b.dueDate)) ? -1 : 1;
+    // });
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {

@@ -1,7 +1,9 @@
+'use server';
+
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { Envelope } from '@/types/envelope';
-import { affidavit, invoice, Prisma } from '@prisma/client';
+import { affidavit, affidavit_status, invoice, Prisma } from '@prisma/client';
 import { getPendingDeclarations, PERIOD_MAP, PeriodData } from '../lib';
 import { getFirstBusinessDay } from '@/lib/providers';
 import dayjs from 'dayjs';
@@ -31,6 +33,7 @@ const FINANCIAL_ACTIVITIES = ['Entidades Financieras'];
 export const getAffidavits = async (input: {
   page?: string;
   items_per_page?: string;
+  status?: affidavit_status;
 }) => {
   const response: Envelope<affidavit[]> = {
     success: true,
@@ -61,6 +64,13 @@ export const getAffidavits = async (input: {
 
     if (input.items_per_page) {
       queries.take = +input.items_per_page;
+    }
+
+    if (input.status) {
+      queries.where = {
+        ...queries.where,
+        status: input.status,
+      };
     }
 
     const [declarations, total_items] = await Promise.all([
@@ -100,11 +110,11 @@ export const getUpcomingDueDates = async () => {
   };
 
   try {
-    const { user } = await getUserAndCommercialEnablement();
+    // const { user } = await getUserAndCommercialEnablement();
 
     response.data = await getPendingDeclarations({
       declarableTaxId: 'commercial_activity',
-      userId: user.id,
+      userId: 'asdas',
     });
   } catch (error) {
     console.error(error);
@@ -114,6 +124,50 @@ export const getUpcomingDueDates = async () => {
       response.error = error.message;
     } else {
       response.error = 'Hubo un error al calcular las fechas de vencimiento';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const getBalance = async () => {
+  const response: Envelope<number> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    // const { user } = await getUserAndCommercialEnablement();
+
+    // const affidavits = await dbSupabase.affidavit.findMany({
+    //   where: {
+    //     user: { id: user.id },
+    //     declarable_tax_id: 'commercial_activity',
+    //     status: {
+    //       in: ['pending_payment', 'refused'],
+    //     },
+    //   },
+    // });
+
+    // response.data = affidavits.reduce((acc, affidavit) => {
+    //   let debt = 0;
+    //   if (dayjs().isAfter(dayjs(affidavit.payment_due_date), 'day')) {
+    //     debt = affidavit.fee_amount;
+    //   }
+    //   return acc + debt;
+    // }, 0);
+
+    response.data = 0;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al obtener el saldo pendiente';
     }
   } finally {
     return response;
@@ -522,7 +576,7 @@ const getUserAndCommercialEnablement = async () => {
     }
 
     return { user, commercial_enablement };
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     if (error instanceof Error) {
       throw new Error(error.message);
