@@ -20,7 +20,7 @@ import { useRouter } from 'next/navigation';
 import { formatCuilInput } from '@/lib/formatters';
 
 const formSchema = z.object({
-  tax_id: z.string().min(11, { message: 'Por favor, ingrese un CUIT válido' }),
+  tax_id: z.string().min(13, { message: 'Por favor, ingrese un CUIT válido' }),
   password: z
     .string()
     .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' }),
