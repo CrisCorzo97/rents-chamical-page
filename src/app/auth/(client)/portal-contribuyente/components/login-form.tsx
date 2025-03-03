@@ -17,9 +17,10 @@ import { z } from 'zod';
 import { login } from '../auth-client.actions';
 import { toast, Toaster } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { formatCuilInput } from '@/lib/formatters';
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'Correo electrónico inválido' }),
+  tax_id: z.string().min(11, { message: 'Por favor, ingrese un CUIT válido' }),
   password: z
     .string()
     .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' }),
@@ -28,6 +29,7 @@ const formSchema = z.object({
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
+  const [taxId, setTaxId] = useState<string>('');
   const [zodErrors, setZodErrors] = useState<z.ZodIssue[] | null>(null);
   const [isLoading, startTransition] = useTransition();
 
@@ -39,13 +41,13 @@ export function LoginForm() {
 
   const handleAction = async (formData: FormData) => {
     startTransition(async () => {
-      const email = formData.get('email') as string;
+      const tax_id = formData.get('tax_id') as string;
       const password = formData.get('password') as string;
 
       try {
-        formSchema.parse({ email, password });
+        formSchema.parse({ tax_id, password });
 
-        const { error, data } = await login({ email, password });
+        const { error, data } = await login({ tax_id, password });
 
         if (error) {
           throw new Error(error);
@@ -90,26 +92,26 @@ export function LoginForm() {
           <form action={handleAction}>
             <fieldset className='grid gap-6' disabled={isLoading}>
               <FormItem>
-                <Label htmlFor='email'>Correo Electrónico</Label>
+                <Label htmlFor='tax_id'>CUIT</Label>
                 <Input
-                  name='email'
-                  type='email'
-                  placeholder='m@example.com'
+                  name='tax_id'
                   required
-                  onChange={() => {
-                    zodErrors?.find((error) => error.path[0] === 'email') &&
+                  value={taxId}
+                  onChange={(e) => {
+                    setTaxId(formatCuilInput(e.target.value));
+                    zodErrors?.find((error) => error.path[0] === 'tax_id') &&
                       setZodErrors((prev) => {
                         return (
-                          prev?.filter((error) => error.path[0] !== 'email') ??
+                          prev?.filter((error) => error.path[0] !== 'tax_id') ??
                           []
                         );
                       });
                   }}
                 />
-                {zodErrors?.find((error) => error.path[0] === 'email') && (
+                {zodErrors?.find((error) => error.path[0] === 'tax_id') && (
                   <div className='text-red-500 text-sm'>
                     {
-                      zodErrors.find((error) => error.path[0] === 'email')
+                      zodErrors.find((error) => error.path[0] === 'tax_id')
                         ?.message
                     }
                   </div>

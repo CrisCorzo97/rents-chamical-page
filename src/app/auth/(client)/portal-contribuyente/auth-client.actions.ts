@@ -7,10 +7,10 @@ import bcrypt from 'bcryptjs';
 import { verifyPassword } from '../../(backoffice)/auth-bo.actions';
 
 export const login = async ({
-  email,
+  tax_id,
   password,
 }: {
-  email: string;
+  tax_id: string;
   password: string;
 }): Promise<Envelope<{ redirectUrl: string }>> => {
   const response: Envelope<{ redirectUrl: string }> = {
@@ -21,10 +21,21 @@ export const login = async ({
   };
 
   try {
+    const user = await dbSupabase.user.findFirst({
+      where: {
+        cuil: tax_id,
+        role_id: 5,
+      },
+    });
+
+    if (!user) {
+      throw new Error('Usuario no encontrado.');
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: user.email,
       password,
     });
 

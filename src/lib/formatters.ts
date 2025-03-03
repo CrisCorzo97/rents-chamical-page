@@ -9,6 +9,9 @@ export function formatCuilInput(value: string): string {
   if (onlyNums.length > 11) {
     onlyNums = onlyNums.slice(0, 11) + '-' + onlyNums.slice(11);
   }
+  if (onlyNums.length > 13) {
+    onlyNums = onlyNums.slice(0, 13);
+  }
 
   return onlyNums;
 }
