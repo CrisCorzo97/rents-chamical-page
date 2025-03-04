@@ -15,8 +15,11 @@ import {
 import { BalanceCard } from './components/balance-card';
 import { DuePeriodsCard } from './components/due-periods-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
-import { affidavit_status } from '@prisma/client';
 import { buildQuery } from '@/lib/url';
+import AffidavitTable from './components/affidavit-table';
+import { sortByToState } from '@/lib/table';
+
+export type AffidavitStatus = 'pending_payment' | 'under_review' | 'finished';
 
 export default async function CommercialActivityAffidavitPage({
   searchParams,
@@ -25,14 +28,31 @@ export default async function CommercialActivityAffidavitPage({
     page?: string;
     items_per_page?: string;
     status?: string;
+    sort_by?: string;
+    sort_direction?: string;
   }>;
 }) {
-  const { page, items_per_page, status } = await searchParams;
+  const { page, items_per_page, status, sort_by, sort_direction } =
+    await searchParams;
 
-  const declarations = await getAffidavits({
+  let order_by;
+
+  const sortingState = sortByToState({
+    sort_by: sort_by ?? '',
+    sort_direction: sort_direction ?? '',
+  });
+
+  if (sort_by && sort_direction) {
+    order_by = {
+      [sort_by]: sort_direction,
+    };
+  }
+
+  const affidavits = await getAffidavits({
     page,
     items_per_page,
-    status: (status as affidavit_status) ?? 'pending_payment',
+    status: (status as AffidavitStatus) ?? 'pending_payment',
+    order_by,
   });
 
   const balance = await getBalance();
@@ -105,9 +125,15 @@ export default async function CommercialActivityAffidavitPage({
               </Link>
             </TabsTrigger>
           </TabsList>
-          <TabsContent value='pending_payment'></TabsContent>
-          <TabsContent value='under_review'></TabsContent>
-          <TabsContent value='finished'></TabsContent>
+          <TabsContent value='pending_payment'>
+            <AffidavitTable data={affidavits} sorting={sortingState} />
+          </TabsContent>
+          <TabsContent value='under_review'>
+            <AffidavitTable data={affidavits} sorting={sortingState} />
+          </TabsContent>
+          <TabsContent value='finished'>
+            <AffidavitTable data={affidavits} sorting={sortingState} />
+          </TabsContent>
         </Tabs>
       </section>
     </section>

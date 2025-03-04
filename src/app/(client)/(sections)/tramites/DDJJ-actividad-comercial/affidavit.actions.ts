@@ -3,11 +3,13 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { Envelope } from '@/types/envelope';
-import { affidavit, affidavit_status, invoice, Prisma } from '@prisma/client';
+import { $Enums, affidavit, invoice, Prisma } from '@prisma/client';
 import { getPendingDeclarations, PERIOD_MAP, PeriodData } from '../lib';
 import { getFirstBusinessDay } from '@/lib/providers';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { AffidavitWithRelations } from './types';
+import { AffidavitStatus } from './page';
 dayjs.extend(customParseFormat);
 
 type Subcase = {
@@ -33,9 +35,10 @@ const FINANCIAL_ACTIVITIES = ['Entidades Financieras'];
 export const getAffidavits = async (input: {
   page?: string;
   items_per_page?: string;
-  status?: affidavit_status;
+  status?: AffidavitStatus;
+  order_by?: Prisma.affidavitOrderByWithRelationInput;
 }) => {
-  const response: Envelope<affidavit[]> = {
+  const response: Envelope<AffidavitWithRelations[]> = {
     success: true,
     data: null,
     error: null,
@@ -67,14 +70,43 @@ export const getAffidavits = async (input: {
     }
 
     if (input.status) {
+      let status:
+        | $Enums.affidavit_status
+        | Prisma.Enumaffidavit_statusFilter<'affidavit'>
+        | undefined = undefined;
+
+      switch (input.status) {
+        case 'pending_payment':
+          status = {
+            in: ['pending_payment', 'refused'],
+          };
+          break;
+        case 'under_review':
+          status = 'under_review';
+          break;
+        case 'finished':
+          status = 'approved';
+          break;
+      }
+
       queries.where = {
         ...queries.where,
-        status: input.status,
+        status,
       };
     }
 
+    if (input.order_by) {
+      queries.orderBy = input.order_by;
+    }
+
     const [declarations, total_items] = await Promise.all([
-      dbSupabase.affidavit.findMany(queries),
+      dbSupabase.affidavit.findMany({
+        ...queries,
+        include: {
+          invoice: true,
+          user: true,
+        },
+      }),
       dbSupabase.affidavit.count({
         where: queries.where,
       }),
