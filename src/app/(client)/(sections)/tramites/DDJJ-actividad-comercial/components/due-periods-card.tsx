@@ -8,13 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui';
-import { ArrowRight } from 'lucide-react';
-import { PeriodData } from '../../lib';
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import 'dayjs/locale/es';
-import { formatName } from '@/lib/formatters';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { formatName } from '@/lib/formatters';
+import { buildQuery } from '@/lib/url';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { PeriodData } from '../../lib';
 
 dayjs.locale('es');
 dayjs.extend(customParseFormat);
@@ -29,6 +31,8 @@ export function DuePeriodsCard({ periods }: DuePeriodsCardProps) {
     const today = dayjs();
     return dueDate.isBefore(today);
   };
+
+  const { push } = useRouter();
 
   return (
     <Card className='w-full md:col-span-3'>
@@ -60,7 +64,22 @@ export function DuePeriodsCard({ periods }: DuePeriodsCardProps) {
                     )}
                   </div>
                 </div>
-                <Button variant='ghost' size='sm'>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() =>
+                    push(
+                      `/tramites/DDJJ-actividad-comercial/presentar${buildQuery(
+                        {
+                          period: dayjs(period.period, 'YYYY-MM').format(
+                            'MMMM-YYYY'
+                          ),
+                          dueDate: period.dueDate,
+                        }
+                      )}`
+                    )
+                  }
+                >
                   <span>Presentar</span>
                   <ArrowRight className='h-5 w-5 ml-2' />
                 </Button>

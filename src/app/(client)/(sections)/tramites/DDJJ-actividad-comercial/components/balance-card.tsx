@@ -32,7 +32,13 @@ export function BalanceCard({ amount }: BalanceCardProps) {
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant='outline' className='flex items-center gap-2'>
+        <Button
+          variant='outline'
+          className='flex items-center gap-2'
+          onClick={() =>
+            push('/tramites/DDJJ-actividad-comercial/historial-pagos')
+          }
+        >
           Historial Pagos
         </Button>
         <Button
