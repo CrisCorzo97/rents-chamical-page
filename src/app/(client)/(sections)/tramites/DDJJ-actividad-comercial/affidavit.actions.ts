@@ -8,7 +8,7 @@ import { getPendingDeclarations, PERIOD_MAP, PeriodData } from '../lib';
 import { getFirstBusinessDay } from '@/lib/providers';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { AffidavitWithRelations } from './types';
+import { AffidavitWithRelations, InvoiceWithRelations } from './types';
 import { AffidavitStatus } from './page';
 dayjs.extend(customParseFormat);
 
@@ -534,6 +534,110 @@ export const updateInvoice = async (input: {
       response.error = error.message;
     } else {
       response.error = 'Hubo un error al actualizar la factura';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const getInvoices = async (input: {
+  page?: number;
+  items_per_page?: number;
+  status?: 'pending_payment' | 'paid' | 'defeated';
+  order_by?: Prisma.invoiceOrderByWithRelationInput;
+}) => {
+  const response: Envelope<InvoiceWithRelations[]> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const { user } = await getUserAndCommercialEnablement();
+
+    const queries: Prisma.invoiceFindManyArgs = {
+      where: {
+        user: { id: user.id },
+        affidavit: {
+          some: {
+            declarable_tax_id: 'commercial_activity',
+          },
+        },
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take: 5,
+    };
+
+    if (input.items_per_page) {
+      queries.take = +input.items_per_page;
+    }
+
+    if (input.page) {
+      queries.skip = (+input.page - 1) * (queries.take ?? 5);
+    }
+
+    if (input.status) {
+      switch (input.status) {
+        case 'pending_payment':
+          queries.where = {
+            ...queries.where,
+            payment_date: null,
+          };
+          break;
+        case 'paid':
+          queries.where = {
+            ...queries.where,
+            payment_date: {
+              not: null,
+            },
+          };
+          break;
+        case 'defeated':
+          queries.where = {
+            ...queries.where,
+            payment_date: null,
+            due_date: {
+              lt: dayjs().toDate(),
+            },
+          };
+          break;
+      }
+    }
+
+    if (input.order_by) {
+      queries.orderBy = input.order_by;
+    }
+
+    const [invoices, total_items] = await Promise.all([
+      dbSupabase.invoice.findMany({
+        ...queries,
+        include: {
+          affidavit: true,
+        },
+      }),
+      dbSupabase.invoice.count({
+        where: queries.where,
+      }),
+    ]);
+
+    response.data = invoices;
+    response.pagination = {
+      total_pages: Math.ceil(total_items / (queries.take ?? 5)),
+      total_items,
+      page: input.page ? +input.page : 1,
+      limit_per_page: queries.take ?? 5,
+    };
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al obtener las facturas';
     }
   } finally {
     return response;
