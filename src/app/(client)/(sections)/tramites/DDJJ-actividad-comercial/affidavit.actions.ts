@@ -8,9 +8,12 @@ import { getPendingDeclarations, PERIOD_MAP, PeriodData } from '../lib';
 import { getFirstBusinessDay } from '@/lib/providers';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import locale from 'dayjs/locale/es';
 import { AffidavitWithRelations, InvoiceWithRelations } from './types';
 import { AffidavitStatus } from './page';
+import { generateInvoiceCode } from '@/lib/code-generator';
 dayjs.extend(customParseFormat);
+dayjs.locale(locale);
 
 type Subcase = {
   fee: number;
@@ -142,11 +145,11 @@ export const getUpcomingDueDates = async () => {
   };
 
   try {
-    // const { user } = await getUserAndCommercialEnablement();
+    const { user } = await getUserAndCommercialEnablement();
 
     response.data = await getPendingDeclarations({
       declarableTaxId: 'commercial_activity',
-      userId: 'asdas',
+      userId: user.id,
     });
   } catch (error) {
     console.error(error);
@@ -293,7 +296,7 @@ export const createAffidavit = async (input: {
     const paymentPeriodicity = PERIOD_MAP[declarableTax.payment_periodicity];
 
     const paymentDueDate = await getFirstBusinessDay(
-      dayjs(period, 'DD/MM/YYYY')
+      dayjs(period, 'MMMM-YYYY')
         .add(paymentPeriodicity, 'month')
         .date(Number(declarableTax.procedure_expiration_day))
         .format('YYYY-MM-DD')
@@ -307,7 +310,7 @@ export const createAffidavit = async (input: {
       declared_amount,
       fee_amount,
       payment_due_date: dayjs(paymentDueDate).toDate(),
-      period: dayjs(period, 'DD/MM/YYYY').format('YYYY-MM-DD'),
+      period: dayjs(period, 'MMMM-YYYY').format('YYYY-MM-DD'),
       status: 'pending_payment',
       user: {
         connect: { id: user.id },
@@ -435,7 +438,14 @@ export const createInvoice = async (input: { affidavit_ids: string[] }) => {
     }, 0);
     const totalAmount = feeAmount + interests;
 
+    const invoiceId = await getLastInvoiceCode();
+
+    if (!invoiceId) {
+      throw new Error('No se pudo obtener el código de la factura');
+    }
+
     const invoiceData: Prisma.invoiceCreateInput = {
+      id: invoiceId,
       fee_amount: feeAmount,
       compensatory_interest: interests,
       total_amount: totalAmount,
@@ -644,6 +654,28 @@ export const getInvoices = async (input: {
   }
 };
 
+const getDeclarableTax = async () => {
+  try {
+    const declarableTax = await dbSupabase.declarable_tax.findFirst({
+      where: {
+        id: 'commercial_activity',
+      },
+    });
+
+    if (!declarableTax) {
+      throw new Error('No se encontró el impuesto declarable');
+    }
+
+    return declarableTax;
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('Hubo un error al obtener el impuesto declarable');
+  }
+};
+
 const uploadPaymentProof = async (input: {
   invoice_id: string;
   file: File;
@@ -723,24 +755,27 @@ const getUserAndCommercialEnablement = async () => {
   }
 };
 
-const getDeclarableTax = async () => {
+const getLastInvoiceCode = async () => {
   try {
-    const declarableTax = await dbSupabase.declarable_tax.findFirst({
+    const lastInvoice = await dbSupabase.invoice.findFirst({
       where: {
-        id: 'commercial_activity',
+        id: {
+          startsWith: `${dayjs().year()}-`,
+        },
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      select: {
+        id: true,
       },
     });
 
-    if (!declarableTax) {
-      throw new Error('No se encontró el impuesto declarable');
-    }
+    const code = generateInvoiceCode(lastInvoice?.id);
 
-    return declarableTax;
+    return code;
   } catch (error) {
     console.error(error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Hubo un error al obtener el impuesto declarable');
+    throw new Error('Hubo un error al obtener el último código de factura');
   }
 };
