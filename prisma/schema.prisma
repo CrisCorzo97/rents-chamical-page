@@ -678,12 +678,12 @@ model tax_penalties {
   declarable_tax_id String         @db.VarChar
   period            String         @db.VarChar
   amount            Float
-  interest          Float?
-  due_date          DateTime?      @db.Timestamptz(6)
   payment_date      DateTime?      @db.Timestamptz(6)
   created_at        DateTime       @default(now()) @db.Timestamptz(6)
   updated_at        DateTime?      @db.Timestamptz(6)
+  invoice_id        String?        @db.VarChar
   declarable_tax    declarable_tax @relation(fields: [declarable_tax_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoice           invoice?       @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user              user           @relation(fields: [taxpayer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
@@ -691,18 +691,19 @@ model tax_penalties {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model invoice {
-  id                    String      @id @db.VarChar
+  id                    String          @id @db.VarChar
   fee_amount            Float
   compensatory_interest Float?
   total_amount          Float
-  due_date              DateTime    @db.Timestamptz(6)
+  due_date              DateTime        @db.Timestamptz(6)
   attached_receipt      String?
-  payment_date          DateTime?   @db.Timestamptz(6)
-  created_at            DateTime    @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime?   @db.Timestamptz(6)
-  taxpayer_id           String      @db.Uuid
+  payment_date          DateTime?       @db.Timestamptz(6)
+  created_at            DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime?       @db.Timestamptz(6)
+  taxpayer_id           String          @db.Uuid
   affidavit             affidavit[]
-  user                  user        @relation(fields: [taxpayer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                  user            @relation(fields: [taxpayer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tax_penalties         tax_penalties[]
 
   @@schema("public")
 }

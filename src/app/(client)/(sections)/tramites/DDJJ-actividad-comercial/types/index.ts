@@ -8,3 +8,11 @@ export type AffidavitWithRelations = affidavit & {
 export type InvoiceWithRelations = invoice & {
   affidavit: affidavit[] | null;
 };
+
+export type ConceptToPay = {
+  id: string;
+  concept: string;
+  period: string;
+  dueDate: string;
+  amount: number;
+};

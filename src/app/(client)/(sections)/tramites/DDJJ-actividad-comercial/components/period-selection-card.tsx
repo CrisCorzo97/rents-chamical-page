@@ -8,81 +8,81 @@ import {
   CardTitle,
   Checkbox,
 } from '@/components/ui';
-
-interface Period {
-  month: string;
-  year: number;
-  dueDate: string;
-  amount: number;
-  selected?: boolean;
-}
+import { ConceptToPay } from '../types';
+import { useMemo, useState } from 'react';
+import { formatNumberToCurrency } from '@/lib/formatters';
 
 interface PeriodSelectionCardProps {
-  periods: Period[];
-  onSelectionChange: (periods: Period[]) => void;
-  onProceedToPayment: () => void;
+  concepts: ConceptToPay[];
 }
 
-export function PeriodSelectionCard({
-  periods,
-  onSelectionChange,
-  onProceedToPayment,
-}: PeriodSelectionCardProps) {
-  const totalAmount = periods
-    .filter((period) => period.selected)
-    .reduce((sum, period) => sum + period.amount, 0);
+export function PeriodSelectionCard({ concepts }: PeriodSelectionCardProps) {
+  const [conceptsSelected, setConceptsSelected] = useState<ConceptToPay[]>([]);
 
-  const handlePeriodToggle = (index: number) => {
-    const updatedPeriods = periods.map((period, i) =>
-      i === index ? { ...period, selected: !period.selected } : period
-    );
-    onSelectionChange(updatedPeriods);
-  };
+  const totalAmount = useMemo(() => {
+    return conceptsSelected.reduce((acc, concept) => {
+      return acc + concept.amount;
+    }, 0);
+  }, [conceptsSelected]);
 
   return (
-    <Card className='w-full max-w-md bg-gradient-to-br from-red-900 to-red-950 text-white'>
+    <Card className='w-full max-w-4xl'>
       <CardHeader>
-        <CardTitle className='text-lg font-medium text-white/90'>
-          Selecciona los ítems a pagar
+        <CardTitle className='text-lg font-medium'>
+          Selecciona los conceptos a pagar
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className='space-y-4'>
-          <div className='grid grid-cols-3 gap-4 px-3 text-sm text-white/70'>
+        <div className='space-y-4 grid grid-cols-4'>
+          <div className='col-span-4 grid grid-cols-4 gap-4 px-3 text-sm text-muted-foreground'>
             <div>Período</div>
+            <div>Concepto</div>
             <div>Vencimiento</div>
             <div>Monto</div>
           </div>
-          {periods.map((period, index) => (
+          {concepts.map((concept) => (
             <div
-              key={index}
-              className='flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3'
+              key={concept.id}
+              className='col-span-4 flex items-center justify-between rounded-lg border p-3'
             >
-              <div className='grid grid-cols-3 flex-1 gap-4'>
-                <div className='text-sm'>
-                  {period.month} {period.year}
+              <div className='grid grid-cols-4 flex-1 gap-4'>
+                <div className='text-sm'>{concept.period}</div>
+                <div className='text-sm'>{concept.concept}</div>
+                <div className='text-sm text-muted-foreground'>
+                  {concept.dueDate}
                 </div>
-                <div className='text-sm text-white/70'>{period.dueDate}</div>
                 <div className='text-sm'>
-                  ${period.amount.toLocaleString('es-AR')}
+                  {formatNumberToCurrency(concept.amount)}
                 </div>
               </div>
               <Checkbox
-                checked={period.selected}
-                onCheckedChange={() => handlePeriodToggle(index)}
-                className='ml-4 h-5 w-5 border-white/30 data-[state=checked]:border-white data-[state=checked]:bg-white/20'
+                checked={conceptsSelected.some(
+                  (selected) => selected.id === concept.id
+                )}
+                onCheckedChange={() =>
+                  setConceptsSelected((prev) => {
+                    if (prev.some((selected) => selected.id === concept.id)) {
+                      return prev.filter(
+                        (selected) => selected.id !== concept.id
+                      );
+                    }
+
+                    return [...prev, concept];
+                  })
+                }
+                className='ml-4 h-5 w-5'
               />
             </div>
           ))}
-          <div className='flex items-center justify-between border-t border-white/10 pt-4'>
+          <div className='col-span-4 flex items-center justify-between border-t pt-4'>
             <div className='text-sm font-medium'>Total a abonar:</div>
             <div className='text-lg font-bold'>
-              ${totalAmount.toLocaleString('es-AR')}
+              {formatNumberToCurrency(totalAmount)}
             </div>
           </div>
           <Button
-            onClick={onProceedToPayment}
-            className='w-full bg-white/10 hover:bg-white/20'
+            onClick={() => console.log('Ir a pagar')}
+            className='col-start-4 w-full'
             disabled={totalAmount === 0}
           >
             Ir a pagar

@@ -42,11 +42,11 @@ export function BalanceCard({ amount }: BalanceCardProps) {
           Historial Pagos
         </Button>
         <Button
-          variant='ghost'
+          variant='default'
           className='ml-auto'
           onClick={() => push('/tramites/DDJJ-actividad-comercial/pagar')}
         >
-          <span>Ir a pagar</span>
+          Ir a pagar
           <ArrowRight className='h-5 w-5 ml-2' />
         </Button>
       </CardFooter>

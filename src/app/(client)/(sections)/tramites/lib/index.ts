@@ -83,7 +83,7 @@ export const getPendingDeclarations = async (input: {
     });
 
     const filteredPeriods = periods.filter(
-      (p) => !declaredPeriods.some((d) => d.period === p.period)
+      (p) => !declaredPeriods.some((d) => d.period.includes(p.period))
     );
 
     return filteredPeriods.sort((a, b) => {

@@ -2,7 +2,7 @@
 
 import { DataTableColumnHeader } from '@/components/data-table';
 import { CustomDataTable } from '@/components/data-table/customDataTable';
-import { Button } from '@/components/ui';
+import { Badge, Button } from '@/components/ui';
 import { useFPS } from '@/hooks';
 import { formatName, formatNumberToCurrency } from '@/lib/formatters';
 import { stateToSortBy } from '@/lib/table';
@@ -82,29 +82,13 @@ export default function AffidavitTable({ data, sorting }: AffidavitTableProps) {
 
         switch (status) {
           case 'pending_payment':
-            return (
-              <span className='bg-yellow-100 py-2 px-3 rounded-sm text-yellow-600'>
-                Pendiente de pago
-              </span>
-            );
+            return <Badge variant='warning'>Pendiente de pago</Badge>;
           case 'under_review':
-            return (
-              <span className='bg-blue-100 py-2 px-3 rounded-sm text-blue-500'>
-                En revisión
-              </span>
-            );
+            return <Badge variant='info'>En revisión</Badge>;
           case 'approved':
-            return (
-              <span className='bg-green-100 py-2 px-3 rounded-sm text-green-500'>
-                Aprobado
-              </span>
-            );
+            return <Badge variant='success'>Aprobado</Badge>;
           case 'refused':
-            return (
-              <span className='bg-red-100 py-2 px-3 rounded-sm text-red-500'>
-                Rechazado
-              </span>
-            );
+            return <Badge variant='error'>Rechazado</Badge>;
           default:
             return <></>;
         }

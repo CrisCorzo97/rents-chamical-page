@@ -1,3 +1,53 @@
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import Link from 'next/link';
+import { PeriodSelectionCard } from '../components/period-selection-card';
+import { getConceptsToPay } from '../affidavit.actions';
+
 export default async function PaymentPage() {
-  return <div>PaymentPage</div>;
+  const concepts = await getConceptsToPay();
+
+  return (
+    <article className='max-w-6xl mx-auto mb-8'>
+      <Breadcrumb className='h-12 mt-6'>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href='/' prefetch>
+                Inicio
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href='/tramites' prefetch>
+                Trámites
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href='/tramites/DDJJ-actividad-comercial' prefetch>
+                DDJJ Actividad Comercial
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Presentar</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <PeriodSelectionCard concepts={concepts.data ?? []} />
+    </article>
+  );
 }

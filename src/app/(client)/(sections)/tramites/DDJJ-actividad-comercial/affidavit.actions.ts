@@ -3,15 +3,27 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { Envelope } from '@/types/envelope';
-import { $Enums, affidavit, invoice, Prisma } from '@prisma/client';
+import {
+  $Enums,
+  affidavit,
+  invoice,
+  Prisma,
+  tax_penalties,
+} from '@prisma/client';
 import { getPendingDeclarations, PERIOD_MAP, PeriodData } from '../lib';
 import { getFirstBusinessDay } from '@/lib/providers';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import locale from 'dayjs/locale/es';
-import { AffidavitWithRelations, InvoiceWithRelations } from './types';
+import {
+  AffidavitWithRelations,
+  ConceptToPay,
+  InvoiceWithRelations,
+} from './types';
 import { AffidavitStatus } from './page';
 import { generateInvoiceCode } from '@/lib/code-generator';
+import { revalidatePath } from 'next/cache';
+import { formatName } from '@/lib/formatters';
 dayjs.extend(customParseFormat);
 dayjs.locale(locale);
 
@@ -40,6 +52,7 @@ export const getAffidavits = async (input: {
   items_per_page?: string;
   status?: AffidavitStatus;
   order_by?: Prisma.affidavitOrderByWithRelationInput;
+  filter?: Prisma.affidavitWhereInput;
 }) => {
   const response: Envelope<AffidavitWithRelations[]> = {
     success: true,
@@ -102,6 +115,13 @@ export const getAffidavits = async (input: {
       queries.orderBy = input.order_by;
     }
 
+    if (input.filter) {
+      queries.where = {
+        ...queries.where,
+        ...input.filter,
+      };
+    }
+
     const [declarations, total_items] = await Promise.all([
       dbSupabase.affidavit.findMany({
         ...queries,
@@ -130,6 +150,166 @@ export const getAffidavits = async (input: {
       response.error = error.message;
     } else {
       response.error = 'Hubo un error al obtener las declaraciones';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const getTaxPenalties = async (input: {
+  page?: string;
+  items_per_page?: string;
+  order_by?: Prisma.tax_penaltiesOrderByWithRelationInput;
+  filter?: Prisma.tax_penaltiesWhereInput;
+}) => {
+  const response: Envelope<tax_penalties[]> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const { user } = await getUserAndCommercialEnablement();
+
+    const queries: Prisma.tax_penaltiesFindManyArgs = {
+      where: {
+        user: { id: user.id },
+        declarable_tax_id: 'commercial_activity',
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take: 5,
+    };
+
+    if (input.items_per_page) {
+      queries.take = +input.items_per_page;
+    }
+
+    if (input.page) {
+      queries.skip = (+input.page - 1) * (queries.take ?? 5);
+    }
+
+    if (input.order_by) {
+      queries.orderBy = input.order_by;
+    }
+
+    if (input.filter) {
+      queries.where = {
+        ...queries.where,
+        ...input.filter,
+      };
+    }
+
+    const [penalties, total_items] = await Promise.all([
+      dbSupabase.tax_penalties.findMany({
+        ...queries,
+      }),
+      dbSupabase.tax_penalties.count({
+        where: queries.where,
+      }),
+    ]);
+
+    response.data = penalties;
+    response.pagination = {
+      total_pages: Math.ceil(total_items / (queries.take ?? 5)),
+      total_items,
+      page: input.page ? +input.page : 1,
+      limit_per_page: queries.take ?? 5,
+    };
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al obtener las multas';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const getConceptsToPay = async () => {
+  const response: Envelope<ConceptToPay[]> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const { data: affidavits } = await getAffidavits({
+      items_per_page: '100',
+      filter: {
+        status: {
+          in: ['pending_payment', 'refused'],
+        },
+        payment_due_date: {
+          lte: dayjs().endOf('month').toDate(),
+        },
+      },
+    });
+
+    if (!Array.isArray(affidavits)) {
+      throw new Error(
+        'No se encontraron declaraciones juradas pendientes de pago'
+      );
+    }
+
+    const { data: taxPenalties } = await getTaxPenalties({
+      items_per_page: '100',
+    });
+
+    if (!Array.isArray(taxPenalties)) {
+      throw new Error('No se encontraron multas pendientes de pago');
+    }
+
+    const concepts: ConceptToPay[] = [];
+
+    for (const affidavit of affidavits) {
+      concepts.push({
+        id: affidavit.id,
+        concept: 'Declaración Jurada',
+        period: formatName(dayjs(affidavit.period).format('MMMM-YYYY')),
+        amount: affidavit.fee_amount,
+        dueDate: dayjs(affidavit.payment_due_date).format('DD/MM/YYYY'),
+      });
+    }
+
+    for (const penalty of taxPenalties) {
+      concepts.push({
+        id: penalty.id,
+        concept: 'Multa',
+        period: formatName(dayjs(penalty.period).format('MMMM-YYYY')),
+        amount: penalty.amount,
+        dueDate: dayjs(penalty.created_at).format('DD/MM/YYYY'),
+      });
+    }
+
+    concepts.sort((a, b) => {
+      if (
+        dayjs(a.dueDate, 'DD/MM/YYYY').isBefore(dayjs(b.dueDate, 'DD/MM/YYYY'))
+      )
+        return -1;
+      if (
+        dayjs(a.dueDate, 'DD/MM/YYYY').isAfter(dayjs(b.dueDate, 'DD/MM/YYYY'))
+      )
+        return 1;
+      return 0;
+    });
+
+    response.data = concepts;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al obtener los conceptos a pagar';
     }
   } finally {
     return response;
@@ -174,27 +354,24 @@ export const getBalance = async () => {
   };
 
   try {
-    // const { user } = await getUserAndCommercialEnablement();
+    const { user } = await getUserAndCommercialEnablement();
 
-    // const affidavits = await dbSupabase.affidavit.findMany({
-    //   where: {
-    //     user: { id: user.id },
-    //     declarable_tax_id: 'commercial_activity',
-    //     status: {
-    //       in: ['pending_payment', 'refused'],
-    //     },
-    //   },
-    // });
+    const affidavits = await dbSupabase.affidavit.findMany({
+      where: {
+        user: { id: user.id },
+        declarable_tax_id: 'commercial_activity',
+        status: {
+          in: ['pending_payment', 'refused'],
+        },
+        payment_due_date: {
+          lte: dayjs().endOf('month').toDate(),
+        },
+      },
+    });
 
-    // response.data = affidavits.reduce((acc, affidavit) => {
-    //   let debt = 0;
-    //   if (dayjs().isAfter(dayjs(affidavit.payment_due_date), 'day')) {
-    //     debt = affidavit.fee_amount;
-    //   }
-    //   return acc + debt;
-    // }, 0);
-
-    response.data = 0;
+    response.data = affidavits.reduce((acc, affidavit) => {
+      return acc + affidavit.fee_amount;
+    }, 0);
   } catch (error) {
     console.error(error);
     response.success = false;
@@ -320,6 +497,8 @@ export const createAffidavit = async (input: {
     response.data = await dbSupabase.affidavit.create({
       data: affidavitData,
     });
+
+    revalidatePath('/tramites/DDJJ-actividad-comercial');
   } catch (error) {
     console.error(error);
     response.success = false;
