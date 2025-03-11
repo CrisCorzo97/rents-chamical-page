@@ -580,8 +580,11 @@ export const updateAffidavit = async (input: {
   }
 };
 
-export const createInvoice = async (input: { affidavit_ids: string[] }) => {
-  const { affidavit_ids } = input;
+export const createInvoice = async (input: {
+  affidavit_ids: string[];
+  tax_penaltie_ids: string[];
+}) => {
+  const { affidavit_ids, tax_penaltie_ids } = input;
 
   const response: Envelope<invoice> = {
     success: true,
@@ -598,6 +601,7 @@ export const createInvoice = async (input: { affidavit_ids: string[] }) => {
       (declarableTax.calculate_info as CalculateInfo)?.compensatory_interest ??
       0;
 
+    // Busco las declaraciones en base a los ids
     const affidavits = await dbSupabase.affidavit.findMany({
       where: {
         id: {
@@ -607,14 +611,34 @@ export const createInvoice = async (input: { affidavit_ids: string[] }) => {
       },
     });
 
-    const feeAmount = affidavits.reduce(
-      (acc, affidavit) => acc + affidavit.fee_amount,
+    // Busco las multas en base a los ids
+    const taxPenalties = await dbSupabase.tax_penalties.findMany({
+      where: {
+        id: {
+          in: tax_penaltie_ids,
+        },
+        user: { id: user.id },
+      },
+    });
+
+    // Calculo el monto total de las multas
+    const penaltiesAmount = taxPenalties.reduce(
+      (acc, penalty) => acc + penalty.amount,
       0
     );
+
+    // Calculo el monto total de las declaraciones y lo sumo con las multas
+    const feeAmount =
+      penaltiesAmount +
+      affidavits.reduce((acc, affidavit) => acc + affidavit.fee_amount, 0);
+
+    // Calculo los intereses compensatorios
     const interests = affidavits.reduce((acc, affidavit) => {
       const days = dayjs().diff(dayjs(affidavit.payment_due_date), 'day');
       return acc + affidavit.fee_amount * compensatoryInterest * days;
     }, 0);
+
+    // Calculo el monto total de la factura
     const totalAmount = feeAmount + interests;
 
     const invoiceId = await getLastInvoiceCode();
