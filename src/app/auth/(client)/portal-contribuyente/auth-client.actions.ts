@@ -5,6 +5,7 @@ import { Envelope } from '@/types/envelope';
 import dbSupabase from '@/lib/prisma/prisma';
 import bcrypt from 'bcryptjs';
 import { verifyPassword } from '../../(backoffice)/auth-bo.actions';
+import { buildQuery } from '@/lib/url';
 
 export const login = async ({
   tax_id,
@@ -45,7 +46,11 @@ export const login = async ({
     }
 
     response.success = true;
-    response.data = { redirectUrl: '/auth/portal-contribuyente/callback' };
+    response.data = {
+      redirectUrl: `/auth/portal-contribuyente/callback${buildQuery({
+        redirect_to: '/tramites/DDJJ-actividad-comercial',
+      })}`,
+    };
   } catch (error) {
     console.error(error);
     response.success = false;

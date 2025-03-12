@@ -80,7 +80,7 @@ export function DuePeriodsCard({ periods }: DuePeriodsCardProps) {
                     )
                   }
                 >
-                  <span>Presentar</span>
+                  Presentar
                   <ArrowRight className='h-5 w-5 ml-2' />
                 </Button>
               </div>

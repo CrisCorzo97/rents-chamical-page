@@ -14,10 +14,21 @@ import {
 } from './affidavit.actions';
 import { BalanceCard } from './components/balance-card';
 import { DuePeriodsCard } from './components/due-periods-card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui';
 import { buildQuery } from '@/lib/url';
 import AffidavitTable from './components/affidavit-table';
 import { sortByToState } from '@/lib/table';
+import { Info } from 'lucide-react';
+import { getUser } from '@/lib/user';
 
 export type AffidavitStatus = 'pending_payment' | 'under_review' | 'finished';
 
@@ -57,6 +68,7 @@ export default async function CommercialActivityAffidavitPage({
 
   const balance = await getBalance();
   const duePeriods = await getUpcomingDueDates();
+  const user = await getUser();
 
   return (
     <section className='text-lg max-w-6xl mx-auto mb-8'>
@@ -85,6 +97,30 @@ export default async function CommercialActivityAffidavitPage({
       </Breadcrumb>
 
       <section className='grid grid-cols-1 gap-4 md:grid-cols-5'>
+        <div className='w-full flex items-center justify-between md:col-span-5'>
+          {/* Agregar un visualizador del CUIT del contribuyente actual y un botón de cerrar sesión */}
+          <Alert className='w-48 bg-yellow-100 border-yellow-500  md:col-span-5'>
+            <AlertDescription>
+              <b>CUIT:</b> {user?.cuil ?? '-'}
+            </AlertDescription>
+          </Alert>
+
+          <Link href='/auth/logout'>
+            <Button variant='destructive' size='lg'>
+              Cerrar sesión
+            </Button>
+          </Link>
+        </div>
+
+        <Alert className='my-6 w-full bg-blue-100 border-blue-500 md:col-span-5'>
+          <Info className='w-4 h-4' />
+          <AlertTitle>¡Aviso importante!</AlertTitle>
+          <AlertDescription>
+            Las presentaciones de DDJJ de actividad comercial se realizan de
+            forma mensual y el pago de las mismas se realiza de forma bimestral.
+          </AlertDescription>
+        </Alert>
+
         <BalanceCard amount={balance.data ?? 0} />
 
         <DuePeriodsCard periods={duePeriods.data ?? []} />

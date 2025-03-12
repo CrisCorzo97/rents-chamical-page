@@ -68,7 +68,7 @@ export function PaymentInstructionsCard({
   return (
     <>
       <Toaster />
-      <Card className='w-full max-w-md'>
+      <Card className='w-full max-w-4xl'>
         <CardHeader>
           <CardTitle className='text-lg font-medium'>
             Por favor, realiza el pago a la siguiente cuenta y adjunta el
@@ -103,7 +103,7 @@ export function PaymentInstructionsCard({
             />
           </div>
 
-          <CardFooter className='flex justify-between'>
+          <CardFooter className='p-0 pt-4 flex justify-end'>
             <Button
               onClick={onUpload}
               loading={isUploading}

@@ -44,6 +44,7 @@ export function BalanceCard({ amount }: BalanceCardProps) {
         <Button
           variant='default'
           className='ml-auto'
+          disabled={amount === 0}
           onClick={() => push('/tramites/DDJJ-actividad-comercial/pagar')}
         >
           Ir a pagar

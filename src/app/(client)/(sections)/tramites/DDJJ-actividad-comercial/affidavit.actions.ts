@@ -472,9 +472,13 @@ export const createAffidavit = async (input: {
 
     const paymentPeriodicity = PERIOD_MAP[declarableTax.payment_periodicity];
 
+    const monthsToAdd =
+      paymentPeriodicity -
+      (dayjs(period, 'MMMM-YYYY').month() % paymentPeriodicity === 0 ? 0 : 1);
+
     const paymentDueDate = await getFirstBusinessDay(
       dayjs(period, 'MMMM-YYYY')
-        .add(paymentPeriodicity, 'month')
+        .add(monthsToAdd, 'month')
         .date(Number(declarableTax.procedure_expiration_day))
         .format('YYYY-MM-DD')
     );
@@ -657,7 +661,14 @@ export const createInvoice = async (input: {
         connect: { id: user.id },
       },
       affidavit: {
-        connect: affidavits.map((a) => ({ id: a.id })),
+        connect: affidavits.map((a) => ({
+          id: a.id,
+        })),
+      },
+      tax_penalties: {
+        connect: taxPenalties.map((tp) => ({
+          id: tp.id,
+        })),
       },
     };
 
@@ -699,6 +710,10 @@ export const updateInvoice = async (input: {
         id: invoice_id,
         user: { id: user.id },
       },
+      include: {
+        affidavit: true,
+        tax_penalties: true,
+      },
     });
 
     if (!invoiceData) {
@@ -737,6 +752,20 @@ export const updateInvoice = async (input: {
         updated_at: dayjs().toDate(),
       },
     });
+
+    if (updated) {
+      await dbSupabase.affidavit.updateMany({
+        where: {
+          id: {
+            in: invoiceData.affidavit.map((a) => a.id),
+          },
+        },
+        data: {
+          status: 'under_review',
+          updated_at: dayjs().toDate(),
+        },
+      });
+    }
 
     response.data = updated;
   } catch (error) {

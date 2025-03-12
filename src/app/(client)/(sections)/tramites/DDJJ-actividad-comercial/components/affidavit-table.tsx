@@ -16,6 +16,7 @@ import {
 import dayjs from 'dayjs';
 import { Upload } from 'lucide-react';
 import { AffidavitWithRelations } from '../types';
+import { useRouter } from 'next/navigation';
 
 interface AffidavitTableProps {
   data: Envelope<AffidavitWithRelations[]>;
@@ -26,6 +27,8 @@ export default function AffidavitTable({ data, sorting }: AffidavitTableProps) {
   const { handleSort, handlePagination } = useFPS({
     pagination: data.pagination as Pagination,
   });
+
+  const { push } = useRouter();
 
   const columns: ColumnDef<AffidavitWithRelations>[] = [
     {
@@ -108,10 +111,14 @@ export default function AffidavitTable({ data, sorting }: AffidavitTableProps) {
             <Button
               variant='outline'
               className='flex items-center gap-2'
-              size='icon'
-              onClick={() => {}}
+              size='sm'
+              onClick={() =>
+                push(
+                  `/tramites/DDJJ-actividad-comercial/pagar/${row.original.invoice_id}`
+                )
+              }
             >
-              <Upload />
+              <Upload className='w-4 h-4' />
               Subir comprobante
             </Button>
           );

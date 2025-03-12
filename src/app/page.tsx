@@ -31,6 +31,22 @@ export default async function Home() {
           </p>
 
           <div className='mb-8 flex flex-wrap gap-4'>
+            <Link href='/tramites/DDJJ-actividad-comercial' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
+                    <CardTitle className='text-xl'>
+                      Presentación de DDJJ
+                    </CardTitle>
+                    <CardDescription>
+                      Realiza la presentación de tu Declaración Jurada de
+                      Actividad Comercial de forma rápida y sencilla.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8' />
+                </CardContent>
+              </Card>
+            </Link>
             <Link href='/tramites/consultas' prefetch>
               <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
                 <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
@@ -56,20 +72,6 @@ export default async function Home() {
                       Entérate de las últimas noticias y actualizaciones
                       relacionadas con la Dirección de Rentas y sus servicios.
                       Consulta los comunicados oficiales y novedades destacadas.
-                    </CardDescription>
-                  </div>
-                  <ChevronRight className='w-8 h-8' />
-                </CardContent>
-              </Card>
-            </Link>
-            <Link href='/organismo/sobre-rentas' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
-                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
-                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
-                    <CardTitle className='text-xl'>Sobre Rentas</CardTitle>
-                    <CardDescription>
-                      Aprende más sobre la Dirección de Rentas, incluyendo su
-                      historia, visión, misión y funciones clave.
                     </CardDescription>
                   </div>
                   <ChevronRight className='w-8 h-8' />
