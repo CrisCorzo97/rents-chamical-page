@@ -11,6 +11,7 @@ import {
   getAffidavits,
   getBalance,
   getUpcomingDueDates,
+  getUserAndCommercialEnablement,
 } from './affidavit.actions';
 import { BalanceCard } from './components/balance-card';
 import { DuePeriodsCard } from './components/due-periods-card';
@@ -29,6 +30,8 @@ import AffidavitTable from './components/affidavit-table';
 import { sortByToState } from '@/lib/table';
 import { Info } from 'lucide-react';
 import { getUser } from '@/lib/user';
+import { formatName } from '@/lib/formatters';
+import { redirect } from 'next/navigation';
 
 export type AffidavitStatus = 'pending_payment' | 'under_review' | 'finished';
 
@@ -45,6 +48,12 @@ export default async function CommercialActivityAffidavitPage({
 }) {
   const { page, items_per_page, status, sort_by, sort_direction } =
     await searchParams;
+
+  const { commercial_enablement } = await getUserAndCommercialEnablement();
+
+  if (!commercial_enablement) {
+    return redirect('/tramites/DDJJ-actividad-comercial/regularizar');
+  }
 
   let order_by;
 
@@ -101,7 +110,17 @@ export default async function CommercialActivityAffidavitPage({
           {/* Agregar un visualizador del CUIT del contribuyente actual y un botón de cerrar sesión */}
           <Alert className='w-48 bg-yellow-100 border-yellow-500  md:col-span-5'>
             <AlertDescription>
-              <b>CUIT:</b> {user?.cuil ?? '-'}
+              <p>
+                <b>CUIT:</b> {user?.cuil ?? '-'}
+              </p>
+              <p>
+                <b>Contribuyente:</b>{' '}
+                {user
+                  ? `${formatName(user.first_name)} ${formatName(
+                      user.last_name
+                    )}`
+                  : '-'}
+              </p>
             </AlertDescription>
           </Alert>
 

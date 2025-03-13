@@ -63,9 +63,12 @@ export default async function PaymentInstructionsPage({
       <PaymentInstructionsCard
         invoiceId={invoice_id}
         bankDetails={{
-          account: '123456789',
-          bank: 'Banco de la Ciudad',
-          cbu: '123456789',
+          bank: 'Banco Rioja SAU',
+          tax_id: '30-61490356-9',
+          company_name: 'Municipalidad De Chamical',
+          account_number: '0050100001000144',
+          cbu: '3090005701001010001448',
+          alias: 'CENTRO.PADRE.LIRIO',
         }}
       />
     </article>

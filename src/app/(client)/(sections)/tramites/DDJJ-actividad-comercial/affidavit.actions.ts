@@ -401,7 +401,7 @@ export const calculateFeeAmount = async (input: { amount: number }) => {
 
     if (
       FINANCIAL_ACTIVITIES.includes(
-        commercial_enablement.commercial_activity?.activity ?? ''
+        commercial_enablement!.commercial_activity?.activity ?? ''
       )
     ) {
       const feeCase = cases.find(
@@ -886,6 +886,44 @@ export const getInvoices = async (input: {
   }
 };
 
+export const getUserAndCommercialEnablement = async () => {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (!user || error) {
+      if (error) {
+        throw new Error(error.message);
+      }
+      throw new Error('No se pudo obtener el usuario');
+    }
+
+    const commercial_enablement =
+      await dbSupabase.commercial_enablement.findFirst({
+        where: {
+          tax_id: user.user_metadata.tax_id,
+        },
+        include: {
+          commercial_activity: true,
+        },
+      });
+
+    return { user, commercial_enablement };
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error(
+      'Hubo un error al obtener el usuario y la habilitación comercial'
+    );
+  }
+};
+
 const getDeclarableTax = async () => {
   try {
     const declarableTax = await dbSupabase.declarable_tax.findFirst({
@@ -940,50 +978,6 @@ const uploadPaymentProof = async (input: {
     } else {
       throw new Error('Hubo un error al subir el comprobante de pago');
     }
-  }
-};
-
-const getUserAndCommercialEnablement = async () => {
-  try {
-    const supabase = await createSupabaseServerClient();
-
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-
-    if (!user || error) {
-      if (error) {
-        throw new Error(error.message);
-      }
-      throw new Error('No se pudo obtener el usuario');
-    }
-
-    const commercial_enablement =
-      await dbSupabase.commercial_enablement.findFirst({
-        where: {
-          tax_id: user.user_metadata.tax_id,
-        },
-        include: {
-          commercial_activity: true,
-        },
-      });
-
-    if (!commercial_enablement || !commercial_enablement.commercial_activity) {
-      throw new Error(
-        'No se encontró la habilitación comercial para el usuario'
-      );
-    }
-
-    return { user, commercial_enablement };
-  } catch (error: any) {
-    console.error(error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error(
-      'Hubo un error al obtener el usuario y la habilitación comercial'
-    );
   }
 };
 
