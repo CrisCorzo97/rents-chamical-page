@@ -83,7 +83,7 @@ export default async function CreateAffidavitPage({
               <li>Mayor a $1.000.000.000 (0,025%)</li>
             </ul>
             <span>
-              <strong>Tasa mínima a abonar:</strong> $10.000
+              <strong>Tasa mínima a abonar:</strong> $7.500
             </span>
           </AlertDescription>
         </Alert>
