@@ -17,8 +17,11 @@ import { useRouter } from 'next/navigation';
 
 interface BankDetails {
   bank: string;
-  account: string;
+  company_name: string;
+  tax_id: string;
+  account_number: string;
   cbu: string;
+  alias: string;
 }
 
 interface PaymentInstructionsCardProps {
@@ -83,12 +86,24 @@ export function PaymentInstructionsCard({
                 <span>{bankDetails.bank}</span>
               </div>
               <div className='flex justify-between'>
+                <span className='font-medium'>CUIT:</span>
+                <span>{bankDetails.tax_id}</span>
+              </div>
+              <div className='flex justify-between'>
+                <span className='font-medium'>Razón Social:</span>
+                <span>{bankDetails.company_name}</span>
+              </div>
+              <div className='flex justify-between'>
                 <span className='font-medium'>Nro de cuenta:</span>
-                <span>{bankDetails.account}</span>
+                <span>{bankDetails.account_number}</span>
               </div>
               <div className='flex justify-between'>
                 <span className='font-medium'>CBU:</span>
                 <span>{bankDetails.cbu}</span>
+              </div>
+              <div className='flex justify-between'>
+                <span className='font-medium'>Alias:</span>
+                <span>{bankDetails.alias}</span>
               </div>
             </div>
           </div>
