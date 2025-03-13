@@ -1,6 +1,8 @@
 'use client';
 import Link from 'next/link';
 import {
+  Alert,
+  AlertDescription,
   Button,
   Card,
   CardContent,
@@ -83,6 +85,14 @@ export function LoginForm() {
               Inicio
             </Button>
           </Link>
+
+          <Alert className='px-3 py-2 bg-blue-100 text-blue-800 border-blue-800'>
+            <AlertDescription>
+              Si ya te registrarte, recuerda validar tu cuenta a través del link
+              que te enviamos a tu correo.
+            </AlertDescription>
+          </Alert>
+
           <CardTitle className='text-2xl'>Iniciar Sesión</CardTitle>
           <CardDescription>
             Ingresa tus credenciales para acceder a tu cuenta de contribuyente.

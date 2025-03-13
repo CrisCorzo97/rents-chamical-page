@@ -59,8 +59,8 @@ export default function Regularize() {
             No encontramos su inscripción en el registro de Actividad Comercial
           </CardTitle>
           <CardDescription className='text-center text-lg'>
-            Por favor pase por la oficina de Rentas Municipal para regularizar
-            su situación.
+            Para regularizar su situación, diríjase a la oficina de Rentas
+            Municipal.
           </CardDescription>
         </CardHeader>
         <CardContent className='flex items-center justify-center'>
