@@ -6,6 +6,7 @@ import {
   ReceiptText,
   Store,
   UserRoundCheck,
+  Wallet,
 } from 'lucide-react';
 
 export type SidebarTab = {
@@ -50,6 +51,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         icon: <Store />,
         label: 'Habilitación comercial',
         href: '/private/admin/commercial_enablement',
+      },
+      {
+        id: 'collection_management',
+        icon: <Wallet />,
+        label: 'Gestión de cobranza',
+        href: '/private/admin/collection_management',
       },
     ],
     bottom: [
@@ -134,6 +141,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         icon: <Store />,
         label: 'Habilitación comercial',
         href: '/private/admin/commercial_enablement',
+      },
+      {
+        id: 'collection_management',
+        icon: <Wallet />,
+        label: 'Gestión de cobranza',
+        href: '/private/admin/collection_management',
       },
     ],
     bottom: [

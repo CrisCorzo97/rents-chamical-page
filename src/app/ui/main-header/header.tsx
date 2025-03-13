@@ -47,7 +47,14 @@ export const MainHeader = () => {
       label: 'Trámites',
       key: 'formalities',
       href: '/tramites',
-      subItems: [{ label: 'Consultas', key: 'queries', href: '/consultas' }],
+      subItems: [
+        { label: 'Consultas', key: 'queries', href: '/consultas' },
+        {
+          label: 'DDJJ Actividad Comercial',
+          key: 'commercial-activity-affidavits',
+          href: '/DDJJ-actividad-comercial',
+        },
+      ],
     },
     {
       label: 'Información',
