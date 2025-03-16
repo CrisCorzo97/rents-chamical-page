@@ -657,6 +657,7 @@ export const createInvoice = async (input: {
       compensatory_interest: interests,
       total_amount: totalAmount,
       due_date: dayjs().endOf('day').toDate(),
+      status: 'pending_payment',
       user: {
         connect: { id: user.id },
       },
@@ -749,6 +750,7 @@ export const updateInvoice = async (input: {
         compensatory_interest: interests,
         attached_receipt: attachmentUrl,
         payment_date: paymentDate,
+        status: attachmentUrl ? 'under_review' : undefined,
         updated_at: dayjs().toDate(),
       },
     });
@@ -924,29 +926,7 @@ export const getUserAndCommercialEnablement = async () => {
   }
 };
 
-const getDeclarableTax = async () => {
-  try {
-    const declarableTax = await dbSupabase.declarable_tax.findFirst({
-      where: {
-        id: 'commercial_activity',
-      },
-    });
-
-    if (!declarableTax) {
-      throw new Error('No se encontró el impuesto declarable');
-    }
-
-    return declarableTax;
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Hubo un error al obtener el impuesto declarable');
-  }
-};
-
-const uploadPaymentProof = async (input: {
+export const uploadPaymentProof = async (input: {
   invoice_id: string;
   file: File;
 }) => {
@@ -978,6 +958,28 @@ const uploadPaymentProof = async (input: {
     } else {
       throw new Error('Hubo un error al subir el comprobante de pago');
     }
+  }
+};
+
+const getDeclarableTax = async () => {
+  try {
+    const declarableTax = await dbSupabase.declarable_tax.findFirst({
+      where: {
+        id: 'commercial_activity',
+      },
+    });
+
+    if (!declarableTax) {
+      throw new Error('No se encontró el impuesto declarable');
+    }
+
+    return declarableTax;
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('Hubo un error al obtener el impuesto declarable');
   }
 };
 

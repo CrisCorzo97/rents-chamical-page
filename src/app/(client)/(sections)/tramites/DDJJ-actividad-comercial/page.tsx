@@ -28,7 +28,7 @@ import {
 import { buildQuery } from '@/lib/url';
 import AffidavitTable from './components/affidavit-table';
 import { sortByToState } from '@/lib/table';
-import { Info } from 'lucide-react';
+import { Info, LogOut } from 'lucide-react';
 import { getUser } from '@/lib/user';
 import { formatName } from '@/lib/formatters';
 import { redirect } from 'next/navigation';
@@ -81,55 +81,53 @@ export default async function CommercialActivityAffidavitPage({
 
   return (
     <section className='text-lg max-w-6xl mx-auto mb-8'>
-      <Breadcrumb className='max-w-6xl mx-auto h-20'>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/' prefetch>
-                Inicio
-              </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href='/tramites' prefetch>
-                Trámites
-              </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>DDJJ Actividad Comercial</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <div className='w-full flex items-start justify-between md:col-span-5'>
+        <Breadcrumb className='h-20'>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href='/' prefetch>
+                  Inicio
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href='/tramites' prefetch>
+                  Trámites
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>DDJJ Actividad Comercial</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        <Link href='/auth/logout'>
+          <Button variant='destructive' size='sm'>
+            <LogOut className='w-4 h-4 mr-2 text-destructive-foreground' />
+            Cerrar sesión
+          </Button>
+        </Link>
+      </div>
 
       <section className='grid grid-cols-1 gap-4 md:grid-cols-5'>
-        <div className='w-full flex items-center justify-between md:col-span-5'>
-          {/* Agregar un visualizador del CUIT del contribuyente actual y un botón de cerrar sesión */}
-          <Alert className='w-48 bg-yellow-100 border-yellow-500  md:col-span-5'>
-            <AlertDescription>
-              <p>
-                <b>CUIT:</b> {user?.cuil ?? '-'}
-              </p>
-              <p>
-                <b>Contribuyente:</b>{' '}
-                {user
-                  ? `${formatName(user.first_name)} ${formatName(
-                      user.last_name
-                    )}`
-                  : '-'}
-              </p>
-            </AlertDescription>
-          </Alert>
-
-          <Link href='/auth/logout'>
-            <Button variant='destructive' size='lg'>
-              Cerrar sesión
-            </Button>
-          </Link>
-        </div>
+        <Alert className='col-span-5 border-primary md:col-span-2'>
+          <AlertDescription>
+            <p>
+              <b>CUIT:</b> {user?.cuil ?? '-'}
+            </p>
+            <p>
+              <b>Contribuyente:</b>{' '}
+              {user
+                ? `${formatName(user.first_name)} ${formatName(user.last_name)}`
+                : '-'}
+            </p>
+          </AlertDescription>
+        </Alert>
 
         <Alert className='my-6 w-full bg-blue-100 border-blue-500 md:col-span-5'>
           <Info className='w-4 h-4' />

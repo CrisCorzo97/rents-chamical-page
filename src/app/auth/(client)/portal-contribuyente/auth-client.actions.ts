@@ -95,8 +95,8 @@ export const signup = async ({
       password,
       options: {
         data: {
-          first_name,
-          last_name,
+          first_name: first_name.toUpperCase(),
+          last_name: last_name.toUpperCase(),
           tax_id,
           role_id: 5,
         },

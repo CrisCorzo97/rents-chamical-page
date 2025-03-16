@@ -1,6 +1,7 @@
 import {
   Building2,
   Church,
+  FilePenLine,
   LayoutDashboard,
   LogOut,
   ReceiptText,
@@ -57,6 +58,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         icon: <Wallet />,
         label: 'Gestión de cobranza',
         href: '/private/admin/collection_management',
+      },
+      {
+        id: 'affidavits',
+        icon: <FilePenLine />,
+        label: 'DDJJ Realizadas',
+        href: '/private/admin/affidavits',
       },
     ],
     bottom: [
@@ -147,6 +154,12 @@ export const SIDEBAR_TABS_BY_ROLE: Record<
         icon: <Wallet />,
         label: 'Gestión de cobranza',
         href: '/private/admin/collection_management',
+      },
+      {
+        id: 'affidavits',
+        icon: <FilePenLine />,
+        label: 'DDJJ Realizadas',
+        href: '/private/admin/affidavits',
       },
     ],
     bottom: [

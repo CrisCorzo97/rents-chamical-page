@@ -1,3 +1,7 @@
+import { sortByToState } from '@/lib/table';
+import { getAffidavits } from './actions';
+import { affidavit_status } from '@prisma/client';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,14 +10,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { sortByToState } from '@/lib/table';
 import Link from 'next/link';
-import { CollectionManagementClient } from './page.client';
-import { getInvoicesWithRelations } from './actions';
-import { affidavit_status } from '@prisma/client';
+import { AffidavitsClient } from './page.client';
 
-export default async function CollectionManagementPage({
+export default async function AffidavitsPage({
   searchParams,
 }: {
   searchParams: Promise<{
@@ -40,7 +40,7 @@ export default async function CollectionManagementPage({
     };
   }
 
-  const data = await getInvoicesWithRelations({
+  const data = await getAffidavits({
     page,
     items_per_page,
     order_by,
@@ -64,12 +64,12 @@ export default async function CollectionManagementPage({
           <BreadcrumbItem>Portal Administrativo</BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Gestión de Cobranzas</BreadcrumbPage>
+            <BreadcrumbPage>DDJJ Realizadas</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <CollectionManagementClient
+      <AffidavitsClient
         data={data}
         sorting={sortingState}
         filter={filter ?? ''}

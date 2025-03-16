@@ -28,8 +28,8 @@ const formSchema = z.object({
   first_name: z
     .string()
     .min(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-    .regex(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ]+$/, {
-      message: 'El nombre solo puede contener letras',
+    .regex(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/, {
+      message: 'El nombre solo puede contener letras y espacios',
     }),
   last_name: z
     .string()
@@ -80,6 +80,7 @@ export function SignupForm() {
         }
       } catch (error) {
         if (error instanceof z.ZodError) {
+          setTaxId('');
           setZodErrors(error.errors);
         } else {
           toast.error('Ha ocurrido un error, por favor intente nuevamente.');
@@ -327,13 +328,16 @@ export function SignupForm() {
       <Dialog open={isSuccessfulRequest} onOpenChange={setIsSuccessfulRequest}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>¡Cuenta creada con éxito!</DialogTitle>
-            <DialogDescription>
-              Por favor revisa tu correo electrónico para confirmar tu cuenta y
-              completar el proceso de registro.
+            <DialogTitle className='mb-2 text-2xl'>¡Falta poco!</DialogTitle>
+            <DialogDescription className='text-base'>
+              <span className='flex items-center gap-2 text-gray-800'>
+                Te hemos enviado un correo electrónico con un link para
+                verificar tu cuenta. Para finalizar tu registro, haz click en el
+                link que te enviamos.
+              </span>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className='mt-4'>
             <Link href='/' replace>
               <Button>Continuar</Button>
             </Link>
