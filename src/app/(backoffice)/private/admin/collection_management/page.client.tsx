@@ -8,7 +8,7 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useFPS } from '@/hooks';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { formatName, formatNumberToCurrency } from '@/lib/formatters';
@@ -20,10 +20,18 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  FormItem,
+  Input,
   Label,
   Select,
   SelectContent,
@@ -51,7 +59,8 @@ import dayjs from 'dayjs';
 import locale from 'dayjs/locale/es';
 import { affidavit_status } from '@prisma/client';
 import { BadgeProps } from '@/components/ui/badge';
-import { acceptPayment, rejectPayment } from './actions';
+import { acceptPayment, rejectPayment, uploadAttachment } from './actions';
+import { toast, Toaster } from 'sonner';
 
 dayjs.locale(locale);
 
@@ -84,13 +93,45 @@ export const CollectionManagementClient = ({
   sorting,
   filter,
 }: CollectionManagementClientProps) => {
-  // const [queryFilter, setQueryFilter] = useState<string>(filter);
   const [recordDetails, setRecordDetails] =
     useState<InvoiceWithRelations | null>(null);
+  const [fileToUpload, setFileToUpload] = useState<{
+    invoice?: InvoiceWithRelations;
+    attachment?: File;
+  } | null>(null);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
+  const [isUploading, startUploading] = useTransition();
 
   const { handleSort, handlePagination, handleFilter } = useFPS({
     pagination: data.pagination as Pagination,
   });
+
+  const handleUploadFile = () => {
+    startUploading(async () => {
+      if (fileToUpload) {
+        try {
+          const { error } = await uploadAttachment({
+            invoice: fileToUpload.invoice!,
+            attachment: fileToUpload.attachment!,
+          });
+
+          if (error) {
+            throw new Error(error);
+          }
+
+          toast.success('Comprobante de pago subido correctamente');
+          setUploadDialogOpen(false);
+          setFileToUpload(null);
+        } catch (error) {
+          console.error(error);
+          if (error instanceof Error) {
+            toast.error(error.message);
+          }
+          toast.error('Hubo un error al subir el comprobante de pago');
+        }
+      }
+    });
+  };
 
   const columns: ColumnDef<InvoiceWithRelations>[] = [
     {
@@ -218,9 +259,18 @@ export const CollectionManagementClient = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={row.original.attached_receipt !== null}
+                onClick={() => {
+                  setUploadDialogOpen(true);
+                  setFileToUpload((prev) => ({
+                    invoice: row.original,
+                    ...prev,
+                  }));
+                }}
               >
-                <Upload size={18} className='mr-2 text-gray-700' />
-                <span>Subir comprobante</span>
+                <div className='relative flex cursor-default select-none items-center'>
+                  <Upload size={18} className='mr-2 text-gray-700' />
+                  Subir comprobante
+                </div>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className='text-green-600'
@@ -246,18 +296,6 @@ export const CollectionManagementClient = ({
     },
   ];
 
-  // useCallbackDebouncing({
-  //   value: queryFilter,
-  //   delay: 1200,
-  //   callback: () => {
-  //     if (queryFilter !== filter) {
-  //       handleFilter({
-  //         filter: queryFilter,
-  //       });
-  //     }
-  //   },
-  // });
-
   const table = useReactTable({
     data: data.data ?? [],
     columns,
@@ -280,22 +318,8 @@ export const CollectionManagementClient = ({
 
   return (
     <section className='w-full mb-10 flex flex-wrap gap-3'>
+      <Toaster />
       <div className='w-full flex-1'>
-        {/* <div className='flex items-center justify-between py-4'>
-          <Input
-            placeholder='Filtrar por contribuyente'
-            value={queryFilter}
-            onChange={(event) => setQueryFilter(event.target.value)}
-            className='max-w-sm h-11'
-          />
-
-          <Link href='/private/admin/commercial_enablement/create' prefetch>
-            <Button className='flex items-center gap-2' size='lg'>
-              <Plus size={18} />
-              Nuevo registro
-            </Button>
-          </Link>
-        </div> */}
         <div className='w-full max-w-md py-4 flex items-center gap-1'>
           <Select
             value={filter}
@@ -442,6 +466,51 @@ export const CollectionManagementClient = ({
           </>
         )}
       </Card>
+
+      <Dialog open={uploadDialogOpen}>
+        <DialogContent className='sm:max-w-[425px] space-y-4' hiddenCloseButton>
+          <DialogHeader>
+            <DialogTitle>Cargar comprobante de pago</DialogTitle>
+            <DialogDescription>
+              Sube el comprobante de pago para la factura seleccionada.
+            </DialogDescription>
+          </DialogHeader>
+          <FormItem>
+            <Label htmlFor='file-upload'>Selecciona un archivo:</Label>
+            <Input
+              id='file-upload'
+              type='file'
+              accept='.pdf,.jpg,.jpeg,.png'
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setFileToUpload((prev) => ({
+                    ...prev!,
+                    attachment: e.target.files![0],
+                  }));
+                }
+              }}
+            />
+          </FormItem>
+          <DialogFooter className='flex items-center gap-1'>
+            <Button
+              variant='outline'
+              onClick={() => {
+                setUploadDialogOpen(false);
+                setFileToUpload(null);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              disabled={!fileToUpload}
+              onClick={handleUploadFile}
+              loading={isUploading}
+            >
+              Subir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

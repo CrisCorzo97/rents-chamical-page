@@ -926,29 +926,7 @@ export const getUserAndCommercialEnablement = async () => {
   }
 };
 
-const getDeclarableTax = async () => {
-  try {
-    const declarableTax = await dbSupabase.declarable_tax.findFirst({
-      where: {
-        id: 'commercial_activity',
-      },
-    });
-
-    if (!declarableTax) {
-      throw new Error('No se encontró el impuesto declarable');
-    }
-
-    return declarableTax;
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Hubo un error al obtener el impuesto declarable');
-  }
-};
-
-const uploadPaymentProof = async (input: {
+export const uploadPaymentProof = async (input: {
   invoice_id: string;
   file: File;
 }) => {
@@ -980,6 +958,28 @@ const uploadPaymentProof = async (input: {
     } else {
       throw new Error('Hubo un error al subir el comprobante de pago');
     }
+  }
+};
+
+const getDeclarableTax = async () => {
+  try {
+    const declarableTax = await dbSupabase.declarable_tax.findFirst({
+      where: {
+        id: 'commercial_activity',
+      },
+    });
+
+    if (!declarableTax) {
+      throw new Error('No se encontró el impuesto declarable');
+    }
+
+    return declarableTax;
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('Hubo un error al obtener el impuesto declarable');
   }
 };
 
