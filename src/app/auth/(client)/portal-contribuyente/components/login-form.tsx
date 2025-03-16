@@ -13,7 +13,7 @@ import {
   Input,
   Label,
 } from '@/components/ui';
-import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, InfoIcon } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { z } from 'zod';
 import { login } from '../auth-client.actions';
@@ -86,17 +86,18 @@ export function LoginForm() {
             </Button>
           </Link>
 
-          <Alert className='px-3 py-2 bg-blue-100 text-blue-800 border-blue-800'>
-            <AlertDescription>
-              Si ya te registrarte, recuerda validar tu cuenta a través del link
-              que te enviamos a tu correo.
-            </AlertDescription>
-          </Alert>
-
           <CardTitle className='text-2xl'>Iniciar Sesión</CardTitle>
           <CardDescription>
             Ingresa tus credenciales para acceder a tu cuenta de contribuyente.
           </CardDescription>
+
+          <Alert className='p-2 mt-4 bg-blue-50 border-blue-500 text-blue-600 border-l-4'>
+            <InfoIcon className='w-5 h-5 text-blue-600' />
+            <AlertDescription className='ml-2'>
+              Si ya te registrarte, recuerda validar tu cuenta a través del link
+              que te enviamos a tu correo.
+            </AlertDescription>
+          </Alert>
         </CardHeader>
         <CardContent>
           <form action={handleAction}>

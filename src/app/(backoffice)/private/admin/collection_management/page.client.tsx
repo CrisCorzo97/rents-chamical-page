@@ -9,23 +9,38 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
-import { useCallbackDebouncing, useFPS } from '@/hooks';
+import { useFPS } from '@/hooks';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { formatName, formatNumberToCurrency } from '@/lib/formatters';
 import {
+  Badge,
   Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Label,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui';
-import { Check, Eye, FileText, X } from 'lucide-react';
+import {
+  Check,
+  EllipsisVertical,
+  Eye,
+  FileText,
+  FilterX,
+  Upload,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { stateToSortBy } from '@/lib/table';
 import { CustomDataTable } from '@/components/data-table/customDataTable';
@@ -34,9 +49,29 @@ import clsx from 'clsx';
 import { Separator } from '@/components/ui/separator';
 import dayjs from 'dayjs';
 import locale from 'dayjs/locale/es';
+import { affidavit_status } from '@prisma/client';
+import { BadgeProps } from '@/components/ui/badge';
 import { acceptPayment, rejectPayment } from './actions';
 
 dayjs.locale(locale);
+
+const STATUS_DICTIONARY: Record<affidavit_status, string> = {
+  pending_payment: 'Pendiente de pago',
+  under_review: 'En revisión',
+  approved: 'Aprobado',
+  refused: 'Rechazado',
+  defeated: 'Vencido',
+};
+
+const STATUS_OPTIONS: {
+  value: affidavit_status | 'all';
+  label: string;
+}[] = [
+  { value: 'pending_payment', label: 'Pendiente de pago' },
+  { value: 'under_review', label: 'En revisión' },
+  { value: 'approved', label: 'Aprobado' },
+  { value: 'refused', label: 'Rechazado' },
+];
 
 interface CollectionManagementClientProps {
   data: Envelope<InvoiceWithRelations[]>;
@@ -49,7 +84,7 @@ export const CollectionManagementClient = ({
   sorting,
   filter,
 }: CollectionManagementClientProps) => {
-  const [queryFilter, setQueryFilter] = useState<string>(filter);
+  // const [queryFilter, setQueryFilter] = useState<string>(filter);
   const [recordDetails, setRecordDetails] =
     useState<InvoiceWithRelations | null>(null);
 
@@ -106,8 +141,44 @@ export const CollectionManagementClient = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='PAGADO EL DÍA' />
       ),
-      cell: ({ row }) => dayjs(row.original.payment_date).format('DD/MM/YYYY'),
+      cell: ({ row }) =>
+        dayjs(row.original.payment_date).format('DD/MM/YYYY HH:mm'),
       enableSorting: true,
+    },
+    {
+      id: 'status',
+      accessorKey: 'status',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='ESTADO' />
+      ),
+      cell: ({ row }) => {
+        let variant: BadgeProps['variant'] = 'default';
+
+        switch (row.original.status) {
+          case 'approved':
+            variant = 'success';
+            break;
+          case 'refused':
+            variant = 'error';
+            break;
+          case 'under_review':
+            variant = 'warning';
+            break;
+          case 'pending_payment':
+            variant = 'info';
+            break;
+          default:
+            variant = 'default';
+            break;
+        }
+
+        return (
+          <Badge variant={variant}>
+            {STATUS_DICTIONARY[row.original.status]}
+          </Badge>
+        );
+      },
+      enableSorting: false,
     },
     {
       id: 'actions',
@@ -124,100 +195,68 @@ export const CollectionManagementClient = ({
         };
 
         return (
-          <div className='flex flex-wrap items-center gap-2'>
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='outline'
-                    className='flex items-center gap-2'
-                    size='icon'
-                    onClick={selectRecord}
-                  >
-                    <FileText size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className='bg-black text-white'>
-                  <span>Ver detalles</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Link
-                    target='_blank'
-                    href={row.original.attached_receipt ?? '#'}
-                  >
-                    <Button
-                      variant='outline'
-                      className='flex items-center gap-2'
-                      size='icon'
-                    >
-                      <Eye size={18} />
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent className='bg-black text-white'>
-                  <span>Ver comprobante de pago</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='outline'
-                    className='flex items-center gap-2'
-                    size='icon'
-                    onClick={() => rejectPayment(row.original)}
-                  >
-                    <X size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className='bg-black text-white'>
-                  <span>Rechazar pago</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='outline'
-                    className='flex items-center gap-2'
-                    size='icon'
-                    onClick={() => acceptPayment(row.original)}
-                  >
-                    <Check size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className='bg-black text-white'>
-                  <span>Aprobar pago</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' size='icon'>
+                <EllipsisVertical size={18} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className='w-56'>
+              <DropdownMenuItem onClick={selectRecord}>
+                <FileText size={18} className='mr-2 text-gray-700' />
+                <span>Ver detalles</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link
+                  href={row.original.attached_receipt ?? '#'}
+                  target='_blank'
+                  className='relative flex cursor-default select-none items-center'
+                >
+                  <Eye size={18} className='mr-2 text-gray-700' />
+                  <span>Ver comprobante</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={row.original.attached_receipt !== null}
+              >
+                <Upload size={18} className='mr-2 text-gray-700' />
+                <span>Subir comprobante</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className='text-green-600'
+                disabled={row.original.status === 'approved'}
+                onClick={() => acceptPayment(row.original)}
+              >
+                <Check size={18} className='mr-2' />
+                <span>Aceptar</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className='text-destructive'
+                disabled={row.original.status === 'refused'}
+                onClick={() => rejectPayment(row.original)}
+              >
+                <X size={18} className='mr-2' />
+                <span>Rechazar</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       },
       enableSorting: false,
     },
   ];
 
-  useCallbackDebouncing({
-    value: queryFilter,
-    delay: 1200,
-    callback: () => {
-      if (queryFilter !== filter) {
-        handleFilter({
-          filter: queryFilter,
-        });
-      }
-    },
-  });
+  // useCallbackDebouncing({
+  //   value: queryFilter,
+  //   delay: 1200,
+  //   callback: () => {
+  //     if (queryFilter !== filter) {
+  //       handleFilter({
+  //         filter: queryFilter,
+  //       });
+  //     }
+  //   },
+  // });
 
   const table = useReactTable({
     data: data.data ?? [],
@@ -257,6 +296,38 @@ export const CollectionManagementClient = ({
             </Button>
           </Link>
         </div> */}
+        <div className='w-full max-w-md py-4 flex items-center gap-1'>
+          <Select
+            value={filter}
+            onValueChange={(val) =>
+              handleFilter({
+                filter: val,
+              })
+            }
+          >
+            <SelectTrigger className='w-[180px]'>
+              <SelectValue placeholder='Filtrar por estado' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {STATUS_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant='outline'
+            size='icon'
+            onClick={() => handleFilter({ filter: '' })}
+            disabled={!filter}
+          >
+            <FilterX size={18} />
+          </Button>
+        </div>
         <CustomDataTable<InvoiceWithRelations>
           tableTitle='Registros de facturas emitidas'
           columns={columns}
@@ -277,11 +348,17 @@ export const CollectionManagementClient = ({
       >
         {recordDetails && (
           <>
-            <CardHeader>
-              <CardTitle className='text-lg font-semibold'>
+            <CardHeader className='relative'>
+              <X
+                size={20}
+                className='absolute top-3 right-3 cursor-pointer text-gray-800'
+                onClick={() => setRecordDetails(null)}
+              />
+
+              <CardTitle className='text-lg underline font-semibold'>
                 Detalles del registro
               </CardTitle>
-              <CardDescription>
+              <CardDescription className='text-gray-800 font-semibold text-base'>
                 <strong>Comprobante Nro:</strong> {recordDetails.id}
               </CardDescription>
             </CardHeader>
@@ -340,12 +417,14 @@ export const CollectionManagementClient = ({
                 )}
               </span>
               <span className='font-light text-sm'>
-                <Label className='font-semibold'>Total a pagar:</Label>{' '}
+                <Label className='font-semibold'>Total a cobrar:</Label>{' '}
                 {formatNumberToCurrency(recordDetails.total_amount ?? 0)}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Pagado el día:</Label>{' '}
-                {dayjs(recordDetails.payment_date).format('DD/MM/YYYY')}
+                {recordDetails.payment_date
+                  ? dayjs(recordDetails.payment_date).format('DD/MM/YYYY')
+                  : '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Comprobante de pago:</Label>{' '}

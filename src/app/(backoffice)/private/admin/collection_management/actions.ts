@@ -110,6 +110,7 @@ export const acceptPayment = async (invoice: InvoiceWithRelations) => {
         id: invoice.id,
       },
       data: {
+        status: 'approved',
         payment_date: dayjs().toDate(),
         updated_at: dayjs().toDate(),
       },
@@ -172,6 +173,7 @@ export const rejectPayment = async (invoice: InvoiceWithRelations) => {
         id: invoice.id,
       },
       data: {
+        status: 'refused',
         payment_date: null,
         updated_at: dayjs().toDate(),
       },

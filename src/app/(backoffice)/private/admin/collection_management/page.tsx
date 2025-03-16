@@ -11,6 +11,7 @@ import { sortByToState } from '@/lib/table';
 import Link from 'next/link';
 import { CollectionManagementClient } from './page.client';
 import { getInvoicesWithRelations } from './actions';
+import { affidavit_status } from '@prisma/client';
 
 export default async function CollectionManagementPage({
   searchParams,
@@ -44,11 +45,7 @@ export default async function CollectionManagementPage({
     items_per_page,
     order_by,
     filter: {
-      user: {
-        first_name: {
-          contains: filter?.toUpperCase() ?? '',
-        },
-      },
+      status: filter as affidavit_status | undefined,
     },
   });
 

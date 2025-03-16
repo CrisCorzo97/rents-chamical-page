@@ -657,6 +657,7 @@ export const createInvoice = async (input: {
       compensatory_interest: interests,
       total_amount: totalAmount,
       due_date: dayjs().endOf('day').toDate(),
+      status: 'pending_payment',
       user: {
         connect: { id: user.id },
       },
@@ -749,6 +750,7 @@ export const updateInvoice = async (input: {
         compensatory_interest: interests,
         attached_receipt: attachmentUrl,
         payment_date: paymentDate,
+        status: attachmentUrl ? 'under_review' : undefined,
         updated_at: dayjs().toDate(),
       },
     });
