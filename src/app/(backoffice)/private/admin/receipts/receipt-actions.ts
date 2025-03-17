@@ -3,10 +3,30 @@
 import { generateReceiptCode } from '@/lib/code-generator';
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
-import { Prisma, receipt } from '@prisma/client';
+import {
+  affidavit,
+  declarable_tax,
+  Prisma,
+  receipt,
+  tax_penalties,
+  user,
+} from '@prisma/client';
 import dayjs from 'dayjs';
 import { revalidatePath } from 'next/cache';
 import { DailyBoxContent } from './components/dailyBoxReport';
+
+type AllReceipts =
+  | (receipt & { type: 'receipt' })
+  | (affidavit & {
+      user: user;
+      declarable_tax: declarable_tax;
+      type: 'affidavit';
+    })
+  | (tax_penalties & {
+      user: user;
+      declarable_tax: declarable_tax;
+      type: 'tax_penalty';
+    });
 
 export const getReceiptById = async (input: { id: string }) => {
   const response: Envelope<receipt> = {
@@ -296,11 +316,46 @@ export const generateDailyBoxReport = async (date: string) => {
       },
     });
 
-    if (!confirmedReceipts) {
-      throw new Error('Error getting confirmed receipts');
-    }
+    const affidavits = await dbSupabase.affidavit.findMany({
+      where: {
+        status: 'approved',
+        approved_at: {
+          not: null,
+          gte: dayjs(date).startOf('day').toISOString(),
+          lte: dayjs(date).endOf('day').toISOString(),
+        },
+      },
+      orderBy: {
+        approved_at: 'asc',
+      },
+      include: {
+        declarable_tax: true,
+        user: true,
+      },
+    });
 
-    if (confirmedReceipts.length === 0) {
+    const taxPenalties = await dbSupabase.tax_penalties.findMany({
+      where: {
+        payment_date: {
+          not: null,
+          gte: dayjs(date).startOf('day').toISOString(),
+          lte: dayjs(date).endOf('day').toISOString(),
+        },
+      },
+      orderBy: {
+        payment_date: 'asc',
+      },
+      include: {
+        declarable_tax: true,
+        user: true,
+      },
+    });
+
+    if (
+      !confirmedReceipts.length &&
+      !affidavits.length &&
+      !taxPenalties.length
+    ) {
       response.data = {
         total_amount_collected: 0,
         total_receipts: 0,
@@ -314,10 +369,12 @@ export const generateDailyBoxReport = async (date: string) => {
       return response;
     }
 
+    const allReceipts: AllReceipts[] = [];
     let total_amount = 0;
     const details: Record<string, number> = {};
 
     for (const receipt of confirmedReceipts) {
+      allReceipts.push({ ...receipt, type: 'receipt' });
       total_amount += receipt.amount;
 
       if (receipt.tax_type !== 'TASAS DIVERSAS') {
@@ -339,26 +396,127 @@ export const generateDailyBoxReport = async (date: string) => {
       }
     }
 
+    for (const affidavit of affidavits) {
+      allReceipts.push({ ...affidavit, type: 'affidavit' });
+      total_amount += affidavit.fee_amount;
+
+      const taxType = `DDJJ MENSUAL ${affidavit.declarable_tax.name.toUpperCase()}`;
+
+      if (details[taxType]) {
+        details[taxType] += affidavit.fee_amount;
+      } else {
+        details[taxType] = affidavit.fee_amount;
+      }
+    }
+
+    for (const taxPenalty of taxPenalties) {
+      allReceipts.push({ ...taxPenalty, type: 'tax_penalty' });
+      total_amount += taxPenalty.amount;
+
+      const taxType = `MULTA ${taxPenalty.declarable_tax.name.toUpperCase()}`;
+
+      if (details[taxType]) {
+        details[taxType] += taxPenalty.amount;
+      } else {
+        details[taxType] = taxPenalty.amount;
+      }
+    }
+
     const pageData: {
       page: number;
       subtotal: number;
-      receipts: receipt[];
+      receipts: {
+        id: string;
+        paid_at: Date;
+        taxpayer: string;
+        tax_type: string;
+        amount: number;
+      }[];
       total_items: number;
     }[] = [];
 
-    confirmedReceipts.forEach((receipt, index) => {
+    allReceipts.forEach((rec, index) => {
       if (index % 35 === 0) {
-        pageData.push({
-          page: pageData.length + 1,
-          subtotal: receipt.amount,
-          receipts: [receipt],
-          total_items: 1,
-        });
+        if (rec.type === 'receipt') {
+          pageData.push({
+            page: pageData.length + 1,
+            subtotal: rec.amount,
+            receipts: [
+              {
+                id: rec.id,
+                paid_at: rec.confirmed_at!,
+                taxpayer: rec.taxpayer,
+                tax_type: rec.tax_type,
+                amount: rec.amount,
+              },
+            ],
+            total_items: 1,
+          });
+        } else if (rec.type === 'affidavit') {
+          pageData.push({
+            page: pageData.length + 1,
+            subtotal: rec.fee_amount,
+            receipts: [
+              {
+                id: rec.invoice_id!,
+                paid_at: rec.approved_at!,
+                taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
+                tax_type: `DDJJ MENSUAL ${rec.declarable_tax.name.toUpperCase()}`,
+                amount: rec.fee_amount,
+              },
+            ],
+            total_items: 1,
+          });
+        } else if (rec.type === 'tax_penalty') {
+          pageData.push({
+            page: pageData.length + 1,
+            subtotal: rec.amount,
+            receipts: [
+              {
+                id: rec.invoice_id!,
+                paid_at: rec.payment_date!,
+                taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
+                tax_type: `MULTA ${rec.declarable_tax.name.toUpperCase()}`,
+                amount: rec.amount,
+              },
+            ],
+            total_items: 1,
+          });
+        }
       } else {
         const lastPage = pageData.find((p) => p.page === pageData.length);
-        lastPage!.subtotal += receipt.amount;
-        lastPage!.receipts.push(receipt);
-        lastPage!.total_items += 1;
+
+        if (rec.type === 'receipt') {
+          lastPage!.subtotal += rec.amount;
+          lastPage!.receipts.push({
+            id: rec.id,
+            paid_at: rec.confirmed_at!,
+            taxpayer: rec.taxpayer,
+            tax_type: rec.tax_type,
+            amount: rec.amount,
+          });
+          lastPage!.total_items += 1;
+        } else if (rec.type === 'affidavit') {
+          lastPage!.subtotal += rec.fee_amount;
+          lastPage!.receipts.push({
+            id: rec.invoice_id!,
+            paid_at: rec.approved_at!,
+            taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
+            tax_type: `DDJJ MENSUAL ${rec.declarable_tax.name.toUpperCase()}`,
+            amount: rec.fee_amount,
+          });
+          lastPage!.total_items += 1;
+        } else if (rec.type === 'tax_penalty') {
+          lastPage!.subtotal += rec.amount;
+          lastPage!.receipts.push({
+            id: rec.invoice_id!,
+            paid_at: rec.payment_date!,
+            taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
+            tax_type: `MULTA ${rec.declarable_tax.name.toUpperCase()}`,
+            amount: rec.amount,
+          });
+          lastPage!.total_items += 1;
+        }
       }
     });
 
@@ -369,7 +527,7 @@ export const generateDailyBoxReport = async (date: string) => {
           total_amount,
           details,
           other_data: {
-            confirmed_receipts: confirmedReceipts.length,
+            confirmed_receipts: allReceipts.length,
           },
         },
       });
