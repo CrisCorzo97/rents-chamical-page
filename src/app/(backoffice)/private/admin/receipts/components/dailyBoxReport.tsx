@@ -11,7 +11,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { receipt } from '@prisma/client';
 import { PDFViewer } from '@react-pdf/renderer';
 import { CalendarIcon, FileChartColumnIncreasing } from 'lucide-react';
 import { useState, useTransition } from 'react';
@@ -40,7 +39,13 @@ export type DailyBoxContent = {
   page_data: {
     page: number;
     subtotal: number;
-    receipts: receipt[];
+    receipts: {
+      id: string;
+      paid_at: Date;
+      taxpayer: string;
+      tax_type: string;
+      amount: number;
+    }[];
     total_items: number;
   }[];
 };

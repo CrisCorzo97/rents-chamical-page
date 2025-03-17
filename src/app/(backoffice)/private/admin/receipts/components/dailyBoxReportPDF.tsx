@@ -1,7 +1,5 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { formatName } from '@/lib/formatters';
-import { receipt } from '@prisma/client';
-import { JsonObject } from '@prisma/client/runtime/library';
+import { formatName, formatNumberToCurrency } from '@/lib/formatters';
 import {
   Document,
   Image,
@@ -183,7 +181,13 @@ const PageComponent = (details: {
   date: string;
   page: number;
   subtotal: number;
-  receipts: receipt[];
+  receipts: {
+    id: string;
+    paid_at: Date;
+    taxpayer: string;
+    tax_type: string;
+    amount: number;
+  }[];
   tax_summary: DailyBoxContent['tax_summary'];
   total_items: number;
   totalPages: number;
@@ -272,7 +276,7 @@ const PageComponent = (details: {
                       <Text
                         style={{ ...styles.contentTableBodyCell, width: '10%' }}
                       >
-                        {dayjs(item.confirmed_at).format('HH:mm')}hs
+                        {dayjs(item.paid_at).format('HH:mm')}hs
                       </Text>
                       <Text
                         style={{ ...styles.contentTableBodyCell, width: '15%' }}
@@ -290,21 +294,12 @@ const PageComponent = (details: {
                       <Text
                         style={{ ...styles.contentTableBodyCell, width: '30%' }}
                       >
-                        {item.tax_type === 'TASAS DIVERSAS'
-                          ? formatName(
-                              (item.other_data as JsonObject)!
-                                .tax_or_contribution as string
-                            )
-                          : formatName(item.tax_type)}
+                        {formatName(item.tax_type)}
                       </Text>
                       <Text
                         style={{ ...styles.contentTableBodyCell, width: '15%' }}
                       >
-                        $
-                        {item.amount.toLocaleString('es-AR', {
-                          maximumFractionDigits: 2,
-                          minimumFractionDigits: 2,
-                        })}
+                        {formatNumberToCurrency(item.amount)}
                       </Text>
                     </View>
                   ))
