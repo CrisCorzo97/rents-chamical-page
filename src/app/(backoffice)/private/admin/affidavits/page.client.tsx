@@ -28,6 +28,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
   Tooltip,
@@ -250,6 +251,7 @@ export const AffidavitsClient = ({
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
+                <SelectLabel>Estado</SelectLabel>
                 {STATUS_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
