@@ -25,16 +25,12 @@ import {
   CardHeader,
   CardTitle,
   Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
+  SelectContent, SelectItem, SelectTrigger,
   SelectValue,
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
+  TooltipTrigger
 } from '@/components/ui';
 import { FileText, FilterX, X } from 'lucide-react';
 import { CustomDataTable } from '@/components/data-table/customDataTable';
@@ -250,14 +246,11 @@ export const AffidavitsClient = ({
               <SelectValue placeholder='Filtrar por estado' />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Estado</SelectLabel>
                 {STATUS_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}
-              </SelectGroup>
             </SelectContent>
           </Select>
 

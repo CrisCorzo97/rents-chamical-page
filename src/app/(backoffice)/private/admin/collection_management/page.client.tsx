@@ -35,9 +35,7 @@ import {
   Label,
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui';
@@ -334,14 +332,11 @@ export const CollectionManagementClient = ({
               <SelectValue placeholder='Filtrar por estado' />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Estado</SelectLabel>
-                {STATUS_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
+              {STATUS_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
