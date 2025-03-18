@@ -134,16 +134,33 @@ export const CollectionManagementClient = ({
 
   const columns: ColumnDef<InvoiceWithRelations>[] = [
     {
+      id: 'id',
+      accessorKey: 'id',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='NRO' />
+      ),
+      cell: ({ row }) => row.original.id,
+      enableSorting: true,
+    },
+    {
       id: 'taxpayer',
       accessorKey: 'taxpayer',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='CONTRIBUYENTE' />
       ),
-      enableColumnFilter: true,
       cell: ({ row }) =>
         `${formatName(row.original.user?.first_name ?? '-')} ${formatName(
           row.original.user?.last_name ?? ''
         )}`,
+      enableSorting: false,
+    },
+    {
+      id: 'tax_id',
+      accessorKey: 'tax_id',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='CUIT' />
+      ),
+      cell: ({ row }) => row.original.user?.cuil ?? '-',
       enableSorting: false,
     },
     {
@@ -182,7 +199,9 @@ export const CollectionManagementClient = ({
         <DataTableColumnHeader column={column} title='PAGADO EL DÍA' />
       ),
       cell: ({ row }) =>
-        dayjs(row.original.payment_date).format('DD/MM/YYYY HH:mm'),
+        row.original.payment_date
+          ? dayjs(row.original.payment_date).format('DD/MM/YYYY HH:mm')
+          : '-',
       enableSorting: true,
     },
     {
