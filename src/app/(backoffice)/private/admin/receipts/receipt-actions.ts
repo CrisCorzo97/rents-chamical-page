@@ -523,7 +523,7 @@ export const generateDailyBoxReport = async (date: string) => {
     try {
       await dbSupabase.daily_box_report.create({
         data: {
-          date: dayjs().toDate(),
+          date,
           total_amount,
           details,
           other_data: {
