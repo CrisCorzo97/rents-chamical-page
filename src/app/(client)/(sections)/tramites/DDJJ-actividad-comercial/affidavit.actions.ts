@@ -496,8 +496,8 @@ export const createAffidavit = async (input: {
 
     const tentativePaymentDueDate = dayjs(period, 'MMMM-YYYY')
       .add(monthsToAdd, 'month')
-      .add(daysToAdd, 'day')
       .date(Number(declarableTax.procedure_expiration_day))
+      .add(daysToAdd, 'day')
       .format('YYYY-MM-DD');
 
     const paymentDueDate = await getFirstBusinessDay(tentativePaymentDueDate);
