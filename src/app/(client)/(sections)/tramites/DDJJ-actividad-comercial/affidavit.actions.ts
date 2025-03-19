@@ -47,6 +47,13 @@ type CalculateInfo = {
 
 const FINANCIAL_ACTIVITIES = ['Entidades Financieras'];
 
+const DAYS_TO_ADD_BY_TAX_ID = {
+  0: [0, 1, 2],
+  1: [3, 4, 5],
+  2: [6, 7],
+  3: [8, 9],
+};
+
 export const getAffidavits = async (input: {
   page?: string;
   items_per_page?: string;
@@ -476,12 +483,24 @@ export const createAffidavit = async (input: {
       paymentPeriodicity -
       (dayjs(period, 'MMMM-YYYY').month() % paymentPeriodicity === 0 ? 0 : 1);
 
-    const paymentDueDate = await getFirstBusinessDay(
-      dayjs(period, 'MMMM-YYYY')
-        .add(monthsToAdd, 'month')
-        .date(Number(declarableTax.procedure_expiration_day))
-        .format('YYYY-MM-DD')
-    );
+    let daysToAdd = 0;
+
+    for (const [key, value] of Object.entries(DAYS_TO_ADD_BY_TAX_ID)) {
+      const lastDigitTaxId = Number(user.user_metadata.tax_id.slice(-1));
+
+      if (value.includes(lastDigitTaxId)) {
+        daysToAdd = Number(key);
+        break;
+      }
+    }
+
+    const tentativePaymentDueDate = dayjs(period, 'MMMM-YYYY')
+      .add(monthsToAdd, 'month')
+      .add(daysToAdd, 'day')
+      .date(Number(declarableTax.procedure_expiration_day))
+      .format('YYYY-MM-DD');
+
+    const paymentDueDate = await getFirstBusinessDay(tentativePaymentDueDate);
 
     const affidavitData: Prisma.affidavitCreateInput = {
       tax_id: user.user_metadata.tax_id,
@@ -490,7 +509,7 @@ export const createAffidavit = async (input: {
       },
       declared_amount,
       fee_amount,
-      payment_due_date: dayjs(paymentDueDate).toDate(),
+      payment_due_date: dayjs(paymentDueDate).toISOString(),
       period: dayjs(period, 'MMMM-YYYY').format('YYYY-MM-DD'),
       status: 'pending_payment',
       user: {
