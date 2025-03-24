@@ -514,11 +514,17 @@ export const createAffidavit = async (input: {
       }
     }
 
-    const tentativePaymentDueDate = dayjs(period, 'MMMM-YYYY')
+    let tentativePaymentDueDate = dayjs(period, 'MMMM-YYYY')
       .add(monthsToAdd, 'month')
       .date(Number(declarableTax.procedure_expiration_day))
       .add(daysToAdd, 'day')
       .format('YYYY-MM-DD');
+
+    if (tentativePaymentDueDate.split('-')[1] === '03') {
+      tentativePaymentDueDate = dayjs(tentativePaymentDueDate)
+        .add(13, 'day')
+        .format('YYYY-MM-DD');
+    }
 
     const paymentDueDate = await getFirstBusinessDay(tentativePaymentDueDate);
 

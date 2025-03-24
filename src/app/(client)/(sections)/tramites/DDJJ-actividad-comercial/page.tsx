@@ -129,12 +129,22 @@ export default async function CommercialActivityAffidavitPage({
           </AlertDescription>
         </Alert>
 
-        <Alert className='my-6 w-full bg-blue-100 border-blue-500 md:col-span-5'>
-          <Info className='w-4 h-4' />
+        <Alert className='my-6 w-full bg-blue-100 border-blue-600 md:col-span-5'>
+          <Info size={18} className='text-blue-600' />
           <AlertTitle>¡Aviso importante!</AlertTitle>
           <AlertDescription>
             Las presentaciones de DDJJ de actividad comercial se realizan de
             forma mensual y el pago de las mismas se realiza de forma bimestral.
+            <p className='mt-2'>
+              Podés revisar las fechas de vencimiento para cada período en la{' '}
+              <Link
+                target='_blank'
+                className='underline text-blue-600 font-semibold'
+                href='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//RG%203_2025%20-%20Prorroga%20de%20vencimientos.pdf'
+              >
+                RG 03/2025
+              </Link>
+            </p>
           </AlertDescription>
         </Alert>
 
