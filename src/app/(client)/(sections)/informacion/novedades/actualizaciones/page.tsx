@@ -56,16 +56,22 @@ export default function RegulatoryUpdates() {
         </p>
 
         <RegulatoryUpdatesCard
+          title='RG 3/2025 - Prórroga de vencimientos'
+          date='Publicado el 21 de Marzo de 2025'
+          description='Esta resolución general establece una prórroga de los vencimientos de las tasas municipales para el año 2025. Se establece un nuevo calendario de vencimientos para los contribuyentes de acuerdo a la actividad comercial y el monto de ventas declarado.'
+          downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//RG%201_2025%20-%20Vencimientos.pdf'
+        />
+        <RegulatoryUpdatesCard
           title='Instructivo para confeccionar DDJJ Rentas Municipales'
           date='Publicado el 16 de Marzo de 2025'
           description='Este instructivo detalla los pasos a seguir para confeccionar la Declaración Jurada de Rentas Municipales. Se detallan los datos que deben ser completados por los contribuyentes y se establecen los plazos para su presentación.'
-          downloadLink='https://apkomtlxqddpzutagjvn.supabase.co/storage/v1/object/public/documents//Instructivo%20para%20confeccionar%20DDJJ%20Rentas%20Municipales.pdf'
+          downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//Instructivo%20para%20confeccionar%20DDJJ%20Rentas%20Municipales.pdf'
         />
         <RegulatoryUpdatesCard
           title='RG 1/2025 - Vencimientos'
           date='Publicado el 16 de Marzo de 2025'
           description='En esta resolución general se establecen los vencimientos para el año 2025 de las tasas municipales. Se establece un calendario de vencimientos para los contribuyentes de acuerdo a la actividad comercial y el monto de ventas declarado.'
-          downloadLink='https://apkomtlxqddpzutagjvn.supabase.co/storage/v1/object/public/documents//RG%201_2025%20-%20Vencimientos.pdf'
+          downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//RG%201_2025%20-%20Vencimientos.pdf'
         />
         <RegulatoryUpdatesCard
           title='Ordenanza Nro 540 - de modificación del Código Tributario Municipal - DEM'
