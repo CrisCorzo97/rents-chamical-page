@@ -27,12 +27,21 @@ import { formatName } from '@/lib/formatters';
 dayjs.extend(customParseFormat);
 dayjs.locale(locale);
 
-type Subcase = {
-  fee: number;
-  label: string;
-  amount_from: number;
-  amount_up_to: number;
-};
+type Subcase =
+  | {
+      type: 'variable';
+      fee: number;
+      label: string;
+      amount_from: number;
+      amount_up_to: number;
+    }
+  | {
+      type: 'fixed';
+      fixed_rate: number;
+      label: string;
+      amount_from: number;
+      amount_up_to: number;
+    };
 
 type Case = {
   category: string;
@@ -419,7 +428,11 @@ export const calculateFeeAmount = async (input: { amount: number }) => {
         throw new Error('No se encontró el caso para la actividad financiera');
       }
 
-      feeAliquot = feeCase.subcases[0].fee;
+      if (feeCase.subcases[0].type === 'fixed') {
+        feeAmount = feeCase.subcases[0].fixed_rate;
+      } else {
+        feeAliquot = feeCase.subcases[0].fee;
+      }
     } else {
       const feeCase = cases.find(
         (c) => c.category === 'Comercios-Servicios-Industrias'
@@ -435,13 +448,20 @@ export const calculateFeeAmount = async (input: { amount: number }) => {
           amount > subcase.amount_from &&
           (amount <= subcase.amount_up_to || subcase.amount_up_to < 0)
         ) {
-          feeAliquot = subcase.fee;
-          break;
+          if (subcase.type === 'fixed') {
+            feeAmount = subcase.fixed_rate;
+            break;
+          } else {
+            feeAliquot = subcase.fee;
+            break;
+          }
         }
       }
     }
 
-    feeAmount = amount * feeAliquot;
+    if (feeAliquot !== 0) {
+      feeAmount = amount * feeAliquot;
+    }
 
     if (feeAmount < minimun_tax_amount) {
       feeAmount = minimun_tax_amount;
@@ -494,11 +514,17 @@ export const createAffidavit = async (input: {
       }
     }
 
-    const tentativePaymentDueDate = dayjs(period, 'MMMM-YYYY')
+    let tentativePaymentDueDate = dayjs(period, 'MMMM-YYYY')
       .add(monthsToAdd, 'month')
       .date(Number(declarableTax.procedure_expiration_day))
       .add(daysToAdd, 'day')
       .format('YYYY-MM-DD');
+
+    if (tentativePaymentDueDate.split('-')[1] === '03') {
+      tentativePaymentDueDate = dayjs(tentativePaymentDueDate)
+        .add(13, 'day')
+        .format('YYYY-MM-DD');
+    }
 
     const paymentDueDate = await getFirstBusinessDay(tentativePaymentDueDate);
 

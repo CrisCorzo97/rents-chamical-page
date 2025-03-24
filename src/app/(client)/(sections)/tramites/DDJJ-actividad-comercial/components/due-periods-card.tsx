@@ -74,7 +74,6 @@ export function DuePeriodsCard({ periods }: DuePeriodsCardProps) {
                           period: dayjs(period.period, 'YYYY-MM').format(
                             'MMMM-YYYY'
                           ),
-                          dueDate: period.dueDate,
                         }
                       )}`
                     )
