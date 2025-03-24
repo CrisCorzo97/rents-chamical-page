@@ -16,10 +16,9 @@ export default async function CreateAffidavitPage({
 }: {
   searchParams: Promise<{
     period: string;
-    dueDate: string;
   }>;
 }) {
-  const { period, dueDate } = await searchParams;
+  const { period } = await searchParams;
 
   return (
     <article className='max-w-6xl mx-auto mb-8'>
@@ -60,31 +59,50 @@ export default async function CreateAffidavitPage({
           Presentación de Declaración Jurada
         </h1>
 
-        <Alert className='my-6 w-full bg-blue-100 border-blue-500'>
-          <Info className='w-4 h-4' />
-          <AlertTitle>
-            Información sobre la alícuota aplicada en base al monto declarado:
+        <Alert className='my-6 w-full bg-blue-100 border-blue-600'>
+          <Info className='text-blue-600 mt-2' size={16} />
+          <AlertTitle className='text-lg'>
+            Información sobre la escala de montos a pagar
           </AlertTitle>
           <AlertDescription>
             <strong>
               Bancos - Entidades Financieras - Compañías Financieras
             </strong>
-            <ul className='list-disc list-inside ml-4'>
-              <li>Alícuota única (0,5%)</li>
+            <ul className='list-disc list-inside ml-4 mb-2'>
+              <li>
+                Cálculo de Base por Alícuota única <b>(0,5%)</b>
+              </li>
             </ul>
             <strong>Comercios - Servicios - Industrias</strong>
-            <ul className='list-disc list-inside ml-4'>
-              <li>De $0 a $100.000.000 (0,15%)</li>
-              <li>Mayor a $100.000.000 y hasta $200.000.000 (0,125%)</li>
-              <li>Mayor a $200.000.000 y hasta $300.000.000 (0,1%)</li>
-              <li>Mayor a $300.000.000 y hasta $400.000.000 (0,075%)</li>
-              <li>Mayor a $400.000.000 y hasta $500.000.000 (0,05%)</li>
-              <li>Mayor a $500.000.000 y hasta $1.000.000.000 (0,035%)</li>
-              <li>Mayor a $1.000.000.000 (0,025%)</li>
+            <ul className='list-disc list-inside ml-4 mb-2'>
+              <li>
+                De $0 a $5.000.000: <b>$7.500</b>
+              </li>
+              <li>
+                Mayor a $5.000.000 y hasta $10.000.000: <b>$15.000</b>
+              </li>
+              <li>
+                Mayor a $10.000.000 y hasta $20.000.000: <b>$30.000</b>
+              </li>
+              <li>
+                Mayor a $20.000.000 y hasta $35.000.000: <b>$50.000</b>
+              </li>
+              <li>
+                Mayor a $35.000.000 y hasta $50.000.000: <b>$70.000</b>
+              </li>
+              <li>
+                Mayor a $50.000.000 y hasta $100.000.000: <b>$95.000</b>
+              </li>
+              <li>
+                Mayor a $100.000.000 y hasta $200.000.000: <b>$125.000</b>
+              </li>
+              <li>
+                Mayor a $200.000.000: <b>$165.000</b>
+              </li>
             </ul>
-            <span>
-              <strong>Tasa mínima a abonar:</strong> $7.500
-            </span>
+            <p>
+              Cabe destacar que la tasa mínima a abonar es de <b>$7.500</b>
+            </p>
           </AlertDescription>
         </Alert>
 
