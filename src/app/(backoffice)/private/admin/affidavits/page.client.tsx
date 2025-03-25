@@ -24,19 +24,17 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Select,
-  SelectContent, SelectItem, SelectTrigger,
-  SelectValue,
+  Label,
   Tooltip,
   TooltipContent,
   TooltipProvider,
-  TooltipTrigger
+  TooltipTrigger,
 } from '@/components/ui';
-import { FileText, FilterX, X } from 'lucide-react';
+import { FileText, X } from 'lucide-react';
 import { CustomDataTable } from '@/components/data-table/customDataTable';
 import { cn } from '@/lib/cn';
 import clsx from 'clsx';
-import { Label, Separator } from '@radix-ui/react-select';
+import { Separator } from '@radix-ui/react-select';
 dayjs.locale(locale);
 
 const STATUS_DICTIONARY: Record<affidavit_status, string> = {
@@ -184,6 +182,7 @@ export const AffidavitsClient = ({
           } else {
             setRecordDetails(null);
           }
+          console.log({ data: row.original, recordDetails });
         };
 
         return (
@@ -233,7 +232,7 @@ export const AffidavitsClient = ({
   return (
     <section className='w-full mb-10 flex flex-wrap gap-3'>
       <div className='w-full flex-1'>
-        <div className='w-full max-w-md py-4 flex items-center gap-1'>
+        {/* <div className='w-full max-w-md py-4 flex items-center gap-1'>
           <Select
             value={filter}
             onValueChange={(val) =>
@@ -246,11 +245,11 @@ export const AffidavitsClient = ({
               <SelectValue placeholder='Filtrar por estado' />
             </SelectTrigger>
             <SelectContent>
-                {STATUS_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
+              {STATUS_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -262,7 +261,7 @@ export const AffidavitsClient = ({
           >
             <FilterX size={18} />
           </Button>
-        </div>
+        </div> */}
         <CustomDataTable<AffidavitsWithRelations>
           tableTitle='Registros de facturas emitidas'
           columns={columns}
@@ -294,7 +293,7 @@ export const AffidavitsClient = ({
                 Detalles del registro
               </CardTitle>
               <CardDescription className='text-gray-800 font-semibold text-base'>
-                <strong>Comprobante Nro:</strong> {recordDetails.id}
+                <strong>ID:</strong> {recordDetails.id}
               </CardDescription>
             </CardHeader>
 
