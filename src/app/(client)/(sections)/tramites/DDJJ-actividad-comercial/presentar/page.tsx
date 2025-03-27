@@ -79,25 +79,25 @@ export default async function CreateAffidavitPage({
                 De $0 a $5.000.000: <b>$7.500</b>
               </li>
               <li>
-                Mayor a $5.000.000 y hasta $10.000.000: <b>$15.000</b>
+                Mayor a $5.000.000 y hasta $10.000.000: <b>$11.250</b>
               </li>
               <li>
-                Mayor a $10.000.000 y hasta $20.000.000: <b>$30.000</b>
+                Mayor a $10.000.000 y hasta $20.000.000: <b>$16.875</b>
               </li>
               <li>
-                Mayor a $20.000.000 y hasta $35.000.000: <b>$50.000</b>
+                Mayor a $20.000.000 y hasta $35.000.000: <b>$25.312,50</b>
               </li>
               <li>
-                Mayor a $35.000.000 y hasta $50.000.000: <b>$70.000</b>
+                Mayor a $35.000.000 y hasta $50.000.000: <b>$37.968,75</b>
               </li>
               <li>
-                Mayor a $50.000.000 y hasta $100.000.000: <b>$95.000</b>
+                Mayor a $50.000.000 y hasta $100.000.000: <b>$56.953,13</b>
               </li>
               <li>
-                Mayor a $100.000.000 y hasta $200.000.000: <b>$125.000</b>
+                Mayor a $100.000.000 y hasta $200.000.000: <b>$85.429,69</b>
               </li>
               <li>
-                Mayor a $200.000.000: <b>$165.000</b>
+                Mayor a $200.000.000: <b>$128.144,53</b>
               </li>
             </ul>
             <p>
