@@ -257,6 +257,11 @@ export const getConceptsToPay = async () => {
   };
 
   try {
+    const lte_payment_due_date =
+      dayjs().month() === 2
+        ? dayjs().add(1, 'month').endOf('month').toDate()
+        : dayjs().endOf('month').toDate();
+
     const { data: affidavits } = await getAffidavits({
       items_per_page: '100',
       filter: {
@@ -264,7 +269,7 @@ export const getConceptsToPay = async () => {
           in: ['pending_payment', 'refused'],
         },
         payment_due_date: {
-          lte: dayjs().endOf('month').toDate(),
+          lte: lte_payment_due_date,
         },
       },
     });
