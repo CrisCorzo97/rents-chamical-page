@@ -14,7 +14,7 @@ import { buildQuery } from '@/lib/url';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CalendarClock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { PeriodData } from '../../lib';
 
@@ -33,6 +33,28 @@ export function DuePeriodsCard({ periods }: DuePeriodsCardProps) {
   };
 
   const { push } = useRouter();
+
+  if (!periods || periods.length === 0) {
+    return (
+      <Card className='w-full md:col-span-3'>
+        <CardHeader>
+          <CardTitle className='text-xl font-semibold'>Vencimientos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='flex flex-col items-center justify-center py-8 text-center'>
+            <CalendarClock className='h-12 w-12 text-muted-foreground/50 mb-4' />
+            <h3 className='text-lg font-semibold text-muted-foreground mb-2'>
+              No hay vencimientos pendientes
+            </h3>
+            <p className='text-sm text-muted-foreground'>
+              Estás al día con tus pagos. Te notificaremos cuando haya nuevos
+              vencimientos.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className='w-full md:col-span-3'>
