@@ -372,6 +372,11 @@ export const getBalance = async () => {
   try {
     const { user } = await getUserAndCommercialEnablement();
 
+    const lte_payment_due_date =
+      dayjs().month() === 2
+        ? dayjs().add(1, 'month').endOf('month').toDate()
+        : dayjs().endOf('month').toDate();
+
     const affidavits = await dbSupabase.affidavit.findMany({
       where: {
         user: { id: user.id },
@@ -380,7 +385,7 @@ export const getBalance = async () => {
           in: ['pending_payment', 'refused'],
         },
         payment_due_date: {
-          lte: dayjs().endOf('month').toDate(),
+          lte: lte_payment_due_date,
         },
       },
     });
