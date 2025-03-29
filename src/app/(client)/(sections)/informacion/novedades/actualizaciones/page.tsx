@@ -56,6 +56,12 @@ export default function RegulatoryUpdates() {
         </p>
 
         <RegulatoryUpdatesCard
+          title='RG 4/2025 - Tramos'
+          date='Publicado el 28 de Marzo de 2025'
+          description='Esta resolución general establece los tramos de ingresos brutos para el año 2025. Se establecen los límites de ingresos brutos para cada tramo y se detallan el importe de la tasa aplicada a cada uno de ellos.'
+          downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//RG%204_2025%20-%20Tramos.pdf'
+        />
+        <RegulatoryUpdatesCard
           title='RG 3/2025 - Prórroga de vencimientos'
           date='Publicado el 21 de Marzo de 2025'
           description='Esta resolución general establece una prórroga de los vencimientos de las tasas municipales para el año 2025. Se establece un nuevo calendario de vencimientos para los contribuyentes de acuerdo a la actividad comercial y el monto de ventas declarado.'
