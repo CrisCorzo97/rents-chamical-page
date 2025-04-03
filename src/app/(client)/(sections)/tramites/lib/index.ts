@@ -57,9 +57,13 @@ export const getPendingDeclarations = async (input: {
       const presentationPeriodEnd = periodStart
         .add(presentationPeriodicity, 'month')
         .subtract(1, 'day');
-      const tentativeDueDate = presentationPeriodEnd
-        .add(1, 'month')
-        .date(Number(declarableTax.procedure_expiration_day));
+
+      const tentativeDueDate = [0, 1].includes(presentationPeriodEnd.month())
+        ? dayjs('2025-04-10') // Enero y Febrero vencen el 10 de abril
+        : presentationPeriodEnd
+            .add(1, 'month')
+            .date(Number(declarableTax.procedure_expiration_day));
+
       const dueDate = await getFirstBusinessDay(
         tentativeDueDate.format('YYYY-MM-DD')
       );
