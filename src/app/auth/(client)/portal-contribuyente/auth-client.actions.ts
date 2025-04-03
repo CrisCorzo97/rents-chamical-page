@@ -86,6 +86,27 @@ export const signup = async ({
   };
 
   try {
+    const existingUser = await dbSupabase.user.findFirst({
+      where: {
+        OR: [
+          {
+            email,
+            role_id: 5,
+          },
+          {
+            cuil: tax_id,
+            role_id: 5,
+          },
+        ],
+      },
+    });
+
+    if (existingUser) {
+      throw new Error(
+        'Ya existe un usuario registrado con el mismo email o CUIT.'
+      );
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const hashedPassword = await bcrypt.hash(password, 7);
