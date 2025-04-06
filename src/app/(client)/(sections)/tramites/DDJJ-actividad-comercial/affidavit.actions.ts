@@ -668,6 +668,9 @@ export const createInvoice = async (input: {
         },
         user: { id: user.id },
       },
+      orderBy: {
+        payment_due_date: 'desc',
+      },
     });
 
     // Busco las multas en base a los ids
@@ -711,7 +714,7 @@ export const createInvoice = async (input: {
       fee_amount: feeAmount,
       compensatory_interest: interests,
       total_amount: totalAmount,
-      due_date: dayjs().endOf('day').toDate(),
+      due_date: affidavits[0].payment_due_date,
       status: 'pending_payment',
       user: {
         connect: { id: user.id },
