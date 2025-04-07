@@ -709,12 +709,19 @@ export const createInvoice = async (input: {
       throw new Error('No se pudo obtener el código de la factura');
     }
 
+    const due_date = dayjs().isAfter(
+      dayjs(affidavits[0].payment_due_date),
+      'day'
+    )
+      ? dayjs().endOf('day').toISOString()
+      : affidavits[0].payment_due_date;
+
     const invoiceData: Prisma.invoiceCreateInput = {
       id: invoiceId,
       fee_amount: feeAmount,
       compensatory_interest: interests,
       total_amount: totalAmount,
-      due_date: affidavits[0].payment_due_date,
+      due_date,
       status: 'pending_payment',
       user: {
         connect: { id: user.id },
