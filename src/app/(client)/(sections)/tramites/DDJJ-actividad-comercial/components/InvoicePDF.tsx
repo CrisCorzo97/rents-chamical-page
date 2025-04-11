@@ -9,6 +9,8 @@ import {
   Image,
 } from '@react-pdf/renderer';
 import { generateBarcodeBase64 } from '@/lib/code-generator';
+import { ConceptToPay } from '../types';
+import { formatNumberToCurrency } from '@/lib/formatters';
 
 const styles = StyleSheet.create({
   page: {
@@ -150,12 +152,6 @@ const styles = StyleSheet.create({
   },
 });
 
-interface InvoiceItem {
-  concept: string;
-  period: string;
-  amount: number;
-}
-
 interface MunicipalInvoiceProps {
   invoiceData: {
     invoiceId: string;
@@ -163,7 +159,7 @@ interface MunicipalInvoiceProps {
     taxpayerName: string;
     taxpayerId: string;
     address: string;
-    items: InvoiceItem[];
+    items: ConceptToPay[];
     dueDate: string;
     paymentInfo: {
       bank: string;
@@ -244,8 +240,8 @@ const MunicipalInvoice: React.FC<MunicipalInvoiceProps> = ({ invoiceData }) => {
                 <Text>Importe</Text>
               </View>
             </View>
-            {invoiceData.items.map((item, index) => (
-              <View key={index} style={styles.tableRow}>
+            {invoiceData.items.map((item) => (
+              <View key={item.id} style={styles.tableRow}>
                 <View style={[styles.tableCell, styles.columnConcept]}>
                   <Text>{item.concept}</Text>
                 </View>
@@ -253,13 +249,13 @@ const MunicipalInvoice: React.FC<MunicipalInvoiceProps> = ({ invoiceData }) => {
                   <Text>{item.period}</Text>
                 </View>
                 <View style={[styles.tableCell, styles.columnAmount]}>
-                  <Text>$ {item.amount.toFixed(2)}</Text>
+                  <Text>{formatNumberToCurrency(item.amount)}</Text>
                 </View>
               </View>
             ))}
           </View>
           <View style={styles.totalRow}>
-            <Text>TOTAL A PAGAR: $ {total.toFixed(2)}</Text>
+            <Text>TOTAL A PAGAR: {formatNumberToCurrency(total)}</Text>
           </View>
           <View style={styles.dueDate}>
             <Text>Vencimiento: {invoiceData.dueDate}</Text>

@@ -2,9 +2,12 @@
 
 import { PDFViewer } from '@react-pdf/renderer';
 import { useState } from 'react';
-import MunicipalInvoice from '../../components/InvoicePDF';
+import MunicipalInvoice from '@/app/(client)/(sections)/tramites/DDJJ-actividad-comercial/components/InvoicePDF';
 import dayjs from 'dayjs';
-import { InvoiceWithRelations } from '../../types';
+import {
+  InvoiceWithRelations,
+  ConceptToPay,
+} from '@/app/(client)/(sections)/tramites/DDJJ-actividad-comercial/types';
 import { commercial_enablement } from '@prisma/client';
 import { User } from '@supabase/supabase-js';
 import { formatName } from '@/lib/formatters';
@@ -14,7 +17,7 @@ export function InvoicePageClient({
   user,
   commercialEnablement,
 }: {
-  invoice: InvoiceWithRelations;
+  invoice: InvoiceWithRelations & { concepts: ConceptToPay[] };
   user: User;
   commercialEnablement: commercial_enablement;
 }) {
@@ -26,26 +29,7 @@ export function InvoicePageClient({
     ),
     taxpayerId: user.user_metadata.tax_id ?? '-',
     address: commercialEnablement.address ?? '-',
-    items: [
-      {
-        concept: 'DDJJ Actividad Comercial',
-        description: 'DDJJ Actividad Comercial',
-        period: 'Ene 2025',
-        amount: 5000.0,
-      },
-      {
-        concept: 'DDJJ Actividad Comercial',
-        description: 'Tasa de Seguridad e Higiene',
-        period: 'Ene 2025',
-        amount: 2500.0,
-      },
-      {
-        concept: 'Multa',
-        description: 'Recargo por Mora (vto: 10/02/2025)',
-        period: 'Ene 2025',
-        amount: 500.0,
-      },
-    ],
+    items: invoice.concepts,
     dueDate: dayjs(invoice.due_date).format('DD/MM/YYYY'),
     paymentInfo: {
       bank: 'Banco Rioja SAU',

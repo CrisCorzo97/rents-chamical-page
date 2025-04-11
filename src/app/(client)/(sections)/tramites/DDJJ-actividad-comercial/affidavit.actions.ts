@@ -293,8 +293,8 @@ export const getConceptsToPay = async () => {
     for (const affidavit of affidavits) {
       concepts.push({
         id: affidavit.id,
-        concept: 'Declaración Jurada',
-        period: formatName(dayjs(affidavit.period).format('MMMM-YYYY')),
+        concept: 'DDJJ Actividad Comercial',
+        period: formatName(dayjs(affidavit.period).format('MMMM YYYY')),
         amount: affidavit.fee_amount,
         dueDate: dayjs(affidavit.payment_due_date).format('DD/MM/YYYY'),
       });
@@ -304,7 +304,7 @@ export const getConceptsToPay = async () => {
       concepts.push({
         id: penalty.id,
         concept: 'Multa',
-        period: formatName(dayjs(penalty.period).format('MMMM-YYYY')),
+        period: formatName(dayjs(penalty.period).format('MMMM YYYY')),
         amount: penalty.amount,
         dueDate: dayjs(penalty.created_at).format('DD/MM/YYYY'),
       });
@@ -954,8 +954,15 @@ export const getInvoices = async (input: {
   }
 };
 
-export const getInvoice = async (invoice_id: string) => {
-  const response: Envelope<InvoiceWithRelations> = {
+export const getInvoice = async (input: {
+  invoice_id: string;
+  concepts?: boolean;
+}) => {
+  const { invoice_id, concepts = false } = input;
+
+  const response: Envelope<
+    InvoiceWithRelations & { concepts: ConceptToPay[] }
+  > = {
     success: true,
     data: null,
     error: null,
@@ -976,7 +983,34 @@ export const getInvoice = async (invoice_id: string) => {
       throw new Error('No se encontró la factura');
     }
 
-    response.data = invoice;
+    const concepts: ConceptToPay[] = [];
+
+    if (concepts) {
+      for (const affidavit of invoice.affidavit) {
+        concepts.push({
+          id: affidavit.id,
+          concept: 'DDJJ Actividad Comercial',
+          period: formatName(dayjs(affidavit.period).format('MMMM YYYY')),
+          amount: affidavit.fee_amount,
+          dueDate: dayjs(affidavit.payment_due_date).format('DD/MM/YYYY'),
+        });
+      }
+
+      for (const penalty of invoice.tax_penalties) {
+        concepts.push({
+          id: penalty.id,
+          concept: 'Multa',
+          period: formatName(dayjs(penalty.period).format('MMMM YYYY')),
+          amount: penalty.amount,
+          dueDate: dayjs(penalty.created_at).format('DD/MM/YYYY'),
+        });
+      }
+    }
+
+    response.data = {
+      ...invoice,
+      concepts,
+    };
   } catch (error) {
     console.error(error);
     response.success = false;

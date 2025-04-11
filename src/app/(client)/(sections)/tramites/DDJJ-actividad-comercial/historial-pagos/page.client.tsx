@@ -34,6 +34,7 @@ import { useState } from 'react';
 import { InvoiceWithRelations } from '../types';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 dayjs.extend(customParseFormat);
 
 interface PaymentHistoryTableProps {
@@ -103,12 +104,6 @@ export function PaymentHistoryClient({
           }
         };
 
-        const handleViewInvoice = () => {
-          router.push(
-            `/tramites/DDJJ-actividad-comercial/historial-pagos/${row.original.id}`
-          );
-        };
-
         return (
           <div className='flex items-center gap-2'>
             <TooltipProvider>
@@ -128,23 +123,27 @@ export function PaymentHistoryClient({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant='outline'
-                    className='flex items-center gap-2'
-                    size='icon'
-                    onClick={handleViewInvoice}
-                  >
-                    <FileDown size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className='bg-black text-white'>
-                  <span>Descargar factura</span>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Link
+              href={`/pdf-viewer/factura/${row.original.id}`}
+              target='_blank'
+            >
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='outline'
+                      className='flex items-center gap-2'
+                      size='icon'
+                    >
+                      <FileDown size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className='bg-black text-white'>
+                    <span>Descargar factura</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Link>
           </div>
         );
       },
