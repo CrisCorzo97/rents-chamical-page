@@ -10,6 +10,15 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import Link from 'next/link';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
 
 export type NavbarMenuItems = {
   key: string;
@@ -102,70 +111,125 @@ export const MainHeader = () => {
 
   return (
     <header className='w-full h-20 flex grow-0 items-center justify-center bg-primary'>
-      <section className='max-w-6xl w-full flex items-center justify-between'>
+      <section className='max-w-6xl w-full flex items-center justify-between px-4'>
         <div className='flex gap-2'>
-          <LogoRents height={60} fill='#fff' />
+          <LogoRents className='h-12 w-auto md:h-16' fill='#fff' />
         </div>
 
-        <NavigationMenu>
-          <NavigationMenuList>
-            {items.map((item) => (
-              <NavigationMenuItem key={item.key}>
-                {item.subItems ? (
-                  <>
+        {/* Desktop Navigation */}
+        <div className='hidden md:block'>
+          <NavigationMenu>
+            <NavigationMenuList>
+              {items.map((item) => (
+                <NavigationMenuItem key={item.key}>
+                  {item.subItems ? (
+                    <>
+                      <Link href={item.href} prefetch legacyBehavior passHref>
+                        <NavigationMenuTrigger
+                          className={navigationMenuTriggerStyle({
+                            className:
+                              'bg-primary text-primary-foreground hover:bg-primary/90',
+                          })}
+                        >
+                          {item.label}
+                        </NavigationMenuTrigger>
+                      </Link>
+                      <NavigationMenuContent>
+                        {item.subItems.map((subItem) => (
+                          <ul
+                            key={subItem.key}
+                            className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'
+                          >
+                            <ListItem
+                              key={subItem.key}
+                              title={subItem.label}
+                              href={`${item.href}${subItem.href}`}
+                            >
+                              {subItem.subItems ? (
+                                <div className='flex flex-col'>
+                                  {subItem.subItems.map((subSubItem) => (
+                                    <span key={subSubItem.key}>
+                                      {subSubItem.label}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <></>
+                              )}
+                            </ListItem>
+                          </ul>
+                        ))}
+                      </NavigationMenuContent>
+                    </>
+                  ) : (
                     <Link href={item.href} prefetch legacyBehavior passHref>
-                      <NavigationMenuTrigger
+                      <NavigationMenuLink
                         className={navigationMenuTriggerStyle({
                           className:
                             'bg-primary text-primary-foreground hover:bg-primary/90',
                         })}
                       >
                         {item.label}
-                      </NavigationMenuTrigger>
+                      </NavigationMenuLink>
                     </Link>
-                    <NavigationMenuContent>
-                      {item.subItems.map((subItem) => (
-                        <ul
-                          key={subItem.key}
-                          className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'
-                        >
-                          <ListItem
-                            key={subItem.key}
-                            title={subItem.label}
-                            href={`${item.href}${subItem.href}`}
-                          >
-                            {subItem.subItems ? (
-                              <div className='flex flex-col'>
-                                {subItem.subItems.map((subSubItem) => (
-                                  <span key={subSubItem.key}>
-                                    {subSubItem.label}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : (
-                              <></>
-                            )}
-                          </ListItem>
-                        </ul>
-                      ))}
-                    </NavigationMenuContent>
-                  </>
-                ) : (
-                  <Link href={item.href} prefetch legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle({
-                        className:
-                          'bg-primary text-primary-foreground hover:bg-primary/90',
-                      })}
-                    >
-                      {item.label}
-                    </NavigationMenuLink>
-                  </Link>
-                )}
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+                  )}
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className='md:hidden'>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='text-white hover:bg-primary/90'
+              >
+                <Menu className='h-6 w-6' />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side='right' className='w-full bg-primary text-white'>
+              <SheetTitle className='text-white'>
+                <LogoRents className='h-12 w-auto md:h-16' fill='#fff' />
+              </SheetTitle>
+              <SheetDescription className='text-white'></SheetDescription>
+              <nav className='flex flex-col gap-4 mt-8'>
+                {items.map((item) => (
+                  <div key={item.key}>
+                    {item.subItems ? (
+                      <div className='flex flex-col gap-2'>
+                        <Link href={item.href} className='text-lg font-medium'>
+                          {item.label}
+                        </Link>
+                        <div className='flex flex-col gap-2 pl-4'>
+                          {item.subItems.map((subItem) => (
+                            <Link
+                              key={subItem.key}
+                              href={`${item.href}${subItem.href}`}
+                              className='text-base hover:text-primary-foreground/80'
+                            >
+                              {subItem.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className='text-lg font-medium hover:text-primary-foreground/80'
+                      >
+                        {item.label}
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </section>
     </header>
   );
