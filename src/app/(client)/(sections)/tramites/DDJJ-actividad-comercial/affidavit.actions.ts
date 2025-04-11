@@ -925,6 +925,7 @@ export const getInvoices = async (input: {
         ...queries,
         include: {
           affidavit: true,
+          tax_penalties: true,
         },
       }),
       dbSupabase.invoice.count({
@@ -947,6 +948,43 @@ export const getInvoices = async (input: {
       response.error = error.message;
     } else {
       response.error = 'Hubo un error al obtener las facturas';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const getInvoice = async (invoice_id: string) => {
+  const response: Envelope<InvoiceWithRelations> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const invoice = await dbSupabase.invoice.findFirst({
+      where: { id: invoice_id },
+      include: {
+        affidavit: true,
+        tax_penalties: true,
+        user: true,
+      },
+    });
+
+    if (!invoice) {
+      throw new Error('No se encontró la factura');
+    }
+
+    response.data = invoice;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al obtener la factura';
     }
   } finally {
     return response;

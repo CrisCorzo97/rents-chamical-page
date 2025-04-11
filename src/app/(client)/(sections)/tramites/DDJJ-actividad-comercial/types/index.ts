@@ -1,4 +1,4 @@
-import { affidavit, invoice, user } from '@prisma/client';
+import { affidavit, invoice, tax_penalties, user } from '@prisma/client';
 
 export type AffidavitWithRelations = affidavit & {
   user: user | null;
@@ -7,6 +7,7 @@ export type AffidavitWithRelations = affidavit & {
 
 export type InvoiceWithRelations = invoice & {
   affidavit: affidavit[] | null;
+  tax_penalties: tax_penalties[] | null;
 };
 
 export type ConceptToPay = {

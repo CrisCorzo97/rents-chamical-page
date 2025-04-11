@@ -30,10 +30,10 @@ import {
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { FileDown, FileText } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 import { InvoiceWithRelations } from '../types';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useRouter } from 'next/navigation';
 dayjs.extend(customParseFormat);
 
 interface PaymentHistoryTableProps {
@@ -47,6 +47,7 @@ export function PaymentHistoryClient({
 }: PaymentHistoryTableProps) {
   const [recordDetails, setRecordDetails] =
     useState<InvoiceWithRelations | null>(null);
+  const router = useRouter();
 
   const { handleSort, handlePagination } = useFPS({
     pagination: data.pagination as Pagination,
@@ -102,6 +103,12 @@ export function PaymentHistoryClient({
           }
         };
 
+        const handleViewInvoice = () => {
+          router.push(
+            `/tramites/DDJJ-actividad-comercial/historial-pagos/${row.original.id}`
+          );
+        };
+
         return (
           <div className='flex items-center gap-2'>
             <TooltipProvider>
@@ -121,27 +128,23 @@ export function PaymentHistoryClient({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <Link
-              href={`/private/admin/cementery/edit/${row.original.id}`}
-              prefetch
-            >
-              <TooltipProvider>
-                <Tooltip delayDuration={300}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant='outline'
-                      className='flex items-center gap-2'
-                      size='icon'
-                    >
-                      <FileDown size={18} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent className='bg-black text-white'>
-                    <span>Descargar factura</span>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </Link>
+            <TooltipProvider>
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='outline'
+                    className='flex items-center gap-2'
+                    size='icon'
+                    onClick={handleViewInvoice}
+                  >
+                    <FileDown size={18} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className='bg-black text-white'>
+                  <span>Descargar factura</span>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         );
       },

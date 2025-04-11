@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import JsBarcode from "jsbarcode";
 
 // función que reciba el último código de comprobante y devuelva el siguiente, siegiendo la secuencia de comprobantes
 // La estructura del código de comprobante es la siguiente:
@@ -95,4 +96,18 @@ export function validateInvoiceCode(code: string) {
   }
 
   return true;
+}
+
+
+// función para generar el código de barra de la factura
+export function generateBarcodeBase64(data: string): string {
+  const canvas = document.createElement("canvas");
+  JsBarcode(canvas, data, {
+    format: "CODE128",
+    width: 2,
+    height: 60,
+    displayValue: false,
+    margin: 0,
+  });
+  return canvas.toDataURL("image/png");
 }
