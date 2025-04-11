@@ -30,10 +30,11 @@ import {
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { FileDown, FileText } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 import { InvoiceWithRelations } from '../types';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 dayjs.extend(customParseFormat);
 
 interface PaymentHistoryTableProps {
@@ -47,6 +48,7 @@ export function PaymentHistoryClient({
 }: PaymentHistoryTableProps) {
   const [recordDetails, setRecordDetails] =
     useState<InvoiceWithRelations | null>(null);
+  const router = useRouter();
 
   const { handleSort, handlePagination } = useFPS({
     pagination: data.pagination as Pagination,
@@ -122,8 +124,8 @@ export function PaymentHistoryClient({
               </Tooltip>
             </TooltipProvider>
             <Link
-              href={`/private/admin/cementery/edit/${row.original.id}`}
-              prefetch
+              href={`/pdf-viewer/factura/${row.original.id}`}
+              target='_blank'
             >
               <TooltipProvider>
                 <Tooltip delayDuration={300}>
