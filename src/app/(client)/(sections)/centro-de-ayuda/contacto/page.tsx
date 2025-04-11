@@ -58,8 +58,11 @@ export default function Contact() {
             </p>
             <p className='font-light ml-6'>
               <b>Escríbenos a:</b>{' '}
-              <a href='mailto:' className='underline text-blue-500'>
-                [email@rentas.com]
+              <a
+                href='mailto:dir.rentas.chami@gmail.com'
+                className='underline text-blue-500'
+              >
+                dir.rentas.chami@gmail.com
               </a>
             </p>
           </li>
@@ -80,7 +83,7 @@ export default function Contact() {
               </li>
               <li className='mb-2'>
                 <span>
-                  Comunicate al: <b>0800-123-RENTAS (736827)</b>
+                  Comunicate al: <b>(3826) 416199</b>
                 </span>
               </li>
             </ul>
@@ -96,7 +99,7 @@ export default function Contact() {
             <ul className='list-disc list-inside font-light ml-8'>
               <li className='mb-2'>
                 <span>
-                  Dirección: <b>Calle Principal 123, Ciudad</b>
+                  Dirección: <b>Juan Domingo Perón 50, Chamical</b>
                 </span>
               </li>
               <li className='mb-2'>
