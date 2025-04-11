@@ -103,6 +103,16 @@ export default async function CreateAffidavitPage({
             <p>
               Cabe destacar que la tasa mínima a abonar es de <b>$7.500</b>
             </p>
+            <p className='mt-2'>
+              Podés revisar los detalles de cada tramo en la{' '}
+              <Link
+                target='_blank'
+                className='underline text-blue-600 font-semibold'
+                href='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//RG%204_2025%20-%20Tramos.pdf'
+              >
+                RG 04/2025
+              </Link>
+            </p>
           </AlertDescription>
         </Alert>
 
