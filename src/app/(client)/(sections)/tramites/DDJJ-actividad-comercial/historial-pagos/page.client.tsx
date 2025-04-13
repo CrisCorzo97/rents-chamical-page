@@ -85,7 +85,10 @@ export function PaymentHistoryClient({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='FECHA DE PAGO' />
       ),
-      cell: ({ row }) => dayjs(row.original.payment_date).format('DD/MM/YYYY'),
+      cell: ({ row }) =>
+        row.original.payment_date
+          ? dayjs(row.original.payment_date).format('DD/MM/YYYY')
+          : '-',
       enableSorting: true,
     },
     {
@@ -170,7 +173,7 @@ export function PaymentHistoryClient({
   });
 
   return (
-    <section className='w-full mb-10 flex flex-wrap gap-3'>
+    <section className='w-full mb-10 mt-6 flex flex-wrap gap-3'>
       <div className='w-full flex-1'>
         <CustomDataTable<InvoiceWithRelations>
           tableTitle='Registros de cementerio'
@@ -230,7 +233,9 @@ export function PaymentHistoryClient({
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Fecha de pago:</Label>{' '}
-                {dayjs(recordDetails.payment_date).format('DD/MM/YYYY')}
+                {recordDetails.payment_date
+                  ? dayjs(recordDetails.payment_date).format('DD/MM/YYYY')
+                  : '-'}
               </span>
               <span className='font-light text-sm'>
                 <Label className='font-semibold'>Período/s:</Label>{' '}

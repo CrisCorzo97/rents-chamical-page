@@ -47,7 +47,7 @@ export default async function PaymentHistoryPage({
 
   return (
     <article className='max-w-6xl mx-auto mb-8'>
-      <section className='mx-6 h-admin-scroll-area'>
+      <section className='h-admin-scroll-area md:mx-6'>
         <Breadcrumb className='h-12 mt-6'>
           <BreadcrumbList>
             <BreadcrumbItem>

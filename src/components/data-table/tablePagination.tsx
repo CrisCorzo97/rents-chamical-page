@@ -40,11 +40,11 @@ export function TablePagination(props: TablePagination) {
 
   const pagesRendered = useMemo(() => {
     if (pages.length > 5) {
-      const init = pagination?.page - 3 < 0 ? 0 : pagination?.page - 3;
+      const init = pagination?.page - 2 < 0 ? 0 : pagination?.page - 2;
       const end =
-        pagination?.page + 3 > pagination?.total_pages - 1
+        pagination?.page + 2 > pagination?.total_pages - 1
           ? pagination?.total_pages
-          : pagination?.page + 3;
+          : pagination?.page + 2;
 
       return pages.slice(init, end);
     } else {
@@ -52,74 +52,88 @@ export function TablePagination(props: TablePagination) {
     }
   }, [pages, pagination]);
 
-  return (
-    <section className='flex items-center justify-between w-full'>
-      <Pagination className='justify-start p-2 flex-1'>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() =>
-                handlePagination({
-                  page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
-                  limit: pagination?.limit_per_page,
-                })
-              }
-              disabled={pagination?.page === 1}
-            />
-          </PaginationItem>
-          {pagesRendered[0] > 1 && (
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          )}
-          <PaginationItem>
-            {pagesRendered.map((page) => {
-              const isCurrent = pagination?.page === page;
+  const currentRange = useMemo(() => {
+    const start = pagination?.limit_per_page * (pagination?.page - 1) + 1;
+    const end = Math.min(
+      pagination?.limit_per_page * pagination?.page,
+      pagination?.total_items
+    );
+    return `${start} - ${end} de ${pagination?.total_items}`;
+  }, [pagination]);
 
-              return (
-                <PaginationLink
-                  key={page}
-                  size='sm'
-                  onClick={() =>
-                    handlePagination({
-                      page,
-                      limit: pagination?.limit_per_page,
-                    })
-                  }
-                  isActive={isCurrent ? true : undefined}
-                >
-                  {page}
-                </PaginationLink>
-              );
-            })}
-          </PaginationItem>
-          {pagination?.total_pages >
-            pagesRendered[pagesRendered.length - 1] && (
+  return (
+    <div className='flex flex-col sm:flex-row items-center justify-between w-full gap-4 p-4'>
+      <div className='flex items-center justify-center w-full sm:w-auto order-2 sm:order-1'>
+        <Pagination>
+          <PaginationContent className='gap-1 md:gap-2'>
             <PaginationItem>
-              <PaginationEllipsis />
+              <PaginationPrevious
+                onClick={() =>
+                  handlePagination({
+                    page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
+                    limit: pagination?.limit_per_page,
+                  })
+                }
+                disabled={pagination?.page === 1}
+                className='h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2'
+              />
             </PaginationItem>
-          )}
-          <PaginationItem>
-            <PaginationNext
-              onClick={() =>
-                handlePagination({
-                  page:
-                    pagination?.page + 1 <= pagination?.total_pages
-                      ? pagination?.page + 1
-                      : pagination?.total_pages,
-                  limit: pagination?.limit_per_page,
-                })
-              }
-              disabled={pagination?.page === pagination?.total_pages}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-      <div className='flex items-center justify-end gap-2 p-2 flex-1'>
-        <span className='text-sm'>
-          {`${pagination?.limit_per_page * (pagination?.page - 1) + 1} - ${
-            pagination?.limit_per_page * pagination?.page
-          } de ${pagination?.total_items} registros.`}
+
+            <div className='hidden sm:flex items-center gap-1'>
+              {pagesRendered[0] > 1 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              {pagesRendered.map((page) => {
+                const isCurrent = pagination?.page === page;
+                return (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() =>
+                        handlePagination({
+                          page,
+                          limit: pagination?.limit_per_page,
+                        })
+                      }
+                      isActive={isCurrent}
+                      className='h-8 min-w-8 sm:h-9 sm:min-w-9'
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+              {pagination?.total_pages >
+                pagesRendered[pagesRendered.length - 1] && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+            </div>
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  handlePagination({
+                    page:
+                      pagination?.page + 1 <= pagination?.total_pages
+                        ? pagination?.page + 1
+                        : pagination?.total_pages,
+                    limit: pagination?.limit_per_page,
+                  })
+                }
+                disabled={pagination?.page === pagination?.total_pages}
+                className='h-8 w-8 p-0 sm:h-9 sm:w-9 sm:p-2'
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+
+      <div className='flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto order-1 sm:order-2'>
+        <span className='text-sm text-muted-foreground whitespace-nowrap'>
+          {currentRange}
         </span>
 
         <Select
@@ -131,18 +145,18 @@ export function TablePagination(props: TablePagination) {
             });
           }}
         >
-          <SelectTrigger className='w-[180px]'>
+          <SelectTrigger className='w-[100px]'>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value='5'>5</SelectItem>
-              <SelectItem value='10'>10</SelectItem>
-              <SelectItem value='20'>20</SelectItem>
+              <SelectItem value='5'>5 / pág</SelectItem>
+              <SelectItem value='10'>10 / pág</SelectItem>
+              <SelectItem value='20'>20 / pág</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
-    </section>
+    </div>
   );
 }
