@@ -10,6 +10,7 @@ import {
 import { Info } from 'lucide-react';
 import Link from 'next/link';
 import { TaxCalculatorCard } from '../components/tax-calculator-card';
+import { getUserAndCommercialEnablement } from '../affidavit.actions';
 
 export default async function CreateAffidavitPage({
   searchParams,
@@ -19,6 +20,7 @@ export default async function CreateAffidavitPage({
   }>;
 }) {
   const { period } = await searchParams;
+  const { include_both_categories } = await getUserAndCommercialEnablement();
 
   return (
     <article className='max-w-6xl mx-auto mb-8'>
@@ -116,7 +118,10 @@ export default async function CreateAffidavitPage({
           </AlertDescription>
         </Alert>
 
-        <TaxCalculatorCard period={period} />
+        <TaxCalculatorCard
+          period={period}
+          isBothCategories={include_both_categories}
+        />
       </section>
     </article>
   );

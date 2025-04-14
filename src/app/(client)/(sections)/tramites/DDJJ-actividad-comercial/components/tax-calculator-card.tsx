@@ -25,44 +25,114 @@ dayjs.locale(locale);
 
 interface TaxCalculatorCardProps {
   period: string;
+  isBothCategories: boolean;
 }
 
-export function TaxCalculatorCard({ period }: TaxCalculatorCardProps) {
-  const [declaredAmount, setDeclaredAmount] = useState<string>('');
-  const [calculatedAmount, setCalculatedAmount] = useState<number | null>(null);
+export function TaxCalculatorCard({
+  period,
+  isBothCategories,
+}: TaxCalculatorCardProps) {
+  const [commerceAmount, setCommerceAmount] = useState<string>('');
+  const [financialAmount, setFinancialAmount] = useState<string>('');
+  const [commerceCalculatedAmount, setCommerceCalculatedAmount] = useState<
+    number | null
+  >(null);
+  const [financialCalculatedAmount, setFinancialCalculatedAmount] = useState<
+    number | null
+  >(null);
   const [isCalculating, startCalculateTransition] = useTransition();
+  const [isCalculatingFinancial, startCalculateFinancialTransition] =
+    useTransition();
   const [isMutating, startTransition] = useTransition();
 
   const { replace } = useRouter();
 
-  const handleCalculate = () => {
+  const handleCalculateCommerce = () => {
     startCalculateTransition(async () => {
-      const declared_amount = Number(
-        declaredAmount.replace(/[.$]/g, '').replace(',', '.').trim()
+      const amount = Number(
+        commerceAmount.replace(/[.$]/g, '').replace(',', '.').trim()
       );
-      const calculated_amount = await calculateFeeAmount({
-        amount: declared_amount,
+
+      // Calculamos para categoría de Comercios
+      const calculatedAmount = await calculateFeeAmount({
+        amount,
+        category: 'Comercios-Servicios-Industrias',
       });
 
-      setCalculatedAmount(calculated_amount);
+      setCommerceCalculatedAmount(calculatedAmount);
     });
   };
 
-  const handleSubmit = (formData: FormData) => {
-    startTransition(async () => {
-      const declared_amount = Number(
-        (formData.get('declared_amount') as string)
-          .replace(/[.$]/g, '')
-          .replace(',', '.')
-          .trim()
+  const handleCalculateFinancial = () => {
+    startCalculateFinancialTransition(async () => {
+      const amount = Number(
+        financialAmount.replace(/[.$]/g, '').replace(',', '.').trim()
       );
 
-      const fee_amount = Number(
-        (formData.get('calculated_amount') as string)
-          .replace(/[.$]/g, '')
-          .replace(',', '.')
-          .trim()
-      );
+      // Calculamos para categoría financiera
+      const calculatedAmount = await calculateFeeAmount({
+        amount,
+        category: 'Bancos-Entidades Financieras-Compañías Financieras',
+      });
+
+      setFinancialCalculatedAmount(calculatedAmount);
+    });
+  };
+
+  // Calculate total amount
+  const totalCalculatedAmount = isBothCategories
+    ? (commerceCalculatedAmount ?? 0) + (financialCalculatedAmount ?? 0)
+    : commerceCalculatedAmount ?? 0;
+
+  const handleSubmit = (formData: FormData) => {
+    startTransition(async () => {
+      let declared_amount = 0;
+      let fee_amount = 0;
+
+      if (isBothCategories) {
+        // Suma ambas bases imponibles
+        const commerce_amount = Number(
+          (formData.get('commerce_amount') as string)
+            .replace(/[.$]/g, '')
+            .replace(',', '.')
+            .trim()
+        );
+
+        const financial_amount = Number(
+          (formData.get('financial_amount') as string)
+            .replace(/[.$]/g, '')
+            .replace(',', '.')
+            .trim()
+        );
+
+        declared_amount = commerce_amount + financial_amount;
+
+        // Suma ambas tasas calculadas
+        const commerce_fee = Number(
+          (formData.get('commerce_calculated_amount') as string)
+            .replace(/[.$]/g, '')
+            .replace(',', '.')
+            .trim()
+        );
+
+        const financial_fee = Number(
+          (formData.get('financial_calculated_amount') as string)
+            .replace(/[.$]/g, '')
+            .replace(',', '.')
+            .trim()
+        );
+
+        fee_amount = commerce_fee + financial_fee;
+      } else {
+        declared_amount = Number(
+          (formData.get('declared_amount') as string)
+            .replace(/[.$]/g, '')
+            .replace(',', '.')
+            .trim()
+        );
+
+        fee_amount = totalCalculatedAmount;
+      }
 
       try {
         const { data, error } = await createAffidavit({
@@ -99,57 +169,183 @@ export function TaxCalculatorCard({ period }: TaxCalculatorCardProps) {
       <Card className='w-full'>
         <CardHeader>
           <CardTitle className='text-lg font-medium'>
-            Ingresa la base imponible para calcular la tasa determinada
+            {isBothCategories
+              ? 'Ingresa las bases imponibles para calcular la tasa determinada'
+              : 'Ingresa la base imponible para calcular la tasa determinada'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form action={handleSubmit} className='grid grid-cols-5 space-y-5'>
-            <div className='col-span-5 grid grid-cols-5 gap-4'>
-              <FormItem className='space-y-2'>
-                <Label>Período</Label>
-                <Input
-                  value={formatName(dayjs(period).format('MMMM YYYY'))}
-                  readOnly
-                />
-              </FormItem>
-              <FormItem className='space-y-2'>
-                <Label>Base Imponible</Label>
-                <Input
-                  name='declared_amount'
-                  type='string'
-                  value={declaredAmount}
-                  onChange={(e) =>
-                    setDeclaredAmount(formatCurrency(e.target.value))
-                  }
-                  placeholder='Ingrese el monto'
-                />
-              </FormItem>
-              <FormItem className='space-y-2'>
-                <Label>Tasa Determinada</Label>
-                <Input
-                  name='calculated_amount'
-                  className='bg-blue-100'
-                  value={formatNumberToCurrency(calculatedAmount ?? 0)}
-                  readOnly
-                />
-              </FormItem>
-              <FormItem className='space-y-2 flex items-end'>
-                <Button
-                  onClick={handleCalculate}
-                  loading={isCalculating}
-                  className='w-full mb-0'
-                >
-                  Calcular
-                </Button>
-              </FormItem>
-            </div>
+            {isBothCategories ? (
+              <>
+                <div className='col-span-5 grid grid-cols-5 gap-4'>
+                  <FormItem className='space-y-2'>
+                    <Label>Período</Label>
+                    <Input
+                      value={formatName(dayjs(period).format('MMMM YYYY'))}
+                      readOnly
+                    />
+                  </FormItem>
+                </div>
+
+                <div className='col-span-5 grid grid-cols-5 gap-4'>
+                  <FormItem className='col-span-5 space-y-2'>
+                    <Label className='font-bold'>
+                      Categoría: Comercios-Servicios-Industrias
+                    </Label>
+                  </FormItem>
+                  <FormItem className='space-y-2'>
+                    <Label>Base Imponible</Label>
+                    <Input
+                      name='commerce_amount'
+                      type='string'
+                      value={commerceAmount}
+                      onChange={(e) =>
+                        setCommerceAmount(formatCurrency(e.target.value))
+                      }
+                      placeholder='Ingrese el monto'
+                    />
+                  </FormItem>
+                  <FormItem className='space-y-2'>
+                    <Label>Tasa Determinada</Label>
+                    <Input
+                      name='commerce_calculated_amount'
+                      className='bg-blue-100'
+                      value={formatNumberToCurrency(
+                        commerceCalculatedAmount ?? 0
+                      )}
+                      readOnly
+                    />
+                  </FormItem>
+                  <FormItem className='space-y-2 flex items-end'>
+                    <Button
+                      onClick={handleCalculateCommerce}
+                      loading={isCalculating}
+                      className='w-full mb-0'
+                      type='button'
+                    >
+                      Calcular
+                    </Button>
+                  </FormItem>
+                </div>
+
+                <div className='col-span-5 grid grid-cols-5 gap-4'>
+                  <FormItem className='col-span-5 space-y-2'>
+                    <Label className='font-bold'>
+                      Categoría: Bancos-Entidades Financieras-Compañías
+                      Financieras
+                    </Label>
+                  </FormItem>
+                  <FormItem className='space-y-2'>
+                    <Label>Base Imponible</Label>
+                    <Input
+                      name='financial_amount'
+                      type='string'
+                      value={financialAmount}
+                      onChange={(e) =>
+                        setFinancialAmount(formatCurrency(e.target.value))
+                      }
+                      placeholder='Ingrese el monto'
+                    />
+                  </FormItem>
+                  <FormItem className='space-y-2'>
+                    <Label>Tasa Determinada</Label>
+                    <Input
+                      name='financial_calculated_amount'
+                      className='bg-blue-100'
+                      value={formatNumberToCurrency(
+                        financialCalculatedAmount ?? 0
+                      )}
+                      readOnly
+                    />
+                  </FormItem>
+                  <FormItem className='space-y-2 flex items-end'>
+                    <Button
+                      onClick={handleCalculateFinancial}
+                      loading={isCalculatingFinancial}
+                      className='w-full mb-0'
+                      type='button'
+                    >
+                      Calcular
+                    </Button>
+                  </FormItem>
+                </div>
+              </>
+            ) : (
+              // Formulario original para un solo tipo
+              <div className='col-span-5 grid grid-cols-5 gap-4'>
+                <FormItem className='space-y-2'>
+                  <Label>Período</Label>
+                  <Input
+                    value={formatName(dayjs(period).format('MMMM YYYY'))}
+                    readOnly
+                  />
+                </FormItem>
+                <FormItem className='space-y-2'>
+                  <Label>Base Imponible</Label>
+                  <Input
+                    name='declared_amount'
+                    type='string'
+                    value={commerceAmount}
+                    onChange={(e) =>
+                      setCommerceAmount(formatCurrency(e.target.value))
+                    }
+                    placeholder='Ingrese el monto'
+                  />
+                </FormItem>
+                <FormItem className='space-y-2'>
+                  <Label>Tasa Determinada</Label>
+                  <Input
+                    name='calculated_amount'
+                    className='bg-blue-100'
+                    value={formatNumberToCurrency(
+                      commerceCalculatedAmount ?? 0
+                    )}
+                    readOnly
+                  />
+                </FormItem>
+                <FormItem className='space-y-2 flex items-end'>
+                  <Button
+                    onClick={handleCalculateCommerce}
+                    loading={isCalculating}
+                    className='w-full mb-0'
+                    type='button'
+                  >
+                    Calcular
+                  </Button>
+                </FormItem>
+              </div>
+            )}
+
+            {/* Display Total Amount */}
+            {(commerceCalculatedAmount !== null ||
+              (isBothCategories && financialCalculatedAmount !== null)) && (
+              <div className='col-span-5 mt-4 pt-4 border-t'>
+                <div className='flex justify-end items-center gap-4'>
+                  <Label className='text-lg font-semibold'>
+                    Tasa Determinada Total:
+                  </Label>
+                  <Input
+                    name='total_calculated_amount'
+                    className='bg-green-100 text-lg font-bold w-auto text-right'
+                    value={formatNumberToCurrency(totalCalculatedAmount)}
+                    readOnly
+                  />
+                </div>
+              </div>
+            )}
 
             <Button
               type='submit'
               size='lg'
               className='col-start-5'
               loading={isMutating}
-              disabled={calculatedAmount === null}
+              disabled={
+                isBothCategories
+                  ? commerceCalculatedAmount === null ||
+                    financialCalculatedAmount === null
+                  : commerceCalculatedAmount === null
+              }
             >
               Presentar
             </Button>
