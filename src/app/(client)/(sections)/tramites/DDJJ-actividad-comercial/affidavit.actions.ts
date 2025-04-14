@@ -680,9 +680,9 @@ export const updateAffidavit = async (input: {
 
 export const createInvoice = async (input: {
   affidavit_ids: string[];
-  tax_penaltie_ids: string[];
+  tax_penalty_ids: string[];
 }) => {
-  const { affidavit_ids, tax_penaltie_ids } = input;
+  const { affidavit_ids, tax_penalty_ids } = input;
 
   const response: Envelope<invoice> = {
     success: true,
@@ -716,7 +716,7 @@ export const createInvoice = async (input: {
     const taxPenalties = await dbSupabase.tax_penalties.findMany({
       where: {
         id: {
-          in: tax_penaltie_ids,
+          in: tax_penalty_ids,
         },
         user: { id: user.id },
       },
