@@ -33,7 +33,6 @@ import { FileDown, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { InvoiceWithRelations } from '../types';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 dayjs.extend(customParseFormat);
 
@@ -48,7 +47,6 @@ export function PaymentHistoryClient({
 }: PaymentHistoryTableProps) {
   const [recordDetails, setRecordDetails] =
     useState<InvoiceWithRelations | null>(null);
-  const router = useRouter();
 
   const { handleSort, handlePagination } = useFPS({
     pagination: data.pagination as Pagination,

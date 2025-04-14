@@ -985,27 +985,35 @@ export const getInvoice = async (input: {
 
     const concepts: ConceptToPay[] = [];
 
-    if (concepts) {
-      for (const affidavit of invoice.affidavit) {
-        concepts.push({
-          id: affidavit.id,
-          concept: 'DDJJ Actividad Comercial',
-          period: formatName(dayjs(affidavit.period).format('MMMM YYYY')),
-          amount: affidavit.fee_amount,
-          dueDate: dayjs(affidavit.payment_due_date).format('DD/MM/YYYY'),
-        });
-      }
-
-      for (const penalty of invoice.tax_penalties) {
-        concepts.push({
-          id: penalty.id,
-          concept: 'Multa',
-          period: formatName(dayjs(penalty.period).format('MMMM YYYY')),
-          amount: penalty.amount,
-          dueDate: dayjs(penalty.created_at).format('DD/MM/YYYY'),
-        });
-      }
+    for (const affidavit of invoice.affidavit) {
+      concepts.push({
+        id: affidavit.id,
+        concept: 'DDJJ Actividad Comercial',
+        period: formatName(dayjs(affidavit.period).format('MMMM YYYY')),
+        amount: affidavit.fee_amount,
+        dueDate: dayjs(affidavit.payment_due_date).format('DD/MM/YYYY'),
+      });
     }
+
+    for (const penalty of invoice.tax_penalties) {
+      concepts.push({
+        id: penalty.id,
+        concept: 'Multa',
+        period: formatName(dayjs(penalty.period).format('MMMM YYYY')),
+        amount: penalty.amount,
+        dueDate: dayjs(penalty.created_at).format('DD/MM/YYYY'),
+      });
+    }
+
+    const resarcitoryInterest = invoice.compensatory_interest ?? 0;
+
+    concepts.push({
+      id: 'resarcitory_interest',
+      concept: 'Intereses compensatorios',
+      period: formatName(dayjs().format('MMMM YYYY')),
+      amount: resarcitoryInterest,
+      dueDate: dayjs().format('DD/MM/YYYY'),
+    });
 
     response.data = {
       ...invoice,
