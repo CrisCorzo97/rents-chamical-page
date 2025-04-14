@@ -34,20 +34,20 @@ export function PeriodSelectionCard({ concepts }: PeriodSelectionCardProps) {
   const onConfirm = () => {
     startInvoiceTransition(async () => {
       const affidavit_ids: string[] = [];
-      const tax_penaltie_ids: string[] = [];
+      const tax_penalty_ids: string[] = [];
 
       for (const concept of conceptsSelected) {
-        if (concept.concept === 'Declaración Jurada') {
+        if (concept.concept === 'DDJJ Actividad Comercial') {
           affidavit_ids.push(concept.id);
         } else {
-          tax_penaltie_ids.push(concept.id);
+          tax_penalty_ids.push(concept.id);
         }
       }
 
       try {
         const { data, error } = await createInvoice({
           affidavit_ids,
-          tax_penaltie_ids,
+          tax_penalty_ids,
         });
 
         if (error || !data) {
