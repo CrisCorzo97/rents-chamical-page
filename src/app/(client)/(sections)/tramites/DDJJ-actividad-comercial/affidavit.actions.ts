@@ -6,6 +6,8 @@ import { Envelope } from '@/types/envelope';
 import {
   $Enums,
   affidavit,
+  commercial_activity,
+  commercial_enablement,
   invoice,
   Prisma,
   tax_penalties,
@@ -412,8 +414,11 @@ export const getBalance = async () => {
   }
 };
 
-export const calculateFeeAmount = async (input: { amount: number }) => {
-  const { amount } = input;
+export const calculateFeeAmount = async (input: {
+  amount: number;
+  category?: string;
+}) => {
+  const { amount, category } = input;
 
   let feeAmount = 0;
   let feeAliquot = 0;
@@ -425,45 +430,79 @@ export const calculateFeeAmount = async (input: { amount: number }) => {
     const { cases, minimun_tax_amount } =
       declarableTax.calculate_info as CalculateInfo;
 
-    if (
-      FINANCIAL_ACTIVITIES.includes(
-        commercial_enablement!.commercial_activity?.activity ?? ''
-      )
-    ) {
-      const feeCase = cases.find(
-        (c) =>
-          c.category === 'Bancos-Entidades Financieras-Compañías Financieras'
-      );
+    // Si se especifica una categoría, usar esa
+    if (category) {
+      const feeCase = cases.find((c) => c.category === category);
       if (!feeCase) {
-        throw new Error('No se encontró el caso para la actividad financiera');
+        throw new Error(`No se encontró el caso para la categoría ${category}`);
       }
 
-      if (feeCase.subcases[0].type === 'fixed') {
-        feeAmount = feeCase.subcases[0].fixed_rate;
+      if (category === 'Bancos-Entidades Financieras-Compañías Financieras') {
+        if (feeCase.subcases[0].type === 'fixed') {
+          feeAmount = feeCase.subcases[0].fixed_rate;
+        } else {
+          feeAliquot = feeCase.subcases[0].fee;
+        }
       } else {
-        feeAliquot = feeCase.subcases[0].fee;
+        for (const subcase of feeCase.subcases) {
+          if (
+            amount > subcase.amount_from &&
+            (amount <= subcase.amount_up_to || subcase.amount_up_to < 0)
+          ) {
+            if (subcase.type === 'fixed') {
+              feeAmount = subcase.fixed_rate;
+              break;
+            } else {
+              feeAliquot = subcase.fee;
+              break;
+            }
+          }
+        }
       }
     } else {
-      const feeCase = cases.find(
-        (c) => c.category === 'Comercios-Servicios-Industrias'
-      );
-      if (!feeCase) {
-        throw new Error(
-          'No se encontró el caso para la actividad de comercio, servicios o industrias'
+      // Comportamiento anterior - detectar por tipo de actividad
+      if (
+        FINANCIAL_ACTIVITIES.includes(
+          commercial_enablement!.commercial_activity?.activity ?? ''
+        )
+      ) {
+        const feeCase = cases.find(
+          (c) =>
+            c.category === 'Bancos-Entidades Financieras-Compañías Financieras'
         );
-      }
+        if (!feeCase) {
+          throw new Error(
+            'No se encontró el caso para la actividad financiera'
+          );
+        }
 
-      for (const subcase of feeCase.subcases) {
-        if (
-          amount > subcase.amount_from &&
-          (amount <= subcase.amount_up_to || subcase.amount_up_to < 0)
-        ) {
-          if (subcase.type === 'fixed') {
-            feeAmount = subcase.fixed_rate;
-            break;
-          } else {
-            feeAliquot = subcase.fee;
-            break;
+        if (feeCase.subcases[0].type === 'fixed') {
+          feeAmount = feeCase.subcases[0].fixed_rate;
+        } else {
+          feeAliquot = feeCase.subcases[0].fee;
+        }
+      } else {
+        const feeCase = cases.find(
+          (c) => c.category === 'Comercios-Servicios-Industrias'
+        );
+        if (!feeCase) {
+          throw new Error(
+            'No se encontró el caso para la actividad de comercio, servicios o industrias'
+          );
+        }
+
+        for (const subcase of feeCase.subcases) {
+          if (
+            amount > subcase.amount_from &&
+            (amount <= subcase.amount_up_to || subcase.amount_up_to < 0)
+          ) {
+            if (subcase.type === 'fixed') {
+              feeAmount = subcase.fixed_rate;
+              break;
+            } else {
+              feeAliquot = subcase.fee;
+              break;
+            }
           }
         }
       }
@@ -985,27 +1024,35 @@ export const getInvoice = async (input: {
 
     const concepts: ConceptToPay[] = [];
 
-    if (concepts) {
-      for (const affidavit of invoice.affidavit) {
-        concepts.push({
-          id: affidavit.id,
-          concept: 'DDJJ Actividad Comercial',
-          period: formatName(dayjs(affidavit.period).format('MMMM YYYY')),
-          amount: affidavit.fee_amount,
-          dueDate: dayjs(affidavit.payment_due_date).format('DD/MM/YYYY'),
-        });
-      }
-
-      for (const penalty of invoice.tax_penalties) {
-        concepts.push({
-          id: penalty.id,
-          concept: 'Multa',
-          period: formatName(dayjs(penalty.period).format('MMMM YYYY')),
-          amount: penalty.amount,
-          dueDate: dayjs(penalty.created_at).format('DD/MM/YYYY'),
-        });
-      }
+    for (const affidavit of invoice.affidavit) {
+      concepts.push({
+        id: affidavit.id,
+        concept: 'DDJJ Actividad Comercial',
+        period: formatName(dayjs(affidavit.period).format('MMMM YYYY')),
+        amount: affidavit.fee_amount,
+        dueDate: dayjs(affidavit.payment_due_date).format('DD/MM/YYYY'),
+      });
     }
+
+    for (const penalty of invoice.tax_penalties) {
+      concepts.push({
+        id: penalty.id,
+        concept: 'Multa',
+        period: formatName(dayjs(penalty.period).format('MMMM YYYY')),
+        amount: penalty.amount,
+        dueDate: dayjs(penalty.created_at).format('DD/MM/YYYY'),
+      });
+    }
+
+    const resarcitoryInterest = invoice.compensatory_interest ?? 0;
+
+    concepts.push({
+      id: 'resarcitory_interest',
+      concept: 'Intereses compensatorios',
+      period: formatName(dayjs().format('MMMM YYYY')),
+      amount: resarcitoryInterest,
+      dueDate: dayjs().format('DD/MM/YYYY'),
+    });
 
     response.data = {
       ...invoice,
@@ -1041,17 +1088,42 @@ export const getUserAndCommercialEnablement = async () => {
       throw new Error('No se pudo obtener el usuario');
     }
 
-    const commercial_enablement =
-      await dbSupabase.commercial_enablement.findFirst({
-        where: {
-          tax_id: user.user_metadata.tax_id,
-        },
-        include: {
-          commercial_activity: true,
-        },
+    let commercial_enablement:
+      | (commercial_enablement & {
+          commercial_activity: commercial_activity | null;
+        })
+      | null = null;
+    let include_both_categories = false;
+
+    const c_e_records = await dbSupabase.commercial_enablement.findMany({
+      where: {
+        tax_id: user.user_metadata.tax_id,
+      },
+      include: {
+        commercial_activity: true,
+      },
+    });
+
+    if (c_e_records.length > 1) {
+      const categories = {
+        commercial: false,
+        financial: false,
+      };
+
+      c_e_records.forEach((c_e_record) => {
+        if (Number(c_e_record.commercial_activity?.id) === 50) {
+          categories.financial = true;
+        } else {
+          categories.commercial = true;
+        }
       });
 
-    return { user, commercial_enablement };
+      include_both_categories = categories.commercial && categories.financial;
+    }
+
+    commercial_enablement = c_e_records[0];
+
+    return { user, commercial_enablement, include_both_categories };
   } catch (error: any) {
     console.error(error);
     if (error instanceof Error) {
