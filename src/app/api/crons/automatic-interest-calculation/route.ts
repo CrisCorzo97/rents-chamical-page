@@ -1,4 +1,4 @@
-import { updateInvoice } from '@/app/(client)/(sections)/tramites/DDJJ-actividad-comercial/affidavit.actions';
+import { updateInvoiceFromCron } from '@/lib/crons/invoice';
 import dbSupabase from '@/lib/prisma/prisma';
 import { invoice } from '@prisma/client';
 import dayjs from 'dayjs';
@@ -36,13 +36,13 @@ export async function GET(request: Request) {
     const invoicesFailedIds = [];
 
     for (const invoice of invoices) {
-      const { data, error } = await updateInvoice({ invoice_id: invoice.id });
+      const updated = await updateInvoiceFromCron(invoice);
 
-      if (!data || error) {
+      if (!updated) {
         invoicesFailedIds.push(invoice.id);
         continue;
       } else {
-        invoicesUpdatedIds.push(data.id);
+        invoicesUpdatedIds.push(updated.id);
       }
     }
 
