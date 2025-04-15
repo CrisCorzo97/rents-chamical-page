@@ -1,11 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/crons/automatic-interest-calculation",
-      "schedule": "0 3 * * *",
-      "headers": {
-        "x-vercel-cron-key": "CRON_SECRET_KEY"
-      }
+      "path": "/api/crons/automatic-interest-calculation?key=01963b38-446c-7f67-be88-cb35f8ec8d3c",
+      "schedule": "0 3 * * *"
     }
   ]
 }

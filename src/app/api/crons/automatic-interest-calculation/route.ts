@@ -6,7 +6,9 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   // Verificar si es una llamada de cron
-  const cronKey = request.headers.get('x-vercel-cron-key');
+  const url = new URL(request.url);
+  const cronKey = url.searchParams.get('key');
+
   if (!cronKey || cronKey !== process.env.CRON_SECRET_KEY) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
