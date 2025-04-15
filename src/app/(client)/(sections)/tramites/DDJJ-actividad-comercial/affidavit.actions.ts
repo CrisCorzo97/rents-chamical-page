@@ -1046,13 +1046,15 @@ export const getInvoice = async (input: {
 
     const resarcitoryInterest = invoice.compensatory_interest ?? 0;
 
-    concepts.push({
-      id: 'resarcitory_interest',
-      concept: 'Intereses compensatorios',
-      period: formatName(dayjs().format('MMMM YYYY')),
-      amount: resarcitoryInterest,
-      dueDate: dayjs().format('DD/MM/YYYY'),
-    });
+    if (resarcitoryInterest > 0) {
+      concepts.push({
+        id: 'resarcitory_interest',
+        concept: 'Intereses compensatorios',
+        period: formatName(dayjs().format('MMMM YYYY')),
+        amount: resarcitoryInterest,
+        dueDate: dayjs().format('DD/MM/YYYY'),
+      });
+    }
 
     response.data = {
       ...invoice,
