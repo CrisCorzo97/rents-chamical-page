@@ -4,7 +4,13 @@ import { invoice } from '@prisma/client';
 import dayjs from 'dayjs';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Verificar si es una llamada de cron
+  const cronKey = request.headers.get('x-vercel-cron-key');
+  if (!cronKey || cronKey !== process.env.CRON_SECRET_KEY) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  }
+
   let invoices: invoice[] = [];
   let currentInvoices: typeof invoices = [];
 

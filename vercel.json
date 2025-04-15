@@ -2,7 +2,10 @@
   "crons": [
     {
       "path": "/api/crons/automatic-interest-calculation",
-      "schedule": "0 10 * * *"
+      "schedule": "0 3 * * *",
+      "headers": {
+        "x-vercel-cron-key": "CRON_SECRET_KEY"
+      }
     }
   ]
 }
