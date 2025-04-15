@@ -25,7 +25,7 @@ export async function GET(request: Request) {
             lt: dayjs().startOf('day').toDate(),
           },
         },
-        take: 100,
+        take: 50,
         skip: invoices.length,
       });
 
