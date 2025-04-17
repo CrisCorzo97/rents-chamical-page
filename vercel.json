@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "src/api/crons/automatic-interest-calculation/route.ts": {
-      "maxDuration": 60
-    }
-  },
   "crons": [
     {
       "path": "/api/crons/automatic-interest-calculation?key=01963b38-446c-7f67-be88-cb35f8ec8d3c",
