@@ -1,3 +1,5 @@
+'use server';
+
 import { updateInvoiceFromCron } from '@/lib/crons/invoice';
 import dbSupabase from '@/lib/prisma/prisma';
 import { invoice } from '@prisma/client';
