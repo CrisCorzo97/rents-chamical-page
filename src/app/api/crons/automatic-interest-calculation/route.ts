@@ -4,9 +4,11 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 
 export async function GET(request: Request) {
+  const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
   try {
     const response = await axios.post(
-      'https://apkomtlxqddpzutagjvn.supabase.co/functions/v1/Update-Invoice-Interests',
+      `${BASE_URL}/functions/v1/Update-Invoice-Interests`,
       undefined,
       {
         headers: {
