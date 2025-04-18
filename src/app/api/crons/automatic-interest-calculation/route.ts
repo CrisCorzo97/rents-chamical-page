@@ -1,63 +1,29 @@
 'use server';
 
-import { updateInvoiceFromCron } from '@/lib/crons/invoice';
-import dbSupabase from '@/lib/prisma/prisma';
-import { invoice } from '@prisma/client';
-import dayjs from 'dayjs';
 import { NextResponse } from 'next/server';
+import axios from 'axios';
 
 export async function GET(request: Request) {
-  // Verificar si es una llamada de cron
-  const url = new URL(request.url);
-  const cronKey = url.searchParams.get('key');
-
-  if (!cronKey || cronKey !== process.env.CRON_SECRET_KEY) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-  }
-
-  let invoices: invoice[] = [];
-  let currentInvoices: typeof invoices = [];
+  const BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   try {
-    do {
-      currentInvoices = await dbSupabase.invoice.findMany({
-        where: {
-          payment_date: null,
-          due_date: {
-            lt: dayjs().startOf('day').toDate(),
-          },
+    const response = await axios.post(
+      `${BASE_URL}/functions/v1/Update-Invoice-Interests`,
+      undefined,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY}`,
         },
-        take: 20,
-        skip: invoices.length,
-      });
-
-      invoices.push(...currentInvoices);
-    } while (currentInvoices.length > 0);
-
-    const invoicesUpdatedIds = [];
-    const invoicesFailedIds = [];
-
-    for (const invoice of invoices) {
-      const updated = await updateInvoiceFromCron(invoice);
-
-      if (!updated) {
-        invoicesFailedIds.push(invoice.id);
-        continue;
-      } else {
-        invoicesUpdatedIds.push(updated.id);
       }
-    }
+    );
 
     return NextResponse.json({
       status: 200,
-      body: {
-        invoicesUpdatedIds,
-        invoicesFailedIds,
-        message: 'Se actualizaron las facturas con éxito',
-      },
+      body: response.data,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    console.error(error.response.data);
     throw new Error('Hubo un error al actualizar los intereses');
   }
 }
