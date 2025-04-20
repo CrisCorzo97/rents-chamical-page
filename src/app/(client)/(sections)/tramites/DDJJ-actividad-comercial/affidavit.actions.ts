@@ -371,9 +371,23 @@ export const getBalance = async () => {
       },
     });
 
-    response.data = affidavits.reduce((acc, affidavit) => {
-      return acc + affidavit.fee_amount;
-    }, 0);
+    const taxPenalties = await dbSupabase.tax_penalties.findMany({
+      where: {
+        user: { id: user.id },
+        declarable_tax_id: 'commercial_activity',
+        payment_date: null,
+      },
+    });
+
+    const total_amount =
+      affidavits.reduce((acc, affidavit) => {
+        return acc + affidavit.fee_amount;
+      }, 0) +
+      taxPenalties.reduce((acc, penalty) => {
+        return acc + penalty.amount;
+      }, 0);
+
+    response.data = total_amount;
   } catch (error) {
     console.error(error);
     response.success = false;
@@ -558,7 +572,10 @@ export const createAffidavit = async (input: {
       },
       declared_amount,
       fee_amount,
-      payment_due_date: dayjs(paymentDueDate).toISOString(),
+      payment_due_date: dayjs(paymentDueDate)
+        .endOf('day')
+        .subtract(3, 'hour')
+        .toDate(),
       period: dayjs(period, 'MMMM-YYYY').format('YYYY-MM-DD'),
       status: 'pending_payment',
       user: {
@@ -726,7 +743,7 @@ export const createInvoice = async (input: {
       dayjs(affidavits[0].payment_due_date),
       'day'
     )
-      ? dayjs().endOf('day').toISOString()
+      ? dayjs().endOf('day').subtract(3, 'hour').toISOString()
       : affidavits[0].payment_due_date;
 
     const invoiceData: Prisma.invoiceCreateInput = {
