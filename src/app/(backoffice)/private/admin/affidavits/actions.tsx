@@ -1,3 +1,5 @@
+'use server';
+
 import { Envelope } from '@/types/envelope';
 import { Prisma } from '@prisma/client';
 import { AffidavitsWithRelations } from './affidavits.interface';
@@ -76,6 +78,48 @@ export const getAffidavits = async (input: {
     } else {
       response.error = 'Hubo un error al obtener las declaraciones';
     }
+  } finally {
+    return response;
+  }
+};
+
+export const getAffidavitsReport = async () => {
+  const response: Envelope<AffidavitsWithRelations[]> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const affidavits: AffidavitsWithRelations[] = [];
+    let currentAffidavits: typeof affidavits = [];
+
+    do {
+      currentAffidavits = await dbSupabase.affidavit.findMany({
+        where: {
+          declarable_tax_id: 'commercial_activity',
+        },
+        include: {
+          user: true,
+          invoice: true,
+          declarable_tax: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: 50,
+        skip: affidavits.length,
+      });
+
+      affidavits.push(...currentAffidavits);
+    } while (currentAffidavits.length > 0);
+
+    response.data = affidavits;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+    response.error = 'Error al obtener las declaraciones';
   } finally {
     return response;
   }
