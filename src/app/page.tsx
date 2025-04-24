@@ -47,6 +47,20 @@ export default async function Home() {
                 </CardContent>
               </Card>
             </Link>
+            <Link href='/tramites/verificar-cuit' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden'>
+                    <CardTitle className='text-xl'>Generar Oblea</CardTitle>
+                    <CardDescription>
+                      Ingresa tu número de CUIT para generar la oblea
+                      correspondiente a tu licencia comercial.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8' />
+                </CardContent>
+              </Card>
+            </Link>
             <Link href='/tramites/consultas' prefetch>
               <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
                 <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
