@@ -47,7 +47,7 @@ export default async function Home() {
                 </CardContent>
               </Card>
             </Link>
-            <Link href='/tramites/verificar-cuit' prefetch>
+            <Link href='/tramites/oblea/generar' prefetch>
               <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
                 <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
                   <div className='w-full flex flex-col justify-between gap-2 overflow-hidden'>

@@ -727,6 +727,7 @@ export const createInvoice = async (input: {
     // Calculo los intereses compensatorios
     const interests = affidavits.reduce((acc, affidavit) => {
       const days = dayjs().diff(dayjs(affidavit.payment_due_date), 'day');
+      if (days <= 0) return acc;
       return acc + affidavit.fee_amount * compensatoryInterest * days;
     }, 0);
 
@@ -818,7 +819,6 @@ export const updateInvoice = async (input: {
 
     let attachmentUrl = undefined;
     let paymentDate = undefined;
-    let interests = undefined;
 
     if (attachment_file) {
       attachmentUrl = await uploadPaymentProof({
@@ -828,21 +828,9 @@ export const updateInvoice = async (input: {
       paymentDate = dayjs().toDate();
     }
 
-    if (dayjs().isAfter(dayjs(invoiceData.due_date), 'day')) {
-      const declarableTax = await getDeclarableTax();
-      const compensatoryInterest =
-        (declarableTax.calculate_info as CalculateInfo)
-          ?.compensatory_interest ?? 0;
-      interests =
-        invoiceData.fee_amount *
-        compensatoryInterest *
-        dayjs().diff(dayjs(invoiceData.due_date), 'day');
-    }
-
     const updated = await dbSupabase.invoice.update({
       where: { id: invoice_id },
       data: {
-        compensatory_interest: interests,
         attached_receipt: attachmentUrl,
         payment_date: paymentDate,
         status: attachmentUrl ? 'under_review' : undefined,

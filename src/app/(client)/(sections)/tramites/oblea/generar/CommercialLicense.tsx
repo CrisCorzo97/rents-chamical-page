@@ -9,6 +9,7 @@ import {
   Image,
 } from '@react-pdf/renderer';
 import { generateQRCode } from '@/lib/code-generator';
+import { LicenseData } from '../oblea.actions';
 
 const styles = StyleSheet.create({
   page: {
@@ -28,6 +29,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     top: '35%',
+    left: 0,
     opacity: 0.1,
     fontSize: 100,
     textAlign: 'center',
@@ -47,8 +49,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   logo: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     marginRight: 10,
   },
   textLogo: {
@@ -115,6 +117,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   activitySectionBorder: {
+    height: 100,
     border: 1,
     borderColor: '#000',
     padding: 4,
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 15,
+    bottom: 8,
     left: 15,
     right: 15,
   },
@@ -142,26 +145,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   qrCode: {
-    width: 150,
-    height: 150,
+    width: 140,
+    height: 140,
     marginTop: 'auto',
     marginLeft: 'auto',
   },
 });
 
 interface CommercialLicenseProps {
-  licenseData: {
-    tramiteNumber: string;
-    registrationNumber: string;
-    businessName: string;
-    cuit: string;
-    regime: string;
-    status: string;
-    validUntil: string;
-    mainActivity: string;
-    otherActivities?: string[];
-    issueDate: string;
-  };
+  licenseData: LicenseData;
 }
 
 const CommercialLicense: React.FC<CommercialLicenseProps> = ({
@@ -172,7 +164,7 @@ const CommercialLicense: React.FC<CommercialLicenseProps> = ({
   React.useEffect(() => {
     const generateQR = async () => {
       try {
-        const verificationUrl = `https://rentas.chamical.gob.ar/verificar?tramite=${licenseData.tramiteNumber}&cuit=${licenseData.cuit}`;
+        const verificationUrl = `http://localhost:3005/tramites/oblea/verificar?cuit=${licenseData.cuit}`;
         const qrUrl = await generateQRCode(verificationUrl);
         setQrCodeUrl(qrUrl);
       } catch (err) {

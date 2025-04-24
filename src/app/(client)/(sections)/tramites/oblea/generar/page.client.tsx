@@ -23,31 +23,30 @@ import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
 import CommercialLicense from './CommercialLicense';
+import { generateOblea } from '../oblea.actions';
 
 export const GenerateObleaPageClient = () => {
   const [taxId, setTaxId] = useState<string>('');
-  const [error, setError] = useState('');
   const [licenseData, setLicenseData] = useState(null);
   const [isLoading, startTransition] = useTransition();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState<'pdf' | 'message' | null>(
     null
   );
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = () => {
     startTransition(async () => {
       try {
-        const cuit = formData.get('cuit');
-        const response = await fetch(`/api/check-cuit?cuit=${cuit}`);
-        const data = await response.json();
+        const { data, error } = await generateOblea(taxId);
 
-        if (data.status === 'approved') {
-          setLicenseData(data.licenseData);
-          setDialogContent('pdf'); // Mostrar el PDF en el diálogo
-          setIsDialogOpen(true);
-          toast.success('Oblea generada correctamente.');
-        } else {
+        if (error) {
+          setErrorDetails(error);
           setDialogContent('message'); // Mostrar mensaje de error en el diálogo
+          setIsDialogOpen(true);
+        } else {
+          setLicenseData(data);
+          setDialogContent('pdf'); // Mostrar el PDF en el diálogo
           setIsDialogOpen(true);
         }
       } catch (err) {
@@ -113,35 +112,32 @@ export const GenerateObleaPageClient = () => {
 
       {/* Dialog para mostrar el PDF o mensaje */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
-          {dialogContent === 'pdf' && licenseData && (
-            <>
-              <DialogHeader>
-                <DialogTitle>Oblea Generada</DialogTitle>
-              </DialogHeader>
-              <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                <CommercialLicense licenseData={licenseData} />
-              </PDFViewer>
-              <DialogFooter>
-                <Button onClick={closeDialog}>Cerrar</Button>
-              </DialogFooter>
-            </>
-          )}
-          {dialogContent === 'message' && (
-            <>
-              <DialogHeader>
-                <DialogTitle>No se puede generar la oblea</DialogTitle>
-              </DialogHeader>
-              <DialogDescription>
-                El CUIT ingresado no está habilitado para generar una oblea. Por
-                favor, verifica tu estado tributario.
-              </DialogDescription>
-              <DialogFooter>
-                <Button onClick={closeDialog}>Cerrar</Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
+        {dialogContent === 'pdf' && licenseData && (
+          <DialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+            <DialogHeader>
+              <DialogTitle>Oblea Generada</DialogTitle>
+            </DialogHeader>
+            <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
+              <CommercialLicense licenseData={licenseData} />
+            </PDFViewer>
+            <DialogFooter>
+              <Button onClick={closeDialog}>Cerrar</Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
+        {dialogContent === 'message' && errorDetails && (
+          <DialogContent className='flex flex-col'>
+            <DialogHeader>
+              <DialogTitle>No se puede generar la oblea</DialogTitle>
+            </DialogHeader>
+            <DialogDescription className='mb-4'>
+              {errorDetails}
+            </DialogDescription>
+            <DialogFooter>
+              <Button onClick={closeDialog}>Cerrar</Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </>
   );
