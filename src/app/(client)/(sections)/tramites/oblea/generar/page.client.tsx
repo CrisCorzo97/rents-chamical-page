@@ -1,30 +1,30 @@
 'use client';
-import { useState, useTransition } from 'react';
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  FormItem,
-  Input,
-  Label,
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  FormItem,
+  Input,
+  Label,
 } from '@/components/ui';
+import { formatCuilInput } from '@/lib/formatters';
+import { PDFViewer } from '@react-pdf/renderer';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
-import { PDFViewer } from '@react-pdf/renderer';
 import CommercialLicense from './CommercialLicense';
-import { formatCuilInput } from '@/lib/formatters';
 
-export const VerificarCuitPageClient = () => {
+export const GenerateObleaPageClient = () => {
   const [taxId, setTaxId] = useState<string>('');
   const [error, setError] = useState('');
   const [licenseData, setLicenseData] = useState(null);
