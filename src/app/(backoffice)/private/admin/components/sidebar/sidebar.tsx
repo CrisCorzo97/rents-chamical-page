@@ -92,7 +92,7 @@ export const Sidebar = ({ userRole }: { userRole: number }) => {
                 className={cn(
                   sidebarListStyles.li.className,
                   clsx({
-                    'bg-primary text-primary-foreground': pathname.includes(
+                    'bg-primary text-primary-foreground': pathname?.includes(
                       item.href
                     ),
                   })
@@ -125,7 +125,7 @@ export const Sidebar = ({ userRole }: { userRole: number }) => {
                 className={cn(
                   sidebarListStyles.li.className,
                   clsx({
-                    'bg-primary text-primary-foreground': pathname.includes(
+                    'bg-primary text-primary-foreground': pathname?.includes(
                       item.href
                     ),
                   })
