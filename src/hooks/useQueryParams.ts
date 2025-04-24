@@ -8,7 +8,7 @@ export function useQueryParams() {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const params = (() => new URLSearchParams(searchParams))();
+  const params = (() => new URLSearchParams(searchParams ?? ''))();
 
   const generateQuery = useCallback(() => {
     const query = Object.fromEntries(params.entries());

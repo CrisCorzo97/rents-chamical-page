@@ -23,11 +23,11 @@ import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
 import CommercialLicense from './CommercialLicense';
-import { generateOblea } from '../oblea.actions';
+import { generateOblea, LicenseData } from '../oblea.actions';
 
 export const GenerateObleaPageClient = () => {
   const [taxId, setTaxId] = useState<string>('');
-  const [licenseData, setLicenseData] = useState(null);
+  const [licenseData, setLicenseData] = useState<LicenseData | null>(null);
   const [isLoading, startTransition] = useTransition();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState<'pdf' | 'message' | null>(
