@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { MainHeader } from './ui';
 import { ChevronRight, Info, KeyRound } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui';
 
 export default async function Home() {
   return (
@@ -48,7 +49,13 @@ export default async function Home() {
               </Card>
             </Link>
             <Link href='/tramites/oblea/generar' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer relative transition-all hover:text-primary'>
+                <Badge
+                  variant='info'
+                  className='text-white absolute -top-2 right-2 px-2'
+                >
+                  !
+                </Badge>
                 <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
                   <div className='w-full flex flex-col justify-between gap-2 overflow-hidden'>
                     <CardTitle className='text-xl'>Generar Oblea</CardTitle>
