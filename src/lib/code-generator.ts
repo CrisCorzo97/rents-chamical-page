@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import JsBarcode from "jsbarcode";
+import JsBarcode from 'jsbarcode';
+import QRCode from 'qrcode';
 
 // función que reciba el último código de comprobante y devuelva el siguiente, siegiendo la secuencia de comprobantes
 // La estructura del código de comprobante es la siguiente:
@@ -98,16 +99,33 @@ export function validateInvoiceCode(code: string) {
   return true;
 }
 
-
 // función para generar el código de barra de la factura
 export function generateBarcodeBase64(data: string): string {
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   JsBarcode(canvas, data, {
-    format: "CODE128",
+    format: 'CODE128',
     width: 2,
     height: 60,
     displayValue: false,
     margin: 0,
   });
-  return canvas.toDataURL("image/png");
+  return canvas.toDataURL('image/png');
+}
+
+// función para generar el código QR de la oblea
+export async function generateQRCode(url: string): Promise<string> {
+  try {
+    const qrDataUrl = await QRCode.toDataURL(url, {
+      width: 200,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#ffffff',
+      },
+    });
+    return qrDataUrl;
+  } catch (err) {
+    console.error('Error generating QR code:', err);
+    return '';
+  }
 }

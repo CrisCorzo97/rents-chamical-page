@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { MainHeader } from './ui';
 import { ChevronRight, Info, KeyRound } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui';
 
 export default async function Home() {
   return (
@@ -41,6 +42,26 @@ export default async function Home() {
                     <CardDescription>
                       Realiza la presentación de tu Declaración Jurada de
                       Actividad Comercial de forma rápida y sencilla.
+                    </CardDescription>
+                  </div>
+                  <ChevronRight className='w-8 h-8' />
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href='/tramites/oblea/generar' prefetch>
+              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer relative transition-all hover:text-primary'>
+                <Badge
+                  variant='info'
+                  className='text-white absolute -top-2 right-2 px-2'
+                >
+                  !
+                </Badge>
+                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
+                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden'>
+                    <CardTitle className='text-xl'>Generar Oblea</CardTitle>
+                    <CardDescription>
+                      Ingresa tu número de CUIT para generar la oblea
+                      correspondiente a tu licencia comercial.
                     </CardDescription>
                   </div>
                   <ChevronRight className='w-8 h-8' />
