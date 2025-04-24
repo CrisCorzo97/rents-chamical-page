@@ -167,7 +167,7 @@ const CommercialLicense: React.FC<CommercialLicenseProps> = ({
   React.useEffect(() => {
     const generateQR = async () => {
       try {
-        const verificationUrl = `http://localhost:3005/tramites/oblea/verificar?cuit=${licenseData.cuit}`;
+        const verificationUrl = `https://rentas.municipalidadchamical.gob.ar/tramites/oblea/verificar?cuit=${licenseData.cuit}`;
         const qrUrl = await generateQRCode(verificationUrl);
         setQrCodeUrl(qrUrl);
       } catch (err) {
