@@ -106,14 +106,13 @@ const styles = StyleSheet.create({
   },
   dateRow: {
     flexDirection: 'row',
-    marginBottom: 6,
+    marginBottom: 12,
   },
   dateLabel: {
-    width: 40,
-    fontSize: 9,
+    fontSize: 10,
   },
   dateValue: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
   },
   activitySectionBorder: {
@@ -151,7 +150,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   blankSpace: {
-    height: 60,
+    height: 50,
   },
 });
 
@@ -216,6 +215,11 @@ const CommercialLicense: React.FC<CommercialLicenseProps> = ({
                 <Text style={styles.value}>{licenseData.businessName}</Text>
               </View>
 
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Contribuyente:</Text>
+                <Text style={styles.value}>{licenseData.taxpayerName}</Text>
+              </View>
+
               {/* <View style={styles.registrationNumber}>
                 <Text style={styles.registrationLabel}>N° Habilitación</Text>
                 <Text style={styles.registrationValue}>
@@ -226,12 +230,7 @@ const CommercialLicense: React.FC<CommercialLicenseProps> = ({
               <View style={styles.blankSpace}></View>
 
               <View style={styles.dateRow}>
-                <Text style={styles.dateLabel}>Desde:</Text>
-                <Text style={styles.dateValue}>01/01/2025</Text>
-              </View>
-
-              <View style={styles.dateRow}>
-                <Text style={styles.dateLabel}>Hasta:</Text>
+                <Text style={styles.dateLabel}>Vigencia: </Text>
                 <Text style={styles.dateValue}>{licenseData.validUntil}</Text>
               </View>
 

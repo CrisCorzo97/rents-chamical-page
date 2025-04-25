@@ -37,6 +37,9 @@ export const PageClient = ({ status, licenseData, error }: PageClientProps) => {
               <strong>CUIT:</strong> {licenseData.cuit}
             </p>
             <p className='mb-2 text-gray-700'>
+              <strong>Contribuyente:</strong> {licenseData.taxpayerName}
+            </p>
+            <p className='mb-2 text-gray-700'>
               <strong>Actividad Principal:</strong> {licenseData.mainActivity}
             </p>
             {Array.isArray(licenseData.otherActivities) &&
@@ -47,10 +50,7 @@ export const PageClient = ({ status, licenseData, error }: PageClientProps) => {
                 </p>
               )}
             <p className='mb-2 text-gray-700'>
-              <strong>Válido Desde:</strong> {licenseData.validFrom}
-            </p>
-            <p className='mb-2 text-gray-700'>
-              <strong>Válido Hasta:</strong> {licenseData.validUntil}
+              <strong>Vigencia:</strong> {licenseData.validUntil}
             </p>
             <p className='mb-2 text-gray-700'>
               <strong>Fecha de Verificación:</strong> {licenseData.issueDate}
@@ -78,6 +78,9 @@ export const PageClient = ({ status, licenseData, error }: PageClientProps) => {
                   <strong>CUIT:</strong> {licenseData.cuit}
                 </p>
                 <p className='mb-2 text-gray-700'>
+                  <strong>Contribuyente:</strong> {licenseData.taxpayerName}
+                </p>
+                <p className='mb-2 text-gray-700'>
                   <strong>Actividad Principal:</strong>{' '}
                   {licenseData.mainActivity}
                 </p>
@@ -89,10 +92,7 @@ export const PageClient = ({ status, licenseData, error }: PageClientProps) => {
                     </p>
                   )}
                 <p className='mb-2 text-gray-700'>
-                  <strong>Válido Desde:</strong> {licenseData.validFrom}
-                </p>
-                <p className='mb-2 text-gray-700'>
-                  <strong>Válido Hasta:</strong> {licenseData.validUntil}
+                  <strong>Vigencia:</strong> {licenseData.validUntil}
                 </p>
                 <p className='mb-2 text-gray-700'>
                   <strong>Fecha de Verificación:</strong>{' '}

@@ -1,5 +1,6 @@
 'use server';
 
+import { formatName } from '@/lib/formatters';
 import dbSupabase from '@/lib/prisma/prisma';
 import dayjs from 'dayjs';
 import locale from 'dayjs/locale/es';
@@ -9,8 +10,8 @@ export type LicenseData = {
   commercialEnablementId: string;
   registrationNumber: string;
   businessName: string;
+  taxpayerName: string;
   cuit: string;
-  validFrom: string;
   validUntil: string;
   mainActivity: string;
   otherActivities?: string[];
@@ -20,17 +21,17 @@ export type LicenseData = {
 const getPreviousBimester = () => {
   const today = dayjs();
 
-  const previousBimesterStart =
+  const currentBimesterStart =
     today.month() % 2 === 0 ? today.month() : today.month() - 1;
-  const previousBimesterEnd = previousBimesterStart + 1;
+  const currentBimesterEnd = currentBimesterStart + 1;
 
   const [firstMonth, secondMonth] = [
     today
-      .month(previousBimesterStart - 2)
+      .month(currentBimesterStart - 2)
       .startOf('month')
       .format('YYYY-MM-DD'),
     today
-      .month(previousBimesterEnd - 2)
+      .month(currentBimesterEnd - 2)
       .startOf('month')
       .format('YYYY-MM-DD'),
   ];
@@ -66,9 +67,23 @@ const getAffidavits = async (tax_id: string) => {
         in: [firstMonth, secondMonth],
       },
     },
+    include: {
+      user: {
+        select: {
+          first_name: true,
+          last_name: true,
+        },
+      },
+    },
   });
 
-  return { affidavits, firstMonth, secondMonth };
+  const taxpayerName = formatName(
+    `${affidavits[0]?.user?.first_name ?? ''} ${
+      affidavits[0]?.user?.last_name ?? ''
+    }`
+  );
+
+  return { affidavits, firstMonth, secondMonth, taxpayerName };
 };
 
 export const generateOblea = async (tax_id: string) => {
@@ -88,7 +103,9 @@ export const generateOblea = async (tax_id: string) => {
       );
     }
 
-    const { affidavits, firstMonth, secondMonth } = await getAffidavits(tax_id);
+    const { affidavits, secondMonth, taxpayerName } = await getAffidavits(
+      tax_id
+    );
 
     const isApproved = affidavits.every(
       (affidavit) => affidavit.status === 'approved'
@@ -113,9 +130,12 @@ export const generateOblea = async (tax_id: string) => {
       commercialEnablementId: commercial_enablement.id,
       registrationNumber: commercial_enablement.registration_receipt!,
       businessName: commercial_enablement.company_name!,
+      taxpayerName,
       cuit: tax_id,
-      validFrom: dayjs(firstMonth).format('DD/MM/YYYY'),
-      validUntil: dayjs(secondMonth).endOf('month').format('DD/MM/YYYY'),
+      validUntil: dayjs(secondMonth)
+        .add(2, 'month')
+        .endOf('month')
+        .format('DD/MM/YYYY'),
       mainActivity: commercial_enablement.commercial_activity?.activity!,
       otherActivities: otherActivities.filter((activity) => activity !== null),
       issueDate: dayjs().format('DD/MM/YYYY'),
@@ -155,7 +175,9 @@ export const verifyOblea = async (tax_id: string) => {
       return response;
     }
 
-    const { affidavits } = await getAffidavits(tax_id);
+    const { affidavits, secondMonth, taxpayerName } = await getAffidavits(
+      tax_id
+    );
     const isApproved = affidavits.every(
       (affidavit) => affidavit.status === 'approved'
     );
@@ -164,9 +186,12 @@ export const verifyOblea = async (tax_id: string) => {
       commercialEnablementId: commercial_enablement.id,
       registrationNumber: commercial_enablement.registration_receipt!,
       businessName: commercial_enablement.company_name!,
+      taxpayerName,
       cuit: tax_id,
-      validFrom: dayjs().format('DD/MM/YYYY'),
-      validUntil: dayjs().endOf('month').format('DD/MM/YYYY'),
+      validUntil: dayjs(secondMonth)
+        .add(2, 'month')
+        .endOf('month')
+        .format('DD/MM/YYYY'),
       mainActivity: commercial_enablement.commercial_activity?.activity!,
       otherActivities: [],
       issueDate: dayjs().format('DD/MM/YYYY'),
