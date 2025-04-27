@@ -1,7 +1,3 @@
-import { sortByToState } from '@/lib/table';
-import { getAffidavits } from './actions';
-import { affidavit_status } from '@prisma/client';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,7 +6,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { sortByToState } from '@/lib/table';
+import { affidavit_status } from '@prisma/client';
 import Link from 'next/link';
+import { getAffidavits } from './actions';
 import { AffidavitsClient } from './page.client';
 
 export default async function AffidavitsPage({
@@ -18,14 +18,13 @@ export default async function AffidavitsPage({
 }: {
   searchParams: Promise<{
     page?: number;
-    items_per_page?: number;
+    limit?: number;
     sort_by?: string;
     sort_direction?: string;
     filter?: string;
   }>;
 }) {
-  const { page, items_per_page, sort_by, sort_direction, filter } =
-    await searchParams;
+  const { page, limit, sort_by, sort_direction, filter } = await searchParams;
 
   let order_by;
 
@@ -42,7 +41,7 @@ export default async function AffidavitsPage({
 
   const data = await getAffidavits({
     page,
-    items_per_page,
+    items_per_page: limit,
     order_by,
     filter: {
       status: filter as affidavit_status | undefined,
