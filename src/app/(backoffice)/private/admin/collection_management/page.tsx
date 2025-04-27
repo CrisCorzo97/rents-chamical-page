@@ -8,24 +8,23 @@ import {
 } from '@/components/ui/breadcrumb';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { sortByToState } from '@/lib/table';
-import Link from 'next/link';
-import { CollectionManagementClient } from './page.client';
-import { getInvoicesWithRelations } from './actions';
 import { affidavit_status } from '@prisma/client';
+import Link from 'next/link';
+import { getInvoicesWithRelations } from './actions';
+import { CollectionManagementClient } from './page.client';
 
 export default async function CollectionManagementPage({
   searchParams,
 }: {
   searchParams: Promise<{
     page?: number;
-    items_per_page?: number;
+    limit?: number;
     sort_by?: string;
     sort_direction?: string;
     filter?: string;
   }>;
 }) {
-  const { page, items_per_page, sort_by, sort_direction, filter } =
-    await searchParams;
+  const { page, limit, sort_by, sort_direction, filter } = await searchParams;
 
   let order_by;
 
@@ -42,7 +41,7 @@ export default async function CollectionManagementPage({
 
   const data = await getInvoicesWithRelations({
     page,
-    items_per_page,
+    items_per_page: limit,
     order_by,
     filter: {
       status: filter as affidavit_status | undefined,
