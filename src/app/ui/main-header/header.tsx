@@ -1,4 +1,5 @@
 import { LogoRents } from '@/assets/icons';
+import { Button } from '@/components/ui/button';
 import {
   ListItem,
   NavigationMenu,
@@ -9,16 +10,15 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import Link from 'next/link';
-import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
-  SheetTrigger,
-  SheetTitle,
   SheetDescription,
+  SheetTitle,
+  SheetTrigger,
 } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
+import Link from 'next/link';
 
 export type NavbarMenuItems = {
   key: string;
@@ -62,6 +62,11 @@ export const MainHeader = () => {
           label: 'DDJJ Actividad Comercial',
           key: 'commercial-activity-affidavits',
           href: '/DDJJ-actividad-comercial',
+        },
+        {
+          label: 'Generar Oblea',
+          key: 'generate-sticker',
+          href: '/oblea/generar',
         },
       ],
     },
