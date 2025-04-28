@@ -32,8 +32,10 @@ export function TaxCalculatorCard({
   period,
   isBothCategories,
 }: TaxCalculatorCardProps) {
+  const [amount, setAmount] = useState<string>('');
   const [commerceAmount, setCommerceAmount] = useState<string>('');
   const [financialAmount, setFinancialAmount] = useState<string>('');
+  const [calculatedAmount, setCalculatedAmount] = useState<number | null>(null);
   const [commerceCalculatedAmount, setCommerceCalculatedAmount] = useState<
     number | null
   >(null);
@@ -41,14 +43,30 @@ export function TaxCalculatorCard({
     number | null
   >(null);
   const [isCalculating, startCalculateTransition] = useTransition();
+  const [isCalculatingCommerce, startCalculateCommerceTransition] =
+    useTransition();
   const [isCalculatingFinancial, startCalculateFinancialTransition] =
     useTransition();
   const [isMutating, startTransition] = useTransition();
 
   const { replace } = useRouter();
 
-  const handleCalculateCommerce = () => {
+  const handleCalculate = () => {
     startCalculateTransition(async () => {
+      const value = Number(
+        amount.replace(/[.$]/g, '').replace(',', '.').trim()
+      );
+
+      const calculatedAmount = await calculateFeeAmount({
+        amount: value,
+      });
+
+      setCalculatedAmount(calculatedAmount);
+    });
+  };
+
+  const handleCalculateCommerce = () => {
+    startCalculateCommerceTransition(async () => {
       const amount = Number(
         commerceAmount.replace(/[.$]/g, '').replace(',', '.').trim()
       );
@@ -82,7 +100,7 @@ export function TaxCalculatorCard({
   // Calculate total amount
   const totalCalculatedAmount = isBothCategories
     ? (commerceCalculatedAmount ?? 0) + (financialCalculatedAmount ?? 0)
-    : commerceCalculatedAmount ?? 0;
+    : calculatedAmount ?? 0;
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
@@ -220,7 +238,7 @@ export function TaxCalculatorCard({
                   <FormItem className='space-y-2 flex items-end'>
                     <Button
                       onClick={handleCalculateCommerce}
-                      loading={isCalculating}
+                      loading={isCalculatingCommerce}
                       className='w-full mb-0'
                       type='button'
                     >
@@ -286,10 +304,8 @@ export function TaxCalculatorCard({
                   <Input
                     name='declared_amount'
                     type='string'
-                    value={commerceAmount}
-                    onChange={(e) =>
-                      setCommerceAmount(formatCurrency(e.target.value))
-                    }
+                    value={amount}
+                    onChange={(e) => setAmount(formatCurrency(e.target.value))}
                     placeholder='Ingrese el monto'
                   />
                 </FormItem>
@@ -298,15 +314,13 @@ export function TaxCalculatorCard({
                   <Input
                     name='calculated_amount'
                     className='bg-blue-100'
-                    value={formatNumberToCurrency(
-                      commerceCalculatedAmount ?? 0
-                    )}
+                    value={formatNumberToCurrency(calculatedAmount ?? 0)}
                     readOnly
                   />
                 </FormItem>
                 <FormItem className='space-y-2 flex items-end'>
                   <Button
-                    onClick={handleCalculateCommerce}
+                    onClick={handleCalculate}
                     loading={isCalculating}
                     className='w-full mb-0'
                     type='button'
@@ -344,7 +358,7 @@ export function TaxCalculatorCard({
                 isBothCategories
                   ? commerceCalculatedAmount === null ||
                     financialCalculatedAmount === null
-                  : commerceCalculatedAmount === null
+                  : calculatedAmount === null
               }
             >
               Presentar
