@@ -234,7 +234,7 @@ export const getConceptsToPay = async () => {
 
   try {
     const lte_payment_due_date =
-      dayjs().month() === 2
+      dayjs().month() === 2 || dayjs().month() === 4
         ? dayjs().add(1, 'month').endOf('month').toDate()
         : dayjs().endOf('month').toDate();
 
@@ -354,7 +354,7 @@ export const getBalance = async () => {
     const { user } = await getUserAndCommercialEnablement();
 
     const lte_payment_due_date =
-      dayjs().month() === 2
+      dayjs().month() === 2 || dayjs().month() === 4
         ? dayjs().add(1, 'month').endOf('month').toDate()
         : dayjs().endOf('month').toDate();
 
@@ -560,6 +560,12 @@ export const createAffidavit = async (input: {
     if (tentativePaymentDueDate.split('-')[1] === '03') {
       tentativePaymentDueDate = dayjs(tentativePaymentDueDate)
         .add(13, 'day')
+        .format('YYYY-MM-DD');
+    }
+
+    if (tentativePaymentDueDate.split('-')[1] === '05') {
+      tentativePaymentDueDate = dayjs(tentativePaymentDueDate)
+        .add(10, 'day')
         .format('YYYY-MM-DD');
     }
 

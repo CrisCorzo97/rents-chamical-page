@@ -60,6 +60,10 @@ export const getPendingDeclarations = async (input: {
 
       const tentativeDueDate = [0, 1].includes(presentationPeriodEnd.month())
         ? dayjs('2025-04-10') // Enero y Febrero vencen el 10 de abril
+        : presentationPeriodEnd.month() === 2 // Marzo
+        ? dayjs('2025-05-05') // Marzo vence el 5 de mayo para CUIT 0,1,2
+        : presentationPeriodEnd.month() === 3 // Abril
+        ? dayjs('2025-06-04') // Abril vence el 4 de junio para CUIT 0,1,2
         : presentationPeriodEnd
             .add(1, 'month')
             .date(Number(declarableTax.procedure_expiration_day));
