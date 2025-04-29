@@ -16,6 +16,7 @@ export type LicenseData = {
   mainActivity: string;
   otherActivities?: string[];
   issueDate: string;
+  address: string;
 };
 
 const getPreviousBimester = () => {
@@ -139,6 +140,7 @@ export const generateOblea = async (tax_id: string) => {
       mainActivity: commercial_enablement.commercial_activity?.activity!,
       otherActivities: otherActivities.filter((activity) => activity !== null),
       issueDate: dayjs().format('DD/MM/YYYY'),
+      address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
     };
 
     response.data = licenseData;
@@ -195,6 +197,7 @@ export const verifyOblea = async (tax_id: string) => {
       mainActivity: commercial_enablement.commercial_activity?.activity!,
       otherActivities: [],
       issueDate: dayjs().format('DD/MM/YYYY'),
+      address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
     };
 
     if (!isApproved) {
