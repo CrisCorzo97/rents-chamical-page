@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   blankSpace: {
-    height: 50,
+    height: 20,
   },
 });
 
@@ -218,6 +218,11 @@ const CommercialLicense: React.FC<CommercialLicenseProps> = ({
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Contribuyente:</Text>
                 <Text style={styles.value}>{licenseData.taxpayerName}</Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Text style={styles.label}>Dirección:</Text>
+                <Text style={styles.value}>{licenseData.address}</Text>
               </View>
 
               {/* <View style={styles.registrationNumber}>

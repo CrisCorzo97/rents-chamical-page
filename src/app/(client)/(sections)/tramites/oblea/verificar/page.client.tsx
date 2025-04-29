@@ -40,6 +40,9 @@ export const PageClient = ({ status, licenseData, error }: PageClientProps) => {
               <strong>Contribuyente:</strong> {licenseData.taxpayerName}
             </p>
             <p className='mb-2 text-gray-700'>
+              <strong>Dirección:</strong> {licenseData.address}
+            </p>
+            <p className='mb-2 text-gray-700'>
               <strong>Actividad Principal:</strong> {licenseData.mainActivity}
             </p>
             {Array.isArray(licenseData.otherActivities) &&
@@ -79,6 +82,9 @@ export const PageClient = ({ status, licenseData, error }: PageClientProps) => {
                 </p>
                 <p className='mb-2 text-gray-700'>
                   <strong>Contribuyente:</strong> {licenseData.taxpayerName}
+                </p>
+                <p className='mb-2 text-gray-700'>
+                  <strong>Dirección:</strong> {licenseData.address}
                 </p>
                 <p className='mb-2 text-gray-700'>
                   <strong>Actividad Principal:</strong>{' '}
