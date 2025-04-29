@@ -56,6 +56,12 @@ export default function RegulatoryUpdates() {
         </p>
 
         <RegulatoryUpdatesCard
+          title='RG 5/2025 - Prórroga 2do Bimestre'
+          date='Publicado el 29 de Abril de 2025'
+          description='Esta resolución general establece una prórroga para los vencimientos del segundo bimestre del año 2025. Se extienden los plazos para la presentación de declaraciones juradas y el pago de las tasas municipales correspondientes.'
+          downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//RG%205_2025%20-%20Prorroga%202do%20bimestre.pdf'
+        />
+        <RegulatoryUpdatesCard
           title='RG 4/2025 - Tramos'
           date='Publicado el 28 de Marzo de 2025'
           description='Esta resolución general establece los tramos de ingresos brutos para el año 2025. Se establecen los límites de ingresos brutos para cada tramo y se detallan el importe de la tasa aplicada a cada uno de ellos.'
