@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sistema de Gestión de Rentas - Municipalidad de Chamical
 
-## Getting Started
+## Descripción
 
-First, run the development server:
+Este sistema está diseñado para la gestión integral de las rentas municipales de la ciudad de Chamical, La Rioja. Permite administrar de manera eficiente los impuestos, tasas y contribuciones que los ciudadanos deben abonar al municipio.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Características Principales
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Gestión de impuestos municipales
+- Control de tasas y contribuciones
+- Seguimiento de pagos y vencimientos
+- Generación de comprobantes y recibos
+- Consulta de deudas y estado de cuenta
+- Sistema de notificaciones
+- Interfaz amigable para contribuyentes y administradores
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cómo Usar
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. Inicia sesión con tus credenciales
+2. Si eres contribuyente:
+   - Consulta tus obligaciones tributarias
+   - Realiza pagos en línea
+   - Descarga comprobantes
+   - Verifica el estado de tus pagos
+3. Si eres administrador:
+   - Gestiona las tasas y contribuciones
+   - Controla los vencimientos
+   - Genera reportes
+   - Administra usuarios
 
-## Learn More
+## Soporte
 
-To learn more about Next.js, take a look at the following resources:
+Para consultas sobre el sistema o asistencia técnica, contacta al área de Rentas de la Municipalidad de Chamical.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tecnologías Utilizadas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Next.js (Framework de React)
+- TypeScript
+- Prisma (Base de datos)
+- Tailwind CSS (Estilos)
