@@ -322,11 +322,14 @@ export const getUpcomingDueDates = async () => {
   };
 
   try {
-    const { user } = await getUserAndCommercialEnablement();
+    const { user, commercial_enablement } =
+      await getUserAndCommercialEnablement();
 
     response.data = await getPendingDeclarations({
       declarableTaxId: 'commercial_activity',
       userId: user.id,
+      commercialEnablementRegistrationDate:
+        commercial_enablement?.registration_date!.toISOString(),
     });
   } catch (error) {
     console.error(error);

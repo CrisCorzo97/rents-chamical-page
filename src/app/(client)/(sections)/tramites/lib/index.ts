@@ -20,8 +20,10 @@ export const PERIOD_MAP: Record<declaration_period, number> = {
 export const getPendingDeclarations = async (input: {
   declarableTaxId: string;
   userId: string;
+  commercialEnablementRegistrationDate: string;
 }) => {
-  const { declarableTaxId, userId } = input;
+  const { declarableTaxId, userId, commercialEnablementRegistrationDate } =
+    input;
 
   try {
     const declarableTax = await dbSupabase.declarable_tax.findFirst({
@@ -42,6 +44,7 @@ export const getPendingDeclarations = async (input: {
     const endDate = declarableTax.valid_until
       ? dayjs(declarableTax.valid_until)
       : null;
+    const registrationDate = dayjs(commercialEnablementRegistrationDate);
 
     // Si aún estamos en el primer período, no hay vencimientos
     if (today.isBefore(startDate.add(presentationPeriodicity, 'month')))
@@ -49,6 +52,11 @@ export const getPendingDeclarations = async (input: {
 
     let periods: PeriodData[] = [];
     let periodStart = startDate;
+
+    // Ajustar el inicio del período si la fecha de alta es posterior
+    if (registrationDate.isAfter(periodStart)) {
+      periodStart = registrationDate;
+    }
 
     while (
       periodStart.isBefore(today) &&
