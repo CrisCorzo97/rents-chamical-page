@@ -162,6 +162,7 @@ export const verifyOblea = async (tax_id: string) => {
     }
 
     const { affidavits, secondMonth } = await getAffidavits(tax_id);
+
     const isApproved = affidavits.every(
       (affidavit) => affidavit.status === 'approved'
     );
@@ -182,7 +183,7 @@ export const verifyOblea = async (tax_id: string) => {
       address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
     };
 
-    if (!isApproved) {
+    if (!isApproved || affidavits.length === 0) {
       response.error =
         'El comercio no está habilitado para operar. Oblea no válida.';
     } else {
