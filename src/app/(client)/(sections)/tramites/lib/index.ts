@@ -51,11 +51,11 @@ export const getPendingDeclarations = async (input: {
       return [];
 
     let periods: PeriodData[] = [];
-    let periodStart = startDate;
+    let periodStart = startDate.startOf('month');
 
     // Ajustar el inicio del período si la fecha de alta es posterior
     if (registrationDate.isAfter(periodStart)) {
-      periodStart = registrationDate;
+      periodStart = registrationDate.startOf('month');
     }
 
     while (
