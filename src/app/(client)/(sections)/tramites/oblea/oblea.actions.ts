@@ -58,19 +58,39 @@ const getCommercialEnablement = async (tax_id: string) => {
   return { commercial_enablement };
 };
 
-const getAffidavits = async (tax_id: string) => {
-  const [firstMonth, secondMonth] = getCurrentBimester();
+const getAffidavits = async (input: {
+  tax_id: string;
+  registration_date: Date;
+}) => {
+  const { tax_id, registration_date } = input;
+  const [secondMonth] = getCurrentBimester();
+
+  let initMonth = '2025-01-01';
+
+  if (dayjs(registration_date).isAfter(dayjs(initMonth))) {
+    initMonth = dayjs(registration_date).startOf('month').format('YYYY-MM-DD');
+  }
+
+  const requiredPeriods = [initMonth];
+
+  while (requiredPeriods.at(-1) !== secondMonth) {
+    requiredPeriods.push(
+      dayjs(requiredPeriods[requiredPeriods.length - 1])
+        .add(1, 'month')
+        .format('YYYY-MM-DD')
+    );
+  }
 
   const affidavits = await dbSupabase.affidavit.findMany({
     where: {
       tax_id,
       period: {
-        in: [firstMonth, secondMonth],
+        in: requiredPeriods,
       },
     },
   });
 
-  return { affidavits, firstMonth, secondMonth };
+  return { affidavits, requiredPeriods, secondMonth };
 };
 
 export const generateOblea = async (tax_id: string) => {
@@ -90,7 +110,16 @@ export const generateOblea = async (tax_id: string) => {
       );
     }
 
-    const { affidavits, secondMonth } = await getAffidavits(tax_id);
+    const { affidavits, requiredPeriods, secondMonth } = await getAffidavits({
+      tax_id,
+      registration_date: commercial_enablement.registration_date!,
+    });
+
+    if (affidavits.length < requiredPeriods.length) {
+      throw new Error(
+        'El CUIT ingresado no está habilitado para generar una oblea. Por favor, verifica tu estado tributario.'
+      );
+    }
 
     const isApproved = affidavits.every(
       (affidavit) => affidavit.status === 'approved'
@@ -161,7 +190,10 @@ export const verifyOblea = async (tax_id: string) => {
       return response;
     }
 
-    const { affidavits, secondMonth } = await getAffidavits(tax_id);
+    const { affidavits, requiredPeriods, secondMonth } = await getAffidavits({
+      tax_id,
+      registration_date: commercial_enablement.registration_date!,
+    });
 
     const isApproved = affidavits.every(
       (affidavit) => affidavit.status === 'approved'
@@ -183,7 +215,11 @@ export const verifyOblea = async (tax_id: string) => {
       address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
     };
 
-    if (!isApproved || affidavits.length === 0) {
+    if (
+      affidavits.length === 0 ||
+      affidavits.length < requiredPeriods.length ||
+      !isApproved
+    ) {
       response.error =
         'El comercio no está habilitado para operar. Oblea no válida.';
     } else {
