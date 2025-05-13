@@ -27,9 +27,7 @@ interface DuePeriodsCardProps {
 
 export function DuePeriodsCard({ periods }: DuePeriodsCardProps) {
   const isOverdue = (period: PeriodData) => {
-    const dueDate = dayjs(period.dueDate);
-    const today = dayjs();
-    return dueDate.isBefore(today);
+    return dayjs().isAfter(dayjs(period.dueDate));
   };
 
   const { push } = useRouter();
@@ -89,6 +87,7 @@ export function DuePeriodsCard({ periods }: DuePeriodsCardProps) {
                 <Button
                   variant='ghost'
                   size='sm'
+                  disabled={!period.enabled}
                   onClick={() =>
                     push(
                       `/tramites/DDJJ-actividad-comercial/presentar${buildQuery(
