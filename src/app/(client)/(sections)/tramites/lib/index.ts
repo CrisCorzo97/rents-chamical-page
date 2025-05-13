@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 export type PeriodData = {
   period: string;
   dueDate: string;
+  enabled: boolean;
 };
 
 export const PERIOD_MAP: Record<declaration_period, number> = {
@@ -84,6 +85,7 @@ export const getPendingDeclarations = async (input: {
         periods.push({
           period: `${periodStart.format('YYYY-MM')}`,
           dueDate,
+          enabled: false,
         });
       }
 
@@ -102,9 +104,16 @@ export const getPendingDeclarations = async (input: {
       (p) => !declaredPeriods.some((d) => d.period.includes(p.period))
     );
 
-    return filteredPeriods.sort((a, b) => {
-      return dayjs(a.dueDate).isAfter(dayjs(b.dueDate)) ? -1 : 1;
+    // Ordenar períodos por fecha y habilitar solo el más antiguo
+    const sortedPeriods = filteredPeriods.sort((a, b) => {
+      return dayjs(a.period).isAfter(dayjs(b.period)) ? 1 : -1;
     });
+
+    if (sortedPeriods.length > 0) {
+      sortedPeriods[0].enabled = true;
+    }
+
+    return sortedPeriods;
   } catch (error) {
     console.error(error);
     if (error instanceof Error) {
