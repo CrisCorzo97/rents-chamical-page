@@ -56,6 +56,8 @@ export const DailyBoxReport = () => {
     dayjs().toISOString()
   );
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [openPreview, setOpenPreview] = useState<boolean>(false);
+  const [openCalendar, setOpenCalendar] = useState<boolean>(false);
   const [contentDialog, setContentDialog] = useState<DailyBoxContent>({
     total_amount_collected: 0,
     total_receipts: 0,
@@ -79,7 +81,7 @@ export const DailyBoxReport = () => {
         setContentDialog(data);
 
         // Mostrar el diálogo de confirmación
-        setOpenDialog(true);
+        setOpenPreview(true);
       } catch (error) {
         toast.error(
           'Error al generar el comprobante de cementerio. Intente nuevamente.',
@@ -93,9 +95,14 @@ export const DailyBoxReport = () => {
   return (
     <div>
       <Toaster />
-      <Dialog>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogTrigger asChild>
-          <Button size='lg' variant='outline' className='flex gap-2'>
+          <Button
+            size='lg'
+            variant='outline'
+            className='flex gap-2'
+            onClick={() => setOpenDialog(true)}
+          >
             <FileChartColumnIncreasing size={18} />
             Caja diaria
           </Button>
@@ -110,7 +117,11 @@ export const DailyBoxReport = () => {
 
           <FormItem className='mb-4 mt-2'>
             <Label className='block'>Fecha del reporte</Label>
-            <Popover>
+            <Popover
+              open={openCalendar}
+              onOpenChange={setOpenCalendar}
+              modal={true}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant={'outline'}
@@ -131,9 +142,12 @@ export const DailyBoxReport = () => {
                 <Calendar
                   mode='single'
                   selected={dayjs(dateToGenerate).toDate()}
-                  onSelect={(date) =>
-                    setDateToGenerate(dayjs(date).toISOString())
-                  }
+                  onSelect={(date) => {
+                    if (date) {
+                      setDateToGenerate(dayjs(date).toISOString());
+                    }
+                    setOpenCalendar(false);
+                  }}
                   initialFocus
                   disabled={{ after: dayjs().toDate() }}
                 />
@@ -147,7 +161,7 @@ export const DailyBoxReport = () => {
                 Cancelar
               </Button>
             </DialogClose>
-            <AlertDialog open={openDialog}>
+            <AlertDialog open={openPreview} onOpenChange={setOpenPreview}>
               <AlertDialogTrigger asChild>
                 <Button
                   size='sm'
@@ -172,7 +186,7 @@ export const DailyBoxReport = () => {
                   />
                 </PDFViewer>
                 <AlertDialogFooter className='flex-none'>
-                  <AlertDialogAction onClick={() => setOpenDialog(false)}>
+                  <AlertDialogAction onClick={() => setOpenPreview(false)}>
                     Continuar
                   </AlertDialogAction>
                 </AlertDialogFooter>
