@@ -16,22 +16,25 @@ import { DailyBoxContent } from './dailyBoxReport';
 const styles = StyleSheet.create({
   page: {
     position: 'relative',
-    padding: '30px 30px',
+    paddingTop: 30,
+    paddingBottom: 30,
+    paddingLeft: 30,
+    paddingRight: 30,
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
+    gap: 10,
     alignItems: 'center',
   },
   header: {
     display: 'flex',
     flexDirection: 'row',
-    gap: '24px',
+    gap: 24,
     alignItems: 'center',
     width: '100%',
   },
   headerLogo: {
-    width: '60px',
-    height: '60px',
+    width: 60,
+    height: 60,
   },
   headerTitle: {
     display: 'flex',
@@ -41,12 +44,12 @@ const styles = StyleSheet.create({
   content: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
+    gap: 10,
     width: '100%',
   },
   contentTitle: {
     fontSize: 14,
-    lineHeight: '16px',
+    lineHeight: 1.3,
     fontWeight: 'bold',
     textAlign: 'center',
     backgroundColor: '#f0f0f0',
@@ -54,13 +57,13 @@ const styles = StyleSheet.create({
   contentTable: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
+    gap: 6,
     width: '100%',
   },
   contentTableHeader: {
     display: 'flex',
     flexDirection: 'row',
-    gap: '4px',
+    gap: 4,
     padding: '2px 6px',
     justifyContent: 'space-around',
     backgroundColor: '#f0f0f0',
@@ -72,18 +75,18 @@ const styles = StyleSheet.create({
   contentTableBody: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: 8,
   },
   contentTableBodyRow: {
     display: 'flex',
     flexDirection: 'row',
-    gap: '4px',
+    gap: 4,
     padding: '2px 6px',
     justifyContent: 'space-around',
   },
   contentTableBodyCell: {
     fontSize: 9,
-    lineHeight: '12px',
+    lineHeight: 1.3,
     maxLines: 1,
   },
   footer: {
@@ -126,6 +129,19 @@ export interface ReceiptPDFProps {
 
 // Create Document Component
 export const DailyBoxReportPDF = ({ data }: ReceiptPDFProps) => {
+  const numDataPagesActual = data.page_data?.length || 0;
+  const wantsSeparateSummaryPage = data.tax_summary.add_new_page;
+
+  let effectiveTotalPages = numDataPagesActual;
+  if (wantsSeparateSummaryPage) {
+    effectiveTotalPages += 1;
+  }
+  // If there are no data pages, there's always at least one PDF page
+  // (either for "no data, summary on this page" or "dedicated summary page if no data")
+  if (numDataPagesActual === 0) {
+    effectiveTotalPages = Math.max(1, effectiveTotalPages);
+  }
+
   return (
     <Document
       title='Caja diaria'
@@ -133,54 +149,62 @@ export const DailyBoxReportPDF = ({ data }: ReceiptPDFProps) => {
       subject='Rentas Municipal'
       language='es'
     >
-      {data.page_data?.length ? (
-        data.page_data.map((page) => (
+      {/* Render Data Pages */}
+      {numDataPagesActual > 0 &&
+        data.page_data.map((pageContent) => (
           <PageComponent
-            key={page.page}
+            key={`data-${pageContent.page}`}
             date={data.date}
-            page={page.page}
-            subtotal={page.subtotal}
-            receipts={page.receipts}
-            tax_summary={data.tax_summary}
-            total_items={page.total_items}
-            totalPages={data.page_data.length}
-            totalAmountCollected={data.total_amount_collected}
+            currentPageNumber={pageContent.page}
+            totalPagesInDocument={effectiveTotalPages}
+            receipts={pageContent.receipts}
+            tax_summary_details={data.tax_summary.details}
+            showSummaryOnThisPage={
+              !wantsSeparateSummaryPage &&
+              pageContent.page === numDataPagesActual
+            }
+            totalAmountCollectedAllPages={data.total_amount_collected}
+            isThisADedicatedSummaryPage={false}
           />
-        ))
-      ) : (
+        ))}
+
+      {/* Render Empty Page (if no data pages AND summary is not separate) */}
+      {numDataPagesActual === 0 && !wantsSeparateSummaryPage && (
         <PageComponent
-          key='empty-page'
+          key='empty-with-summary'
           date={data.date}
-          page={1}
-          subtotal={0}
+          currentPageNumber={1}
+          totalPagesInDocument={1} // Only one page in this scenario
           receipts={[]}
-          tax_summary={data.tax_summary}
-          total_items={data.total_receipts}
-          totalPages={1}
-          totalAmountCollected={data.total_amount_collected}
+          tax_summary_details={data.tax_summary.details}
+          showSummaryOnThisPage={true} // Summary is shown on this only page
+          totalAmountCollectedAllPages={data.total_amount_collected}
+          isThisADedicatedSummaryPage={false} // Not "dedicated" as it also states "no data"
         />
       )}
-      {data.tax_summary.add_new_page && (
+
+      {/* Render Dedicated Summary Page (if requested, and might be the only page if no data) */}
+      {wantsSeparateSummaryPage && (
         <PageComponent
-          key='tax-summary'
+          key='dedicated-summary'
           date={data.date}
-          page={data.page_data.length + 1}
-          subtotal={0}
-          receipts={[]}
-          tax_summary={data.tax_summary}
-          total_items={data.total_receipts}
-          totalPages={data.page_data.length}
-          totalAmountCollected={data.total_amount_collected}
+          currentPageNumber={numDataPagesActual + 1} // Page number after data pages (or 1 if no data pages)
+          totalPagesInDocument={effectiveTotalPages}
+          receipts={[]} // No individual receipts on a dedicated summary page
+          tax_summary_details={data.tax_summary.details}
+          showSummaryOnThisPage={true} // This page IS for the summary
+          totalAmountCollectedAllPages={data.total_amount_collected}
+          isThisADedicatedSummaryPage={true}
         />
       )}
     </Document>
   );
 };
 
-const PageComponent = (details: {
+interface PageComponentProps {
   date: string;
-  page: number;
-  subtotal: number;
+  currentPageNumber: number;
+  totalPagesInDocument: number;
   receipts: {
     id: string;
     paid_at: Date;
@@ -188,18 +212,28 @@ const PageComponent = (details: {
     tax_type: string;
     amount: number;
   }[];
-  tax_summary: DailyBoxContent['tax_summary'];
-  total_items: number;
-  totalPages: number;
-  totalAmountCollected: number;
-}) => {
-  const { tax_summary } = details;
+  tax_summary_details: Record<string, number>;
+  showSummaryOnThisPage: boolean;
+  totalAmountCollectedAllPages: number;
+  isThisADedicatedSummaryPage: boolean;
+}
 
-  const showTaxSummary = tax_summary.add_new_page
-    ? details.page === details.totalPages + 1
-    : details.page === details.totalPages;
+const PageComponent = ({
+  date,
+  currentPageNumber,
+  totalPagesInDocument,
+  receipts,
+  tax_summary_details,
+  showSummaryOnThisPage,
+  totalAmountCollectedAllPages,
+  isThisADedicatedSummaryPage,
+}: PageComponentProps) => {
+  const taxSummaryItems = Object.entries(tax_summary_details ?? {});
 
-  const taxSummaryItems = Object.entries(tax_summary.details ?? {});
+  const displayReceiptsTable =
+    !isThisADedicatedSummaryPage && receipts && receipts.length > 0;
+  const displayEmptyReceiptsMessage =
+    !isThisADedicatedSummaryPage && (!receipts || receipts.length === 0);
 
   return (
     <Page size='A4' style={styles.page}>
@@ -228,10 +262,10 @@ const PageComponent = (details: {
       </View>
       <View style={styles.content}>
         <Text style={styles.contentTitle}>
-          RESUMEN DE CAJA DIARIA {dayjs(details.date).format('DD/MM/YYYY')}
+          RESUMEN DE CAJA DIARIA {dayjs(date).format('DD/MM/YYYY')}
         </Text>
         <View style={styles.contentTable}>
-          {(!tax_summary.add_new_page || !showTaxSummary) && (
+          {(displayReceiptsTable || displayEmptyReceiptsMessage) && (
             <View>
               <View style={styles.contentTableHeader}>
                 <Text
@@ -264,8 +298,8 @@ const PageComponent = (details: {
                 </Text>
               </View>
               <View>
-                {details.receipts?.length ? (
-                  details.receipts.map((item, index) => (
+                {displayReceiptsTable &&
+                  receipts.map((item, index) => (
                     <View
                       key={index}
                       style={{
@@ -299,12 +333,19 @@ const PageComponent = (details: {
                       <Text
                         style={{ ...styles.contentTableBodyCell, width: '15%' }}
                       >
-                        {formatNumberToCurrency(item.amount)}
+                        {formatNumberToCurrency(item.amount || 0)}
                       </Text>
                     </View>
-                  ))
-                ) : (
-                  <Text style={{ ...styles.contentTableBodyCell }}>
+                  ))}
+                {displayEmptyReceiptsMessage && (
+                  <Text
+                    style={{
+                      ...styles.contentTableBodyCell,
+                      textAlign: 'center',
+                      paddingTop: 10,
+                      paddingBottom: 10,
+                    }}
+                  >
                     No hay comprobantes confirmados en esta fecha.
                   </Text>
                 )}
@@ -312,12 +353,17 @@ const PageComponent = (details: {
             </View>
           )}
 
-          {taxSummaryItems.length && showTaxSummary && (
+          {taxSummaryItems.length > 0 && showSummaryOnThisPage && (
             <View>
               <View
                 style={{
                   ...styles.contentTableHeader,
-                  marginTop: tax_summary.add_new_page ? 0 : 10,
+                  marginTop:
+                    isThisADedicatedSummaryPage &&
+                    !displayReceiptsTable &&
+                    !displayEmptyReceiptsMessage
+                      ? 0
+                      : 10,
                 }}
               >
                 <Text
@@ -355,7 +401,7 @@ const PageComponent = (details: {
                       }}
                     >
                       $
-                      {amount.toLocaleString('es-AR', {
+                      {(amount || 0).toLocaleString('es-AR', {
                         maximumFractionDigits: 2,
                         minimumFractionDigits: 2,
                       })}
@@ -370,7 +416,7 @@ const PageComponent = (details: {
       <View style={styles.footer}>
         <View>
           <View style={styles.footerBorder}></View>
-          {showTaxSummary && (
+          {showSummaryOnThisPage && ( // Show total only if summary is shown on this page
             <View style={styles.footerTotalRow}>
               <Text
                 style={{
@@ -388,7 +434,7 @@ const PageComponent = (details: {
                 }}
               >
                 $
-                {details.totalAmountCollected.toLocaleString('es-AR', {
+                {(totalAmountCollectedAllPages || 0).toLocaleString('es-AR', {
                   maximumFractionDigits: 2,
                   minimumFractionDigits: 2,
                 })}
@@ -404,11 +450,7 @@ const PageComponent = (details: {
             textAlign: 'right',
           }}
         >
-          {`Página ${details.page} de ${
-            tax_summary.add_new_page
-              ? details.totalPages + 1
-              : details.totalPages
-          }`}
+          {`Página ${currentPageNumber} de ${totalPagesInDocument}`}
         </Text>
       </View>
     </Page>

@@ -1,22 +1,10 @@
 'use client';
 
 import { Button, Calendar, Label, Popover } from '@/components/ui';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { PDFViewer } from '@react-pdf/renderer';
 import { CalendarIcon, FileChartColumnIncreasing } from 'lucide-react';
 import { useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
 import { generateDailyBoxReport } from '../receipt-actions';
-import { DailyBoxReportPDF } from './dailyBoxReportPDF';
 import {
   Dialog,
   DialogClose,
@@ -25,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { FormItem } from '@/components/ui/form';
 import { cn } from '@/lib/cn';
 import dayjs from 'dayjs';
@@ -56,38 +45,43 @@ export const DailyBoxReport = () => {
     dayjs().toISOString()
   );
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [openPreview, setOpenPreview] = useState<boolean>(false);
   const [openCalendar, setOpenCalendar] = useState<boolean>(false);
-  const [contentDialog, setContentDialog] = useState<DailyBoxContent>({
-    total_amount_collected: 0,
-    total_receipts: 0,
-    tax_summary: {
-      add_new_page: false,
-      details: {},
-    },
-    page_data: [],
-  });
 
-  const handleClick = () => {
+  const handleClickAndOpenPreview = () => {
     startTransition(async () => {
       try {
-        const { data, error } = await generateDailyBoxReport(dateToGenerate);
+        const { data: reportContent, error } = await generateDailyBoxReport(
+          dateToGenerate
+        );
 
-        if (error || !data) {
-          throw new Error(error ?? '');
+        if (error || !reportContent) {
+          toast.error(error || 'No se recibieron datos para el reporte.', {
+            duration: 5000,
+          });
+          console.log({ error });
+          return;
         }
 
-        // Actualizar el contenido del diálogo
-        setContentDialog(data);
+        // Guardar datos en sessionStorage para la nueva pestaña
+        const dataForPreview = {
+          content: reportContent,
+          date: dateToGenerate,
+        };
+        sessionStorage.setItem(
+          'dailyBoxReportDataForPreview',
+          JSON.stringify(dataForPreview)
+        );
 
-        // Mostrar el diálogo de confirmación
-        setOpenPreview(true);
+        // Abrir la nueva página en una nueva pestaña
+        window.open('/private/admin/receipts/daily-box-preview', '_blank');
+
+        setOpenDialog(false); // Cerrar el diálogo de selección de fecha
       } catch (error) {
         toast.error(
-          'Error al generar el comprobante de cementerio. Intente nuevamente.',
+          'Error al generar el reporte de caja diaria. Intente nuevamente.',
           { duration: 5000 }
         );
-        console.log({ error });
+        console.error('Error en handleClickAndOpenPreview:', error);
       }
     });
   };
@@ -97,12 +91,7 @@ export const DailyBoxReport = () => {
       <Toaster />
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogTrigger asChild>
-          <Button
-            size='lg'
-            variant='outline'
-            className='flex gap-2'
-            onClick={() => setOpenDialog(true)}
-          >
+          <Button size='lg' variant='outline' className='flex gap-2'>
             <FileChartColumnIncreasing size={18} />
             Caja diaria
           </Button>
@@ -161,37 +150,14 @@ export const DailyBoxReport = () => {
                 Cancelar
               </Button>
             </DialogClose>
-            <AlertDialog open={openPreview} onOpenChange={setOpenPreview}>
-              <AlertDialogTrigger asChild>
-                <Button
-                  size='sm'
-                  variant='default'
-                  onClick={handleClick}
-                  loading={isMutating}
-                >
-                  Generar
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
-                <AlertDialogTitle>
-                  Reporte de caja diaria generado
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  El reporte de caja diara ha sido generado con éxito. Puede
-                  descargarlo a continuación.
-                </AlertDialogDescription>
-                <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-                  <DailyBoxReportPDF
-                    data={{ ...contentDialog, date: dateToGenerate }}
-                  />
-                </PDFViewer>
-                <AlertDialogFooter className='flex-none'>
-                  <AlertDialogAction onClick={() => setOpenPreview(false)}>
-                    Continuar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <Button
+              size='sm'
+              variant='default'
+              onClick={handleClickAndOpenPreview}
+              disabled={isMutating}
+            >
+              {isMutating ? 'Generando...' : 'Generar'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
