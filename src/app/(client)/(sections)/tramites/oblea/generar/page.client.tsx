@@ -23,7 +23,7 @@ import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { toast, Toaster } from 'sonner';
 import CommercialLicense from './CommercialLicense';
-import { generateOblea, LicenseData } from '../oblea.actions';
+import { generateObleaV2, LicenseData } from '../oblea.actions';
 
 export const GenerateObleaPageClient = () => {
   const [taxId, setTaxId] = useState<string>('');
@@ -38,7 +38,7 @@ export const GenerateObleaPageClient = () => {
   const handleSubmit = () => {
     startTransition(async () => {
       try {
-        const { data, error } = await generateOblea(taxId);
+        const { data, error } = await generateObleaV2(taxId);
 
         if (error) {
           setErrorDetails(error);
