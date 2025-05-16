@@ -21,6 +21,7 @@ import { toast, Toaster } from 'sonner';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import locale from 'dayjs/locale/es';
+
 dayjs.locale(locale);
 
 interface TaxCalculatorCardProps {
@@ -294,10 +295,7 @@ export function TaxCalculatorCard({
               <div className='col-span-5 grid grid-cols-5 gap-4'>
                 <FormItem className='space-y-2'>
                   <Label>Período</Label>
-                  <Input
-                    value={formatName(dayjs(period).format('MMMM YYYY'))}
-                    readOnly
-                  />
+                  <Input value={formatName(period)} readOnly />
                 </FormItem>
                 <FormItem className='space-y-2'>
                   <Label>Base Imponible</Label>
