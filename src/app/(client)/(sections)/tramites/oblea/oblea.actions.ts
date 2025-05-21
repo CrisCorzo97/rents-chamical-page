@@ -269,7 +269,7 @@ async function validateOblea(input: {
   const validationStartDate = dayjs(
     commercialEnablementRegistrationDate
   ).isAfter(dayjs().startOf('year'))
-    ? dayjs(commercialEnablementRegistrationDate)
+    ? dayjs(commercialEnablementRegistrationDate).startOf('month')
     : dayjs().startOf('year');
 
   // 3. Obtener todas las DDJJ aprobadas del año actual
@@ -299,8 +299,15 @@ async function validateOblea(input: {
     const months =
       BIMESTER_DICTIONARY[bimester as keyof typeof BIMESTER_DICTIONARY];
 
-    // Verificamos que ambos meses del bimestre estén aprobados
-    const hasBothMonthsApproved = months.every((month) => {
+    if (months.every((month) => month < validationStartDate.month())) {
+      continue;
+    }
+
+    // Sólo verificamos que estén aprobados los meses a partir de la fecha de registro
+    const hasMonthsApproved = months.map((month) => {
+      if (month < validationStartDate.month()) {
+        return true;
+      }
       const affidavit = affidavits.find((affidavit) => {
         const periodMonth = dayjs(affidavit.period).month();
         return periodMonth === month && affidavit.status === 'approved';
@@ -308,7 +315,7 @@ async function validateOblea(input: {
       return affidavit !== undefined;
     });
 
-    if (hasBothMonthsApproved) {
+    if (hasMonthsApproved.every((approved) => approved)) {
       // Calculamos la fecha de vigencia para este bimestre
       const nextBimesterStartDate = dayjs()
         .year(currentYear)
@@ -352,13 +359,22 @@ async function validateOblea(input: {
       BIMESTER_DICTIONARY[
         lastRequiredBimester as keyof typeof BIMESTER_DICTIONARY
       ];
-    validUntil = dayjs()
+
+    // Verificamos si el último bimestre requerido es posterior a la fecha de registro
+    const lastBimesterStart = dayjs()
       .year(currentYear)
-      .month(lastMonths[1] + 1)
-      .startOf('month')
-      .add(3, 'month')
-      .add(9, 'day')
-      .toISOString();
+      .month(lastMonths[0])
+      .startOf('month');
+
+    if (lastBimesterStart.isAfter(validationStartDate)) {
+      validUntil = dayjs()
+        .year(currentYear)
+        .month(lastMonths[1] + 1)
+        .startOf('month')
+        .add(3, 'month')
+        .add(9, 'day')
+        .toISOString();
+    }
   }
 
   return {
