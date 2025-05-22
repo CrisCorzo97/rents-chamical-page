@@ -30,7 +30,7 @@ import { formatName } from '@/lib/formatters';
 dayjs.extend(customParseFormat);
 dayjs.locale(locale);
 
-const FINANCIAL_ACTIVITIES = ['Entidades Financieras'];
+const FINANCIAL_ACTIVITIES_CODE = ['641930'];
 
 const DAYS_TO_ADD_BY_TAX_ID = {
   0: [0, 1, 2],
@@ -453,8 +453,8 @@ export const calculateFeeAmount = async (input: {
     } else {
       // Comportamiento anterior - detectar por tipo de actividad
       if (
-        FINANCIAL_ACTIVITIES.includes(
-          commercial_enablement!.commercial_activity?.activity ?? ''
+        FINANCIAL_ACTIVITIES_CODE.includes(
+          commercial_enablement!.commercial_activity?.code ?? ''
         )
       ) {
         const feeCase = cases.find(
