@@ -56,6 +56,12 @@ export default function RegulatoryUpdates() {
         </p>
 
         <RegulatoryUpdatesCard
+          title='Ordenanza Nro 552 - Tributaria Impositiva'
+          date='Publicado el 22 de Mayo de 2025'
+          description='Esta ordenanza establece las disposiciones tributarias e impositivas para el ejercicio fiscal 2025. Se detallan las tasas, contribuciones y regímenes especiales aplicables a los contribuyentes del municipio.'
+          downloadLink='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//Ordenanza%20Nro%20552%20Tributaria%20Impositiva.pdf'
+        />
+        <RegulatoryUpdatesCard
           title='RG 5/2025 - Prórroga 2do Bimestre'
           date='Publicado el 29 de Abril de 2025'
           description='Esta resolución general establece una prórroga para los vencimientos del segundo bimestre del año 2025. Se extienden los plazos para la presentación de declaraciones juradas y el pago de las tasas municipales correspondientes.'
