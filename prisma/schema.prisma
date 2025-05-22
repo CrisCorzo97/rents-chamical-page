@@ -613,6 +613,7 @@ model commercial_activity {
   id                                                                                             BigInt                  @id @default(autoincrement())
   activity                                                                                       String?                 @db.VarChar
   aliquot                                                                                        Float?
+  code                                                                                           String                  @unique @db.VarChar
   commercial_enablement                                                                          commercial_enablement[]
   commercial_enablement_commercial_enablement_second_commercial_activity_idTocommercial_activity commercial_enablement[] @relation("commercial_enablement_second_commercial_activity_idTocommercial_activity")
   commercial_enablement_commercial_enablement_third_commercial_activity_idTocommercial_activity  commercial_enablement[] @relation("commercial_enablement_third_commercial_activity_idTocommercial_activity")
