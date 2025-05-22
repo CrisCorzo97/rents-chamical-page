@@ -1,16 +1,18 @@
 'use server';
 
-import { Envelope } from '@/types/envelope';
-import { Prisma } from '@prisma/client';
+import { Envelope, PaginationParams } from '@/types/envelope';
+import { affidavit_status, Prisma } from '@prisma/client';
 import { AffidavitsWithRelations } from './affidavits.interface';
 import dbSupabase from '@/lib/prisma/prisma';
+import { formatCuilInput } from '@/lib/formatters';
 
-export const getAffidavits = async (input: {
-  page?: number;
-  items_per_page?: number;
-  filter?: Prisma.affidavitWhereInput;
-  order_by?: Prisma.affidavitOrderByWithRelationInput;
-}) => {
+export const getAffidavits = async ({
+  page,
+  limit,
+  sort_by,
+  sort_direction,
+  filters,
+}: PaginationParams) => {
   const response: Envelope<AffidavitsWithRelations[]> = {
     success: true,
     data: null,
@@ -26,26 +28,26 @@ export const getAffidavits = async (input: {
       orderBy: {
         created_at: 'desc',
       },
-      take: 5,
+      take: limit ?? 5,
     };
 
-    if (input.items_per_page) {
-      queries.take = +input.items_per_page;
+    if (page) {
+      queries.skip = (+page - 1) * (queries.take ?? 5);
     }
 
-    if (input.page) {
-      queries.skip = (+input.page - 1) * (queries.take ?? 5);
-    }
-
-    if (input.filter) {
+    if (filters) {
+      const { status, tax_id } = filters;
       queries.where = {
         ...queries.where,
-        ...input.filter,
+        ...(status && { status: status as affidavit_status }),
+        ...(tax_id && { tax_id: formatCuilInput(tax_id as string) }),
       };
     }
 
-    if (input.order_by) {
-      queries.orderBy = input.order_by;
+    if (sort_by) {
+      queries.orderBy = {
+        [sort_by]: sort_direction,
+      };
     }
 
     const [affidavits, total_items] = await Promise.all([
@@ -64,10 +66,10 @@ export const getAffidavits = async (input: {
 
     response.data = affidavits;
     response.pagination = {
-      total_pages: Math.ceil(total_items / (queries.take ?? 5)),
-      total_items,
-      page: input.page ? +input.page : 1,
-      limit_per_page: queries.take ?? 5,
+      totalPages: Math.ceil(total_items / (queries.take ?? 5)),
+      totalItems: total_items,
+      page: page ? +page : 1,
+      limit: limit ?? 5,
     };
   } catch (error) {
     console.error(error);
