@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 6,
   },
   headerLeft: {
     width: '70%',
@@ -71,14 +71,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   mainContent: {
-    marginTop: 14,
+    marginTop: 10,
     flexDirection: 'row',
   },
   leftContent: {
-    width: '65%',
+    width: '70%',
   },
   rightContent: {
-    width: '35%',
+    width: '30%',
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   dateRow: {
     flexDirection: 'row',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   dateLabel: {
     fontSize: 10,
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   activitySectionBorder: {
-    height: 100,
+    minHeight: 110,
     border: 1,
     borderColor: '#000',
     padding: 4,
@@ -132,6 +132,9 @@ const styles = StyleSheet.create({
   },
   activityText: {
     fontSize: 10,
+    lineHeight: 1.2,
+    maxLines: 2,
+    textOverflow: 'ellipsis',
   },
   footer: {
     position: 'absolute',
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   blankSpace: {
-    height: 20,
+    height: 10,
   },
 });
 
@@ -248,13 +251,15 @@ const CommercialLicense: React.FC<CommercialLicenseProps> = ({
                 </View>
                 {Array.isArray(licenseData.otherActivities) &&
                   licenseData.otherActivities.length > 0 && (
-                    <View style={styles.activitySection}>
+                    <View
+                      style={{ ...styles.activitySection, marginBottom: 0 }}
+                    >
                       <Text style={styles.activityTitle}>
                         Otras Actividades:
                       </Text>
                       {licenseData.otherActivities.map((act, i) => (
                         <Text key={i} style={styles.activityText}>
-                          {act}
+                          • {act}
                         </Text>
                       ))}
                     </View>
