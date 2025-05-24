@@ -61,7 +61,7 @@ export function AffidavitsTable({
     handleLimitChange,
     handleFilterChange,
     handleSortingChange,
-  } = useDataTableURLParams({ defaultLimit: pagination?.limit ?? 5 });
+  } = useDataTableURLParams({ defaultLimit: pagination?.limit ?? 8 });
 
   const renderAffidavitDetails = (affidavit: AffidavitsWithRelations) => {
     return (

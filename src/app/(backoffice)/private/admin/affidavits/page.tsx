@@ -28,7 +28,7 @@ export default async function AffidavitsPage({
 
   const { data, pagination } = await getAffidavits({
     page: typeof page === 'string' ? parseInt(page) : undefined,
-    limit: typeof limit === 'string' ? parseInt(limit) : 5,
+    limit: typeof limit === 'string' ? parseInt(limit) : 8,
     sort_by: typeof sort_by === 'string' ? sort_by : undefined,
     sort_direction:
       typeof sort_direction === 'string'

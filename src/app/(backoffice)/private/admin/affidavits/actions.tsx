@@ -28,11 +28,11 @@ export const getAffidavits = async ({
       orderBy: {
         created_at: 'desc',
       },
-      take: limit ?? 5,
+      take: limit ?? 8,
     };
 
     if (page) {
-      queries.skip = (+page - 1) * (queries.take ?? 5);
+      queries.skip = (+page - 1) * (queries.take ?? 8);
     }
 
     if (filters) {
@@ -83,10 +83,10 @@ export const getAffidavits = async ({
 
     response.data = affidavits;
     response.pagination = {
-      totalPages: Math.ceil(totalItems / (queries.take ?? 5)),
+      totalPages: Math.ceil(totalItems / (queries.take ?? 8)),
       totalItems: totalItems,
       page: page ? +page : 1,
-      limit: limit ?? 5,
+      limit: limit ?? 8,
     };
   } catch (error) {
     console.error(error);
