@@ -23,6 +23,7 @@ export default async function AffidavitsPage({
     sort_direction,
     'filter.status': status,
     'filter.tax_id': taxId,
+    'filter.user': user,
   } = await searchParams;
 
   const { data, pagination } = await getAffidavits({
@@ -34,8 +35,12 @@ export default async function AffidavitsPage({
         ? (sort_direction as 'asc' | 'desc')
         : undefined,
     filters:
-      status || taxId
-        ? { status: status as string, tax_id: taxId as string }
+      status || taxId || user
+        ? {
+            status: status as string,
+            tax_id: taxId as string,
+            user: user as string,
+          }
         : undefined,
   });
 

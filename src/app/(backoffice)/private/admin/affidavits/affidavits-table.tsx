@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { AffidavitsWithRelations } from './affidavits.interface';
 import { formatName, formatNumberToCurrency } from '@/lib/formatters';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { Badge, BadgeProps } from '@/components/ui/badge';
 import { affidavit_status } from '@prisma/client';
 import locale from 'dayjs/locale/es';
@@ -25,6 +26,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
 dayjs.locale(locale);
+dayjs.extend(utc);
 
 const STATUS_DICTIONARY: Record<affidavit_status, string> = {
   pending_payment: 'Pendiente de pago',
@@ -84,7 +86,7 @@ export function AffidavitsTable({
               Período
             </h4>
             <p className='text-sm'>
-              {dayjs(affidavit.period).format('MM/YYYY')}
+              {formatName(dayjs(affidavit.period).utc().format('MMMM YYYY'))}
             </p>
           </div>
           <div>
@@ -120,9 +122,7 @@ export function AffidavitsTable({
         </div>
         <Separator />
         <div>
-          <h4 className='text-sm font-medium text-muted-foreground mb-2'>
-            Detalles Adicionales
-          </h4>
+          <DialogTitle className='mb-4'>Detalles Adicionales</DialogTitle>
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <h4 className='text-sm font-medium text-muted-foreground'>
@@ -175,8 +175,8 @@ export function AffidavitsTable({
 
   const columns: ColumnDef<AffidavitsWithRelations>[] = [
     {
-      id: 'taxpayer',
-      accessorKey: 'taxpayer',
+      id: 'user',
+      accessorKey: 'user',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='CONTRIBUYENTE' />
       ),
@@ -201,7 +201,8 @@ export function AffidavitsTable({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='PERÍODO' />
       ),
-      cell: ({ row }) => dayjs(row.original.period).format('MM/YYYY'),
+      cell: ({ row }) =>
+        formatName(dayjs(row.original.period).utc().format('MMMM YYYY')),
       enableSorting: true,
     },
     {
@@ -229,7 +230,7 @@ export function AffidavitsTable({
         <DataTableColumnHeader column={column} title='VENCIMIENTO' />
       ),
       cell: ({ row }) =>
-        dayjs(row.original.payment_due_date).format('DD/MM/YYYY'),
+        dayjs(row.original.payment_due_date).utc().format('DD/MM/YYYY'),
       enableSorting: true,
     },
     {
@@ -282,6 +283,11 @@ export function AffidavitsTable({
     {
       id: 'tax_id',
       title: 'CUIT',
+      type: 'text',
+    },
+    {
+      id: 'user',
+      title: 'Contribuyente',
       type: 'text',
     },
     {

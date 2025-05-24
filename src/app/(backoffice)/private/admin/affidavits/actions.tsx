@@ -36,11 +36,28 @@ export const getAffidavits = async ({
     }
 
     if (filters) {
-      const { status, tax_id } = filters;
+      const { status, tax_id, user } = filters;
       queries.where = {
         ...queries.where,
         ...(status && { status: status as affidavit_status }),
         ...(tax_id && { tax_id: formatCuilInput(tax_id as string) }),
+        ...(user && {
+          user: {
+            OR: [
+              {
+                first_name: {
+                  contains: user as string,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                last_name: {
+                  contains: user as string,
+                },
+              },
+            ],
+          },
+        }),
       };
     }
 
