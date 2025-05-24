@@ -66,10 +66,10 @@ export const getProperties = async (input: {
 
     response.data = properties;
     response.pagination = {
-      total_pages: Math.ceil(propertiesCounted / (inputQuery.take ?? 5)),
-      total_items: propertiesCounted,
+      totalPages: Math.ceil(propertiesCounted / (inputQuery.take ?? 5)),
+      totalItems: propertiesCounted,
       page: input.page ? +input.page : 1,
-      limit_per_page: inputQuery.take ?? 5,
+      limit: inputQuery.take ?? 5,
     };
   } catch (error) {
     console.error({ error });

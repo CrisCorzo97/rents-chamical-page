@@ -55,7 +55,7 @@ export const getInvoicesWithRelations = async (input: {
       queries.orderBy = input.order_by;
     }
 
-    const [invoices, total_items] = await Promise.all([
+    const [invoices, totalItems] = await Promise.all([
       dbSupabase.invoice.findMany({
         ...queries,
         include: {
@@ -79,10 +79,10 @@ export const getInvoicesWithRelations = async (input: {
 
     response.data = invoices;
     response.pagination = {
-      total_pages: Math.ceil(total_items / (queries.take ?? 5)),
-      total_items,
+      totalPages: Math.ceil(totalItems / (queries.take ?? 5)),
+      totalItems,
       page: input.page ? +input.page : 1,
-      limit_per_page: queries.take ?? 5,
+      limit: queries.take ?? 5,
     };
   } catch (error) {
     console.error(error);

@@ -74,10 +74,10 @@ export const getCementeryRecords = async (input: {
 
     response.data = cementeryRecords;
     response.pagination = {
-      total_pages: Math.ceil(cementeryRecordsCounted / (inputQuery.take ?? 5)),
-      total_items: cementeryRecordsCounted,
+      totalPages: Math.ceil(cementeryRecordsCounted / (inputQuery.take ?? 5)),
+      totalItems: cementeryRecordsCounted,
       page: input.page ? +input.page : 1,
-      limit_per_page: inputQuery.take ?? 5,
+      limit: inputQuery.take ?? 5,
     };
   } catch (error) {
     console.error({ error });

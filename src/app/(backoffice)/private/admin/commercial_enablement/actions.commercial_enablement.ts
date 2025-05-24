@@ -85,12 +85,12 @@ export const getComercialEnablements = async (input: {
 
     response.data = commercialEnablements;
     response.pagination = {
-      total_pages: Math.ceil(
+      totalPages: Math.ceil(
         commercialEnablementsCounted / (inputQuery.take ?? 5)
       ),
-      total_items: commercialEnablementsCounted,
+      totalItems: commercialEnablementsCounted,
       page: input.page ? +input.page : 1,
-      limit_per_page: inputQuery.take ?? 5,
+      limit: inputQuery.take ?? 5,
     };
   } catch (error) {
     console.error({ error });

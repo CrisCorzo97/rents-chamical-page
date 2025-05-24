@@ -104,10 +104,10 @@ export const getConfirmedReceipts = async (input: {
 
     response.data = confirmed_receipts;
     response.pagination = {
-      total_pages: Math.ceil(count / (inputQuery.take ?? 5)),
-      total_items: count,
+      totalPages: Math.ceil(count / (inputQuery.take ?? 5)),
+      totalItems: count,
       page: input.page ? +input.page : 1,
-      limit_per_page: inputQuery.take ?? 5,
+      limit: inputQuery.take ?? 5,
     };
   } catch (error) {
     response.success = false;
@@ -432,7 +432,7 @@ export const generateDailyBoxReport = async (date: string) => {
         tax_type: string;
         amount: number;
       }[];
-      total_items: number;
+      totalItems: number;
     }[] = [];
 
     allReceipts.forEach((rec, index) => {
@@ -450,7 +450,7 @@ export const generateDailyBoxReport = async (date: string) => {
                 amount: rec.amount,
               },
             ],
-            total_items: 1,
+            totalItems: 1,
           });
         } else if (rec.type === 'affidavit') {
           pageData.push({
@@ -465,7 +465,7 @@ export const generateDailyBoxReport = async (date: string) => {
                 amount: rec.fee_amount,
               },
             ],
-            total_items: 1,
+            totalItems: 1,
           });
         } else if (rec.type === 'tax_penalty') {
           pageData.push({
@@ -480,7 +480,7 @@ export const generateDailyBoxReport = async (date: string) => {
                 amount: rec.amount,
               },
             ],
-            total_items: 1,
+            totalItems: 1,
           });
         }
       } else {
@@ -495,7 +495,7 @@ export const generateDailyBoxReport = async (date: string) => {
             tax_type: rec.tax_type,
             amount: rec.amount,
           });
-          lastPage!.total_items += 1;
+          lastPage!.totalItems += 1;
         } else if (rec.type === 'affidavit') {
           lastPage!.subtotal += rec.fee_amount;
           lastPage!.receipts.push({
@@ -505,7 +505,7 @@ export const generateDailyBoxReport = async (date: string) => {
             tax_type: `DDJJ MENSUAL ${rec.declarable_tax.name.toUpperCase()}`,
             amount: rec.fee_amount,
           });
-          lastPage!.total_items += 1;
+          lastPage!.totalItems += 1;
         } else if (rec.type === 'tax_penalty') {
           lastPage!.subtotal += rec.amount;
           lastPage!.receipts.push({
@@ -515,7 +515,7 @@ export const generateDailyBoxReport = async (date: string) => {
             tax_type: `MULTA ${rec.declarable_tax.name.toUpperCase()}`,
             amount: rec.amount,
           });
-          lastPage!.total_items += 1;
+          lastPage!.totalItems += 1;
         }
       }
     });
@@ -541,7 +541,7 @@ export const generateDailyBoxReport = async (date: string) => {
       details,
     };
 
-    const availableSpace = 35 - (pageData.at(-1)?.total_items ?? 0);
+    const availableSpace = 35 - (pageData.at(-1)?.totalItems ?? 0);
 
     if (availableSpace < Object.keys(details).length + 2) {
       tax_summary.add_new_page = true;

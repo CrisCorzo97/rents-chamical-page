@@ -50,7 +50,7 @@ export const getAffidavits = async ({
       };
     }
 
-    const [affidavits, total_items] = await Promise.all([
+    const [affidavits, totalItems] = await Promise.all([
       dbSupabase.affidavit.findMany({
         ...queries,
         include: {
@@ -66,8 +66,8 @@ export const getAffidavits = async ({
 
     response.data = affidavits;
     response.pagination = {
-      totalPages: Math.ceil(total_items / (queries.take ?? 5)),
-      totalItems: total_items,
+      totalPages: Math.ceil(totalItems / (queries.take ?? 5)),
+      totalItems: totalItems,
       page: page ? +page : 1,
       limit: limit ?? 5,
     };
