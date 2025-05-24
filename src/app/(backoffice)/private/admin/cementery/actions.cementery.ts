@@ -1,6 +1,6 @@
 'use server';
 import dbSupabase from '@/lib/prisma/prisma';
-import { Envelope } from '@/types/envelope';
+import { Envelope, PaginationParams } from '@/types/envelope';
 import {
   burial_type,
   cementery,
@@ -26,12 +26,13 @@ export const getCementeryRecordById = async (
   return cementeryRecord;
 };
 
-export const getCementeryRecords = async (input: {
-  limit?: number;
-  page?: number;
-  order_by?: Prisma.cementeryOrderByWithRelationInput;
-  filter?: Prisma.cementeryWhereInput;
-}): Promise<Envelope<CementeryRecordWithRelations[]>> => {
+export const getCementeryRecords = async ({
+  limit,
+  page,
+  sort_by,
+  sort_direction,
+  filters,
+}: PaginationParams): Promise<Envelope<CementeryRecordWithRelations[]>> => {
   const response: Envelope<CementeryRecordWithRelations[]> = {
     success: true,
     data: null,
@@ -40,23 +41,36 @@ export const getCementeryRecords = async (input: {
   };
   try {
     const inputQuery: Prisma.cementeryFindManyArgs = {
-      take: 5,
+      take: limit ?? 8,
       orderBy: {
         taxpayer: 'asc',
       },
     };
 
-    if (input.filter) {
-      inputQuery.where = input.filter;
+    if (page) {
+      inputQuery.skip = (+page - 1) * (inputQuery.take ?? 8);
     }
-    if (input.page) {
-      inputQuery.skip = (+input.page - 1) * (input?.limit ?? 5);
+
+    if (filters) {
+      const { taxpayer, deceased_name } = filters;
+      inputQuery.where = {
+        ...inputQuery.where,
+        ...(taxpayer && {
+          taxpayer: { contains: taxpayer as string, mode: 'insensitive' },
+        }),
+        ...(deceased_name && {
+          deceased_name: {
+            contains: deceased_name as string,
+            mode: 'insensitive',
+          },
+        }),
+      };
     }
-    if (input.limit) {
-      inputQuery.take = +input.limit;
-    }
-    if (input.order_by) {
-      inputQuery.orderBy = input.order_by;
+
+    if (sort_by) {
+      inputQuery.orderBy = {
+        [sort_by]: sort_direction,
+      };
     }
 
     const cementeryRecords = await dbSupabase.cementery.findMany({
@@ -74,10 +88,10 @@ export const getCementeryRecords = async (input: {
 
     response.data = cementeryRecords;
     response.pagination = {
-      totalPages: Math.ceil(cementeryRecordsCounted / (inputQuery.take ?? 5)),
+      totalPages: Math.ceil(cementeryRecordsCounted / (inputQuery.take ?? 8)),
       totalItems: cementeryRecordsCounted,
-      page: input.page ? +input.page : 1,
-      limit: inputQuery.take ?? 5,
+      page: page ? +page : 1,
+      limit: inputQuery.take ?? 8,
     };
   } catch (error) {
     console.error({ error });
