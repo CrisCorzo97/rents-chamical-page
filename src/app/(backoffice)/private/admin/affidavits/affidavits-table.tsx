@@ -175,6 +175,15 @@ export function AffidavitsTable({
 
   const columns: ColumnDef<AffidavitsWithRelations>[] = [
     {
+      id: 'tax_id',
+      accessorKey: 'tax_id',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='CUIT' />
+      ),
+      cell: ({ row }) => row.original.tax_id,
+      enableSorting: false,
+    },
+    {
       id: 'user',
       accessorKey: 'user',
       header: ({ column }) => (
@@ -184,15 +193,6 @@ export function AffidavitsTable({
         `${formatName(row.original.user?.first_name ?? '-')} ${formatName(
           row.original.user?.last_name ?? ''
         )}`,
-      enableSorting: false,
-    },
-    {
-      id: 'tax_id',
-      accessorKey: 'tax_id',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='CUIT' />
-      ),
-      cell: ({ row }) => row.original.tax_id,
       enableSorting: false,
     },
     {
