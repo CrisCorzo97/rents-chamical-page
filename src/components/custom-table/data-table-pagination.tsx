@@ -67,9 +67,9 @@ function getPaginationRange(
 export function DataTablePagination({
   pagination,
   onPageChange,
-  currentLimit = 10,
+  currentLimit = 8,
   onLimitChange,
-  limitOptions = [5, 10, 20, 50],
+  limitOptions = [8, 16, 24],
   pageButtonCount = 1,
 }: DataTablePaginationProps) {
   const { page: currentPage, totalPages, totalItems } = pagination;

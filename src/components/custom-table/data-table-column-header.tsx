@@ -25,8 +25,8 @@ export function DataTableColumnHeader<TData, TValue>({
 }: DataTableColumnHeaderProps<TData, TValue>) {
   // Guardar el título en meta
   column.columnDef.meta = {
-    ...column.columnDef.meta,
     title,
+    ...column.columnDef.meta,
   };
 
   if (!column.getCanSort()) {
