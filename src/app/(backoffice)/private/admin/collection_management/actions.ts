@@ -1,19 +1,21 @@
 'use server';
 
 import dbSupabase from '@/lib/prisma/prisma';
-import { Envelope } from '@/types/envelope';
+import { Envelope, PaginationParams } from '@/types/envelope';
 import { InvoiceWithRelations } from './collection_management.interface';
-import { invoice, Prisma } from '@prisma/client';
+import { affidavit_status, invoice, Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
 import { uploadPaymentProof } from '@/app/(client)/(sections)/tramites/DDJJ-actividad-comercial/affidavit.actions';
 import { revalidatePath } from 'next/cache';
+import { formatCuilInput } from '@/lib/formatters';
 
-export const getInvoicesWithRelations = async (input: {
-  page?: number;
-  items_per_page?: number;
-  filter?: Prisma.invoiceWhereInput;
-  order_by?: Prisma.invoiceOrderByWithRelationInput;
-}) => {
+export const getInvoicesWithRelations = async ({
+  page,
+  limit,
+  sort_by,
+  sort_direction,
+  filters,
+}: PaginationParams) => {
   const response: Envelope<InvoiceWithRelations[]> = {
     success: true,
     data: null,
@@ -23,36 +25,52 @@ export const getInvoicesWithRelations = async (input: {
 
   try {
     const queries: Prisma.invoiceFindManyArgs = {
-      where: {
-        affidavit: {
-          some: {
-            declarable_tax_id: 'commercial_activity',
-          },
-        },
-      },
       orderBy: {
         created_at: 'desc',
       },
-      take: 5,
+      take: limit ?? 8,
     };
 
-    if (input.items_per_page) {
-      queries.take = +input.items_per_page;
+    if (page) {
+      queries.skip = (+page - 1) * (queries.take ?? 8);
     }
 
-    if (input.page) {
-      queries.skip = (+input.page - 1) * (queries.take ?? 5);
-    }
-
-    if (input.filter) {
+    if (filters) {
+      const { status, id, user, tax_id } = filters;
       queries.where = {
         ...queries.where,
-        ...input.filter,
+        ...(status && { status: status as affidavit_status }),
+        ...(id && {
+          id: {
+            contains: id as string,
+          },
+        }),
+        ...(user && {
+          user: {
+            OR: [
+              {
+                first_name: {
+                  contains: user as string,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                last_name: {
+                  contains: user as string,
+                  mode: 'insensitive',
+                },
+              },
+            ],
+          },
+        }),
+        ...(tax_id && { user: { cuil: formatCuilInput(tax_id as string) } }),
       };
     }
 
-    if (input.order_by) {
-      queries.orderBy = input.order_by;
+    if (sort_by) {
+      queries.orderBy = {
+        [sort_by]: sort_direction ?? 'desc',
+      };
     }
 
     const [invoices, totalItems] = await Promise.all([
@@ -79,10 +97,10 @@ export const getInvoicesWithRelations = async (input: {
 
     response.data = invoices;
     response.pagination = {
-      totalPages: Math.ceil(totalItems / (queries.take ?? 5)),
+      totalPages: Math.ceil(totalItems / (queries.take ?? 8)),
       totalItems,
-      page: input.page ? +input.page : 1,
-      limit: queries.take ?? 5,
+      page: page ? +page : 1,
+      limit: queries.take ?? 8,
     };
   } catch (error) {
     console.error(error);

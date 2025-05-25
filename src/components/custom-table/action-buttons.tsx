@@ -2,6 +2,7 @@
 
 import { EllipsisVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,7 @@ interface Action {
   icon: React.ReactNode;
   disabled?: boolean;
   onClick: (row: any) => void;
+  href?: string;
 }
 
 interface ActionButtonsProps {
@@ -35,18 +37,31 @@ export function ActionButtons({ row, actions }: ActionButtonsProps) {
           {actions.map((action, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <Button
-                  variant='outline'
-                  size='icon'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    action.onClick(row);
-                  }}
-                  disabled={action.disabled}
-                >
-                  {action.icon}
-                  <span className='sr-only'>{action.label}</span>
-                </Button>
+                {action.href ? (
+                  <Link href={action.href} target='_blank'>
+                    <Button
+                      variant='outline'
+                      size='icon'
+                      disabled={action.disabled}
+                    >
+                      {action.icon}
+                      <span className='sr-only'>{action.label}</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    variant='outline'
+                    size='icon'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      action.onClick(row);
+                    }}
+                    disabled={action.disabled}
+                  >
+                    {action.icon}
+                    <span className='sr-only'>{action.label}</span>
+                  </Button>
+                )}
               </TooltipTrigger>
               <TooltipContent>
                 <p>{action.label}</p>
@@ -75,11 +90,21 @@ export function ActionButtons({ row, actions }: ActionButtonsProps) {
               action.onClick(row);
             }}
             disabled={action.disabled}
+            asChild={!!action.href}
           >
-            <div className='flex items-center gap-2'>
-              {action.icon}
-              <span>{action.label}</span>
-            </div>
+            {action.href ? (
+              <Link href={action.href} target='_blank'>
+                <div className='flex items-center gap-2'>
+                  {action.icon}
+                  <span>{action.label}</span>
+                </div>
+              </Link>
+            ) : (
+              <div className='flex items-center gap-2'>
+                {action.icon}
+                <span>{action.label}</span>
+              </div>
+            )}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

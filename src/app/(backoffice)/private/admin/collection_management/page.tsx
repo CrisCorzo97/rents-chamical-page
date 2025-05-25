@@ -7,45 +7,44 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { sortByToState } from '@/lib/table';
-import { affidavit_status } from '@prisma/client';
 import Link from 'next/link';
 import { getInvoicesWithRelations } from './actions';
-import { CollectionManagementClient } from './page.client';
+import { CollectionManagementTable } from './collection-management-table';
+import { affidavit_status } from '@prisma/client';
 
 export default async function CollectionManagementPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    page?: number;
-    limit?: number;
-    sort_by?: string;
-    sort_direction?: string;
-    filter?: string;
-  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { page, limit, sort_by, sort_direction, filter } = await searchParams;
-
-  let order_by;
-
-  const sortingState = sortByToState({
-    sort_by: sort_by ?? '',
-    sort_direction: sort_direction ?? '',
-  });
-
-  if (sort_by && sort_direction) {
-    order_by = {
-      [sort_by]: sort_direction,
-    };
-  }
+  const {
+    page,
+    limit,
+    sort_by,
+    sort_direction,
+    'filter.id': id,
+    'filter.user': user,
+    'filter.taxpayer_id': tax_id,
+    'filter.status': status,
+  } = await searchParams;
 
   const data = await getInvoicesWithRelations({
-    page,
-    items_per_page: limit,
-    order_by,
-    filter: {
-      status: filter as affidavit_status | undefined,
-    },
+    page: typeof page === 'string' ? parseInt(page) : undefined,
+    limit: typeof limit === 'string' ? parseInt(limit) : 8,
+    sort_by: typeof sort_by === 'string' ? sort_by : undefined,
+    sort_direction:
+      typeof sort_direction === 'string'
+        ? (sort_direction as 'asc' | 'desc')
+        : undefined,
+    filters:
+      status || id || user || tax_id
+        ? {
+            status: status as affidavit_status,
+            id: id as string,
+            user: user as string,
+            tax_id: tax_id as string,
+          }
+        : undefined,
   });
 
   return (
@@ -63,15 +62,14 @@ export default async function CollectionManagementPage({
           <BreadcrumbItem>Portal Administrativo</BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Gestión de Cobranzas</BreadcrumbPage>
+            <BreadcrumbPage>Gestión de Cobranza</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <CollectionManagementClient
-        data={data}
-        sorting={sortingState}
-        filter={filter ?? ''}
+      <CollectionManagementTable
+        items={data.data ?? []}
+        pagination={data.pagination}
       />
     </ScrollArea>
   );
