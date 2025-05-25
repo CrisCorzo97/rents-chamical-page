@@ -4,10 +4,22 @@ export type Envelope<T> = {
   error: string | null;
   pagination: Pagination | null;
 };
-
-export type Pagination = {
-  total_pages: number;
-  total_items: number;
+export interface Pagination {
   page: number;
-  limit_per_page: number;
-};
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  filters?: Record<string, string | number | boolean | null>; // Acepta varios tipos para filtros
+}
+
+export interface TableData<T> {
+  items: T[];
+  pagination: Pagination | null;
+}

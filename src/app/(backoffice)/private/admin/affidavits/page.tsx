@@ -7,45 +7,41 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { sortByToState } from '@/lib/table';
-import { affidavit_status } from '@prisma/client';
 import Link from 'next/link';
 import { getAffidavits } from './actions';
-import { AffidavitsClient } from './page.client';
+import { AffidavitsTable } from './affidavits-table';
 
 export default async function AffidavitsPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    page?: number;
-    limit?: number;
-    sort_by?: string;
-    sort_direction?: string;
-    filter?: string;
-  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { page, limit, sort_by, sort_direction, filter } = await searchParams;
-
-  let order_by;
-
-  const sortingState = sortByToState({
-    sort_by: sort_by ?? '',
-    sort_direction: sort_direction ?? '',
-  });
-
-  if (sort_by && sort_direction) {
-    order_by = {
-      [sort_by]: sort_direction,
-    };
-  }
-
-  const data = await getAffidavits({
+  const {
     page,
-    items_per_page: limit,
-    order_by,
-    filter: {
-      status: filter as affidavit_status | undefined,
-    },
+    limit,
+    sort_by,
+    sort_direction,
+    'filter.status': status,
+    'filter.tax_id': taxId,
+    'filter.user': user,
+  } = await searchParams;
+
+  const { data, pagination } = await getAffidavits({
+    page: typeof page === 'string' ? parseInt(page) : undefined,
+    limit: typeof limit === 'string' ? parseInt(limit) : 8,
+    sort_by: typeof sort_by === 'string' ? sort_by : undefined,
+    sort_direction:
+      typeof sort_direction === 'string'
+        ? (sort_direction as 'asc' | 'desc')
+        : undefined,
+    filters:
+      status || taxId || user
+        ? {
+            status: status as string,
+            tax_id: taxId as string,
+            user: user as string,
+          }
+        : undefined,
   });
 
   return (
@@ -68,11 +64,7 @@ export default async function AffidavitsPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <AffidavitsClient
-        data={data}
-        sorting={sortingState}
-        filter={filter ?? ''}
-      />
+      <AffidavitsTable items={data ?? []} pagination={pagination ?? null} />
     </ScrollArea>
   );
 }

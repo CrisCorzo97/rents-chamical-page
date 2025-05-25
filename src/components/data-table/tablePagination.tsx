@@ -35,15 +35,15 @@ export function TablePagination(props: TablePagination) {
   const { pagination, handlePagination } = props;
 
   const pages = useMemo(() => {
-    return Array.from({ length: pagination?.total_pages }, (_, i) => i + 1);
+    return Array.from({ length: pagination?.totalPages }, (_, i) => i + 1);
   }, [pagination]);
 
   const pagesRendered = useMemo(() => {
     if (pages.length > 5) {
       const init = pagination?.page - 3 < 0 ? 0 : pagination?.page - 3;
       const end =
-        pagination?.page + 3 > pagination?.total_pages - 1
-          ? pagination?.total_pages
+        pagination?.page + 3 > pagination?.totalPages - 1
+          ? pagination?.totalPages
           : pagination?.page + 3;
 
       return pages.slice(init, end);
@@ -61,7 +61,7 @@ export function TablePagination(props: TablePagination) {
               onClick={() =>
                 handlePagination({
                   page: pagination?.page - 1 > 0 ? pagination?.page - 1 : 1,
-                  limit: pagination?.limit_per_page,
+                  limit: pagination?.limit,
                 })
               }
               disabled={pagination?.page === 1}
@@ -83,7 +83,7 @@ export function TablePagination(props: TablePagination) {
                   onClick={() =>
                     handlePagination({
                       page,
-                      limit: pagination?.limit_per_page,
+                      limit: pagination?.limit,
                     })
                   }
                   isActive={isCurrent ? true : undefined}
@@ -93,8 +93,7 @@ export function TablePagination(props: TablePagination) {
               );
             })}
           </PaginationItem>
-          {pagination?.total_pages >
-            pagesRendered[pagesRendered.length - 1] && (
+          {pagination?.totalPages > pagesRendered[pagesRendered.length - 1] && (
             <PaginationItem>
               <PaginationEllipsis />
             </PaginationItem>
@@ -104,26 +103,26 @@ export function TablePagination(props: TablePagination) {
               onClick={() =>
                 handlePagination({
                   page:
-                    pagination?.page + 1 <= pagination?.total_pages
+                    pagination?.page + 1 <= pagination?.totalPages
                       ? pagination?.page + 1
-                      : pagination?.total_pages,
-                  limit: pagination?.limit_per_page,
+                      : pagination?.totalPages,
+                  limit: pagination?.limit,
                 })
               }
-              disabled={pagination?.page === pagination?.total_pages}
+              disabled={pagination?.page === pagination?.totalPages}
             />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
       <div className='flex items-center justify-end gap-2 p-2 flex-1'>
         <span className='text-sm'>
-          {`${pagination?.limit_per_page * (pagination?.page - 1) + 1} - ${
-            pagination?.limit_per_page * pagination?.page
-          } de ${pagination?.total_items} registros.`}
+          {`${pagination?.limit * (pagination?.page - 1) + 1} - ${
+            pagination?.limit * pagination?.page
+          } de ${pagination?.totalItems} registros.`}
         </span>
 
         <Select
-          defaultValue={`${pagination?.limit_per_page}`}
+          defaultValue={`${pagination?.limit}`}
           onValueChange={(value) => {
             handlePagination({
               page: 1,

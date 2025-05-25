@@ -7,55 +7,39 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { sortByToState } from '@/lib/table';
 import Link from 'next/link';
 import { getCementeryRecords } from './actions.cementery';
-import { CementeryPageClient } from './page.client';
+import { CementeryTable } from './cementery-table';
 
 export default async function CementeryPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    page?: number;
-    limit?: number;
-    sort_by?: string;
-    sort_direction?: string;
-    filter?: string;
-  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { page, limit, sort_by, sort_direction, filter } = await searchParams;
-
-  let order_by;
-
-  const sortingState = sortByToState({
-    sort_by: sort_by ?? '',
-    sort_direction: sort_direction ?? '',
-  });
-
-  if (sort_by && sort_direction) {
-    order_by = {
-      [sort_by]: sort_direction,
-    };
-  }
-
-  const data = await getCementeryRecords({
+  const {
     page,
     limit,
-    order_by,
-    filter: {
-      OR: [
-        {
-          taxpayer: {
-            contains: filter?.toUpperCase() ?? '',
-          },
-        },
-        {
-          deceased_name: {
-            contains: filter?.toUpperCase() ?? '',
-          },
-        },
-      ],
-    },
+    sort_by,
+    sort_direction,
+    'filter.taxpayer': taxpayer,
+    'filter.deceased_name': deceasedName,
+  } = await searchParams;
+
+  const data = await getCementeryRecords({
+    page: typeof page === 'string' ? parseInt(page) : undefined,
+    limit: typeof limit === 'string' ? parseInt(limit) : 8,
+    sort_by: typeof sort_by === 'string' ? sort_by : undefined,
+    sort_direction:
+      typeof sort_direction === 'string'
+        ? (sort_direction as 'asc' | 'desc')
+        : undefined,
+    filters:
+      taxpayer || deceasedName
+        ? {
+            taxpayer: taxpayer as string,
+            deceased_name: deceasedName as string,
+          }
+        : undefined,
   });
 
   return (
@@ -78,11 +62,7 @@ export default async function CementeryPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <CementeryPageClient
-        data={data}
-        sorting={sortingState}
-        filter={filter ?? ''}
-      />
+      <CementeryTable items={data.data ?? []} pagination={data.pagination} />
     </ScrollArea>
   );
 }

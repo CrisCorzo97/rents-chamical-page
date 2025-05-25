@@ -68,12 +68,12 @@ export const getAllRegistrationRequests = async (input: {
 
     response.data = registrationRequest;
     response.pagination = {
-      total_pages: Math.ceil(
+      totalPages: Math.ceil(
         registrationRequestCounted / (inputQuery.take ?? 5)
       ),
-      total_items: registrationRequestCounted,
+      totalItems: registrationRequestCounted,
       page: input.page ? +input.page : 1,
-      limit_per_page: inputQuery.take ?? 5,
+      limit: inputQuery.take ?? 5,
     };
   } catch (error) {
     console.error({ error });

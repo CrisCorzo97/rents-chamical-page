@@ -35,7 +35,7 @@ export type DailyBoxContent = {
       tax_type: string;
       amount: number;
     }[];
-    total_items: number;
+    totalItems: number;
   }[];
 };
 

@@ -114,7 +114,7 @@ export const getAffidavits = async (input: {
       };
     }
 
-    const [declarations, total_items] = await Promise.all([
+    const [declarations, totalItems] = await Promise.all([
       dbSupabase.affidavit.findMany({
         ...queries,
         include: {
@@ -129,10 +129,10 @@ export const getAffidavits = async (input: {
 
     response.data = declarations;
     response.pagination = {
-      total_pages: Math.ceil(total_items / (queries.take ?? 5)),
-      total_items,
+      totalPages: Math.ceil(totalItems / (queries.take ?? 5)),
+      totalItems,
       page: input.page ? +input.page : 1,
-      limit_per_page: queries.take ?? 5,
+      limit: queries.take ?? 5,
     };
   } catch (error) {
     console.error(error);
@@ -194,7 +194,7 @@ export const getTaxPenalties = async (input: {
       };
     }
 
-    const [penalties, total_items] = await Promise.all([
+    const [penalties, totalItems] = await Promise.all([
       dbSupabase.tax_penalties.findMany({
         ...queries,
       }),
@@ -205,10 +205,10 @@ export const getTaxPenalties = async (input: {
 
     response.data = penalties;
     response.pagination = {
-      total_pages: Math.ceil(total_items / (queries.take ?? 5)),
-      total_items,
+      totalPages: Math.ceil(totalItems / (queries.take ?? 5)),
+      totalItems,
       page: input.page ? +input.page : 1,
-      limit_per_page: queries.take ?? 5,
+      limit: queries.take ?? 5,
     };
   } catch (error) {
     console.error(error);
@@ -947,7 +947,7 @@ export const getInvoices = async (input: {
       queries.orderBy = input.order_by;
     }
 
-    const [invoices, total_items] = await Promise.all([
+    const [invoices, totalItems] = await Promise.all([
       dbSupabase.invoice.findMany({
         ...queries,
         include: {
@@ -962,10 +962,10 @@ export const getInvoices = async (input: {
 
     response.data = invoices;
     response.pagination = {
-      total_pages: Math.ceil(total_items / (queries.take ?? 5)),
-      total_items,
+      totalPages: Math.ceil(totalItems / (queries.take ?? 5)),
+      totalItems,
       page: input.page ? +input.page : 1,
-      limit_per_page: queries.take ?? 5,
+      limit: queries.take ?? 5,
     };
   } catch (error) {
     console.error(error);
