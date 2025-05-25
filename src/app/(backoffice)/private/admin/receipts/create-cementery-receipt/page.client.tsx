@@ -35,11 +35,8 @@ export const GenerateCementeryReceiptPageClient = () => {
       try {
         const cementeryRecords = await getCementeryRecords({
           limit: 50,
-          filter: {
-            OR: [
-              { taxpayer: { contains: search?.toUpperCase() ?? '' } },
-              { deceased_name: { contains: search?.toUpperCase() ?? '' } },
-            ],
+          filters: {
+            taxpayer: search,
           },
         });
 
@@ -65,8 +62,7 @@ export const GenerateCementeryReceiptPageClient = () => {
           <CardHeader>
             <CardTitle>Buscar registro de Cementerio</CardTitle>
             <CardDescription>
-              Ingrese el nombre del contribuyente o del difunto para buscar el
-              registro.
+              Ingrese el nombre del contribuyente.
             </CardDescription>
           </CardHeader>
           <CardContent>

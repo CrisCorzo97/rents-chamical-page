@@ -31,11 +31,8 @@ function SearchCementery() {
       try {
         const cementeryRecords = await getCementeryRecords({
           limit: 50,
-          filter: {
-            OR: [
-              { taxpayer: { contains: search?.toUpperCase() ?? '' } },
-              { deceased_name: { contains: search?.toUpperCase() ?? '' } },
-            ],
+          filters: {
+            taxpayer: search,
           },
         });
 
@@ -60,9 +57,7 @@ function SearchCementery() {
         <Card className='-mt-3 w-full'>
           <CardHeader>
             <CardTitle>Buscar registro de Cementerio</CardTitle>
-            <CardDescription>
-              Ingresá tu nombre o el del difunto para buscar el registro.
-            </CardDescription>
+            <CardDescription>Ingresá tu nombre.</CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleSearch} className='flex gap-3'>
