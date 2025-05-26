@@ -316,7 +316,7 @@ export function CollectionManagementTable({
             row.original.user?.last_name ?? ''
           }`
         ),
-      enableSorting: true,
+      enableSorting: false,
     },
     {
       id: 'user.cuil',
@@ -325,7 +325,7 @@ export function CollectionManagementTable({
         <DataTableColumnHeader column={column} title='CUIT' />
       ),
       cell: ({ row }) => row.original.user?.cuil,
-      enableSorting: true,
+      enableSorting: false,
     },
     {
       id: 'declarable_tax',
@@ -342,7 +342,7 @@ export function CollectionManagementTable({
 
         return formatName(declarable_tax);
       },
-      enableSorting: true,
+      enableSorting: false,
     },
     {
       id: 'due_date',
