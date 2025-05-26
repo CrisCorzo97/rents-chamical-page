@@ -63,7 +63,13 @@ export const getInvoicesWithRelations = async ({
             ],
           },
         }),
-        ...(tax_id && { user: { cuil: formatCuilInput(tax_id as string) } }),
+        ...(tax_id && {
+          user: {
+            cuil: {
+              contains: formatCuilInput(tax_id as string),
+            },
+          },
+        }),
       };
     }
 

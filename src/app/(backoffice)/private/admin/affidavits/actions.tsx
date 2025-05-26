@@ -40,7 +40,11 @@ export const getAffidavits = async ({
       queries.where = {
         ...queries.where,
         ...(status && { status: status as affidavit_status }),
-        ...(tax_id && { tax_id: formatCuilInput(tax_id as string) }),
+        ...(tax_id && {
+          tax_id: {
+            contains: formatCuilInput(tax_id as string),
+          },
+        }),
         ...(user && {
           user: {
             OR: [
@@ -53,6 +57,7 @@ export const getAffidavits = async ({
               {
                 last_name: {
                   contains: user as string,
+                  mode: 'insensitive',
                 },
               },
             ],
