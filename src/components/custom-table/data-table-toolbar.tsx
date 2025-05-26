@@ -3,7 +3,7 @@
 import { type Table } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { XIcon } from 'lucide-react';
+import { Loader2, XIcon } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DataTableViewOptions } from './data-table-view-options';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useTransition } from 'react';
 import { useDebounceV2 } from '@/hooks/useDebounceV2';
 
 // Definición para las columnas que se pueden filtrar
@@ -49,7 +49,8 @@ function DebouncedInputFilter<TData>({
   onCommitFilterChange,
 }: DebouncedInputFilterProps<TData>) {
   const [inputValue, setInputValue] = useState<string>(initialValue);
-  const debouncedInputValue = useDebounceV2(inputValue, 1500);
+  const [isCommitting, startTransition] = useTransition();
+  const debouncedInputValue = useDebounceV2(inputValue, 1200);
 
   useEffect(() => {
     setInputValue(initialValue);
@@ -64,7 +65,9 @@ function DebouncedInputFilter<TData>({
     // Solo llamar a onCommitFilterChange si el valor debounced es realmente diferente
     // del valor que ya está "confirmado" (initialValue).
     if (cleanInitialValue !== cleanDebouncedValue) {
-      onCommitFilterChange(columnId, cleanDebouncedValue);
+      startTransition(() => {
+        onCommitFilterChange(columnId, cleanDebouncedValue);
+      });
     }
   }, [debouncedInputValue, initialValue, columnId, onCommitFilterChange]);
 
@@ -93,6 +96,11 @@ function DebouncedInputFilter<TData>({
           <XIcon className='h-4 w-4' />
         </Button>
       )}
+      {isCommitting && (
+        <span className='absolute right-5 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground flex items-center justify-center'>
+          <Loader2 className='h-4 w-4 animate-spin' />
+        </span>
+      )}
     </div>
   );
 }
@@ -106,10 +114,6 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const handleSelectChange = (filterId: string, value: string) => {
     onFilterChange?.(filterId, value === 'ALL_VALUES' ? null : value);
-  };
-
-  const clearExternalFilter = (filterId: string) => {
-    onFilterChange?.(filterId, null);
   };
 
   const commitTextFilterChange = useCallback(
