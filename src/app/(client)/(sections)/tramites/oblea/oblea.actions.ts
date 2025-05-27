@@ -50,8 +50,8 @@ const getCurrentBimester = () => {
 };
 
 const getCommercialEnablement = async (tax_id: string) => {
-  const commercial_enablement =
-    await dbSupabase.commercial_enablement.findFirst({
+  const commercial_enablement = await dbSupabase.commercial_enablement.findMany(
+    {
       where: {
         tax_id,
       },
@@ -62,7 +62,8 @@ const getCommercialEnablement = async (tax_id: string) => {
         commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
           true,
       },
-    });
+    }
+  );
 
   return { commercial_enablement };
 };
@@ -113,7 +114,7 @@ export const generateOblea = async (tax_id: string) => {
   try {
     const { commercial_enablement } = await getCommercialEnablement(tax_id);
 
-    if (!commercial_enablement) {
+    if (commercial_enablement.length === 0) {
       throw new Error(
         'No se encontraron registros de habilitación comercial para este CUIT. Por favor, acercate a la oficina de rentas municipal para regularizar tu situación.'
       );
@@ -121,7 +122,7 @@ export const generateOblea = async (tax_id: string) => {
 
     const { affidavits, requiredPeriods, secondMonth } = await getAffidavits({
       tax_id,
-      registration_date: commercial_enablement.registration_date!,
+      registration_date: commercial_enablement[0].registration_date!,
     });
 
     if (affidavits.length < requiredPeriods.length) {
@@ -141,28 +142,30 @@ export const generateOblea = async (tax_id: string) => {
     }
 
     const otherActivities = [
-      commercial_enablement
+      commercial_enablement[0]
         .commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
-      commercial_enablement
+      commercial_enablement[0]
         .commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
     ];
 
     const licenseData: LicenseData = {
-      commercialEnablementId: commercial_enablement.id,
-      registrationNumber: commercial_enablement.registration_receipt!,
-      businessName: commercial_enablement.company_name!,
-      taxpayerName: formatName(commercial_enablement.taxpayer!),
+      commercialEnablementId: commercial_enablement[0].id,
+      registrationNumber: commercial_enablement[0].registration_receipt!,
+      businessName: commercial_enablement
+        .map((item) => item.company_name)
+        .join(' / '),
+      taxpayerName: formatName(commercial_enablement[0].taxpayer!),
       cuit: tax_id,
       validUntil: dayjs(secondMonth)
         .add(2, 'month')
         .endOf('month')
         .format('DD/MM/YYYY'),
-      mainActivity: commercial_enablement.commercial_activity?.activity!,
+      mainActivity: commercial_enablement[0].commercial_activity?.activity!,
       otherActivities: otherActivities.filter((activity) => activity !== null),
       issueDate: dayjs().format('DD/MM/YYYY'),
-      address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
+      address: `${commercial_enablement[0].address} ${commercial_enablement[0].address_number}`,
     };
 
     response.data = licenseData;
@@ -201,7 +204,7 @@ export const verifyOblea = async (tax_id: string) => {
 
     const { affidavits, requiredPeriods, secondMonth } = await getAffidavits({
       tax_id,
-      registration_date: commercial_enablement.registration_date!,
+      registration_date: commercial_enablement[0].registration_date!,
     });
 
     const isApproved = affidavits.every(
@@ -209,19 +212,21 @@ export const verifyOblea = async (tax_id: string) => {
     );
 
     response.licenseData = {
-      commercialEnablementId: commercial_enablement.id,
-      registrationNumber: commercial_enablement.registration_receipt!,
-      businessName: commercial_enablement.company_name!,
-      taxpayerName: formatName(commercial_enablement.taxpayer!),
+      commercialEnablementId: commercial_enablement[0].id,
+      registrationNumber: commercial_enablement[0].registration_receipt!,
+      businessName: commercial_enablement
+        .map((item) => item.company_name)
+        .join(' / '),
+      taxpayerName: formatName(commercial_enablement[0].taxpayer!),
       cuit: tax_id,
       validUntil: dayjs(secondMonth)
         .add(2, 'month')
         .endOf('month')
         .format('DD/MM/YYYY'),
-      mainActivity: commercial_enablement.commercial_activity?.activity!,
+      mainActivity: commercial_enablement[0].commercial_activity?.activity!,
       otherActivities: [],
       issueDate: dayjs().format('DD/MM/YYYY'),
-      address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
+      address: `${commercial_enablement[0].address} ${commercial_enablement[0].address_number}`,
     };
 
     if (
@@ -401,16 +406,20 @@ export async function generateObleaV2(tax_id: string): Promise<{
   try {
     const { commercial_enablement } = await getCommercialEnablement(tax_id);
 
-    if (!commercial_enablement) {
+    if (commercial_enablement.length === 0) {
       response.error =
         'No se encontraron registros de habilitación comercial para este CUIT.';
       return response;
     }
 
+    const oldestCommercialEnablement = commercial_enablement.sort((a, b) =>
+      dayjs(a.registration_date!).diff(dayjs(b.registration_date!))
+    )[0];
+
     const validation = await validateOblea({
       taxId: tax_id,
       commercialEnablementRegistrationDate:
-        commercial_enablement.registration_date!,
+        oldestCommercialEnablement.registration_date!,
     });
 
     if (!validation.canGenerate) {
@@ -421,25 +430,35 @@ export async function generateObleaV2(tax_id: string): Promise<{
     }
 
     const otherActivities = [
-      commercial_enablement
+      commercial_enablement[0]
         .commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
-      commercial_enablement
+      commercial_enablement[0]
         .commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
     ];
 
     const licenseData: LicenseData = {
-      commercialEnablementId: commercial_enablement.id,
-      registrationNumber: commercial_enablement.registration_receipt!,
-      businessName: commercial_enablement.company_name!,
-      taxpayerName: formatName(commercial_enablement.taxpayer!),
+      commercialEnablementId: commercial_enablement[0].id,
+      registrationNumber: commercial_enablement[0].registration_receipt!,
+      businessName: commercial_enablement
+        .map((item) => formatName(item.company_name ?? ''))
+        .filter((item) => item !== '')
+        .join(' / '),
+      taxpayerName: formatName(commercial_enablement[0].taxpayer!),
       cuit: tax_id,
       validUntil: dayjs(validation.validUntil).format('DD/MM/YYYY'),
-      mainActivity: commercial_enablement.commercial_activity?.activity!,
+      mainActivity: commercial_enablement[0].commercial_activity?.activity!,
       otherActivities: otherActivities.filter((activity) => activity !== null),
       issueDate: dayjs().format('DD/MM/YYYY'),
-      address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
+      address: commercial_enablement
+        .map((item) =>
+          formatName(
+            `${item.address ?? ''} ${item.address_number ?? ''}`
+          ).trim()
+        )
+        .filter((item) => item !== '')
+        .join(' / '),
     };
 
     response.data = licenseData;
@@ -469,40 +488,54 @@ export const verifyObleaV2 = async (tax_id: string) => {
   try {
     const { commercial_enablement } = await getCommercialEnablement(tax_id);
 
-    if (!commercial_enablement) {
+    if (commercial_enablement.length === 0) {
       response.error =
         'No se encontraron registros de habilitación comercial para este CUIT.';
       return response;
     }
 
+    const oldestCommercialEnablement = commercial_enablement.sort((a, b) =>
+      dayjs(a.registration_date!).diff(dayjs(b.registration_date!))
+    )[0];
+
     const validation = await validateOblea({
       taxId: tax_id,
       commercialEnablementRegistrationDate:
-        commercial_enablement.registration_date!,
+        oldestCommercialEnablement.registration_date!,
     });
 
     const otherActivities = [
-      commercial_enablement
+      commercial_enablement[0]
         .commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
-      commercial_enablement
+      commercial_enablement[0]
         .commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
     ];
 
     response.licenseData = {
-      commercialEnablementId: commercial_enablement.id,
-      registrationNumber: commercial_enablement.registration_receipt!,
-      businessName: commercial_enablement.company_name!,
-      taxpayerName: formatName(commercial_enablement.taxpayer!),
+      commercialEnablementId: commercial_enablement[0].id,
+      registrationNumber: commercial_enablement[0].registration_receipt!,
+      businessName: commercial_enablement
+        .map((item) => formatName(item.company_name ?? ''))
+        .filter((item) => item !== '')
+        .join(' / '),
+      taxpayerName: formatName(commercial_enablement[0].taxpayer!),
       cuit: tax_id,
       validUntil: validation.canGenerate
         ? dayjs(validation.validUntil).format('DD/MM/YYYY')
         : '-',
-      mainActivity: commercial_enablement.commercial_activity?.activity!,
+      mainActivity: commercial_enablement[0].commercial_activity?.activity!,
       otherActivities: otherActivities.filter((activity) => activity !== null),
       issueDate: dayjs().format('DD/MM/YYYY'),
-      address: `${commercial_enablement.address} ${commercial_enablement.address_number}`,
+      address: commercial_enablement
+        .map((item) =>
+          formatName(
+            `${item.address ?? ''} ${item.address_number ?? ''}`
+          ).trim()
+        )
+        .filter((item) => item !== '')
+        .join(' / '),
     };
 
     if (!validation.canGenerate) {
