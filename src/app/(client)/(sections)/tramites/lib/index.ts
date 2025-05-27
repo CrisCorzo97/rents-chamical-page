@@ -63,25 +63,43 @@ export const getPendingDeclarations = async (input: {
       periodStart.isBefore(today) &&
       (!endDate || periodStart.isBefore(endDate))
     ) {
-      const presentationPeriodEnd = periodStart
-        .add(presentationPeriodicity, 'month')
-        .subtract(1, 'day');
+      let tentativeDueDate = dayjs('2025-04-10');
 
-      const tentativeDueDate = [0, 1].includes(presentationPeriodEnd.month())
-        ? dayjs('2025-04-10') // Enero y Febrero vencen el 10 de abril
-        : presentationPeriodEnd.month() === 2 // Marzo
-        ? dayjs('2025-05-05') // Marzo vence el 5 de mayo para CUIT 0,1,2
-        : presentationPeriodEnd.month() === 3 // Abril
-        ? dayjs('2025-06-04') // Abril vence el 4 de junio para CUIT 0,1,2
-        : presentationPeriodEnd
-            .add(1, 'month')
-            .date(Number(declarableTax.procedure_expiration_day));
+      switch (periodStart.month()) {
+        case 0:
+        case 1:
+          tentativeDueDate = dayjs('2025-04-10');
+          break;
+        case 2:
+        case 3:
+          tentativeDueDate = dayjs('2025-06-04');
+          break;
+        case 4:
+        case 5:
+          tentativeDueDate = dayjs('2025-08-04');
+          break;
+        case 6:
+        case 7:
+          tentativeDueDate = dayjs('2025-10-04');
+          break;
+        case 8:
+        case 9:
+          tentativeDueDate = dayjs('2025-12-04');
+          break;
+        case 10:
+        case 11:
+          tentativeDueDate = dayjs('2026-02-04');
+          break;
+        default:
+          tentativeDueDate = dayjs('2025-04-10');
+          break;
+      }
 
       const dueDate = await getFirstBusinessDay(
         tentativeDueDate.format('YYYY-MM-DD')
       );
 
-      if (today.isAfter(presentationPeriodEnd)) {
+      if (today.isAfter(dayjs(dueDate).subtract(1, 'month'))) {
         periods.push({
           period: `${periodStart.format('YYYY-MM')}`,
           dueDate,
@@ -89,7 +107,7 @@ export const getPendingDeclarations = async (input: {
         });
       }
 
-      periodStart = periodStart.add(presentationPeriodicity, 'month');
+      periodStart = periodStart.add(1, 'month');
     }
 
     const declaredPeriods = await dbSupabase.affidavit.findMany({
