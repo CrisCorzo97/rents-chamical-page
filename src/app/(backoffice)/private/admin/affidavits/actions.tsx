@@ -5,6 +5,7 @@ import { affidavit_status, Prisma } from '@prisma/client';
 import { AffidavitsWithRelations } from './affidavits.interface';
 import dbSupabase from '@/lib/prisma/prisma';
 import { formatCuilInput } from '@/lib/formatters';
+import { revalidatePath } from 'next/cache';
 
 export const getAffidavits = async ({
   page,
@@ -144,6 +145,29 @@ export const getAffidavitsReport = async () => {
     console.error(error);
     response.success = false;
     response.error = 'Error al obtener las declaraciones';
+  } finally {
+    return response;
+  }
+};
+
+export const deleteAffidavit = async (id: string) => {
+  const response: Envelope<AffidavitsWithRelations[]> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    await dbSupabase.affidavit.delete({
+      where: { id },
+    });
+
+    revalidatePath('/private/admin/affidavits');
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+    response.error = 'Error al eliminar la declaración';
   } finally {
     return response;
   }

@@ -15,6 +15,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface Action {
   label: string;
@@ -22,12 +33,61 @@ interface Action {
   disabled?: boolean;
   onClick: (row: any) => void;
   href?: string;
+  requiresConfirmation?: boolean;
+  confirmationMessage?: string;
 }
 
 interface ActionButtonsProps {
   row: any;
   actions: Action[];
 }
+
+const ActionButton = ({ action, row }: { action: Action; row: any }) => {
+  const buttonContent = (
+    <Button variant='outline' size='icon' disabled={action.disabled}>
+      {action.icon}
+      <span className='sr-only'>{action.label}</span>
+    </Button>
+  );
+
+  if (action.requiresConfirmation) {
+    return (
+      <AlertDialog>
+        <AlertDialogTrigger asChild>{buttonContent}</AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar acción</AlertDialogTitle>
+            <AlertDialogDescription>
+              {action.confirmationMessage ||
+                '¿Estás seguro de que deseas realizar esta acción?'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => action.onClick(row)}>
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
+  return action.href ? (
+    <Link href={action.href} target='_blank'>
+      {buttonContent}
+    </Link>
+  ) : (
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        action.onClick(row);
+      }}
+    >
+      {buttonContent}
+    </div>
+  );
+};
 
 export function ActionButtons({ row, actions }: ActionButtonsProps) {
   if (actions.length <= 2) {
@@ -37,31 +97,7 @@ export function ActionButtons({ row, actions }: ActionButtonsProps) {
           {actions.map((action, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                {action.href ? (
-                  <Link href={action.href} target='_blank'>
-                    <Button
-                      variant='outline'
-                      size='icon'
-                      disabled={action.disabled}
-                    >
-                      {action.icon}
-                      <span className='sr-only'>{action.label}</span>
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button
-                    variant='outline'
-                    size='icon'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      action.onClick(row);
-                    }}
-                    disabled={action.disabled}
-                  >
-                    {action.icon}
-                    <span className='sr-only'>{action.label}</span>
-                  </Button>
-                )}
+                <ActionButton action={action} row={row} />
               </TooltipTrigger>
               <TooltipContent>
                 <p>{action.label}</p>
@@ -87,12 +123,38 @@ export function ActionButtons({ row, actions }: ActionButtonsProps) {
             key={index}
             onClick={(e) => {
               e.stopPropagation();
-              action.onClick(row);
+              if (!action.requiresConfirmation) {
+                action.onClick(row);
+              }
             }}
             disabled={action.disabled}
-            asChild={!!action.href}
+            asChild={!!action.href || action.requiresConfirmation}
           >
-            {action.href ? (
+            {action.requiresConfirmation ? (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <div className='flex items-center gap-2'>
+                    {action.icon}
+                    <span>{action.label}</span>
+                  </div>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmar acción</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {action.confirmationMessage ||
+                        '¿Estás seguro de que deseas realizar esta acción?'}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => action.onClick(row)}>
+                      Confirmar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : action.href ? (
               <Link href={action.href} target='_blank'>
                 <div className='flex items-center gap-2'>
                   {action.icon}
