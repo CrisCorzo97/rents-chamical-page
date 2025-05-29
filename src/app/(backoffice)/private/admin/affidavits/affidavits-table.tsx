@@ -8,7 +8,7 @@ import utc from 'dayjs/plugin/utc';
 import { Badge, BadgeProps } from '@/components/ui/badge';
 import { affidavit_status } from '@prisma/client';
 import locale from 'dayjs/locale/es';
-import { FileText } from 'lucide-react';
+import { FileText, Trash } from 'lucide-react';
 import { DataTable, DataTableColumnHeader } from '@/components/custom-table';
 import { TableData } from '@/types/envelope';
 import { useDataTableURLParams } from '@/hooks/useDataTableURLParams';
@@ -19,12 +19,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-
+import { deleteAffidavit } from './actions';
+import { Toaster } from '@/components/ui/toaster';
+import { toast } from 'sonner';
 dayjs.locale(locale);
 dayjs.extend(utc);
 
@@ -173,6 +174,17 @@ export function AffidavitsTable({
     setSelectedAffidavit(null);
   };
 
+  const handleDeleteAffidavit = async (id: string) => {
+    const { success, error } = await deleteAffidavit(id);
+    if (success) {
+      toast.success('Declaración eliminada correctamente');
+    } else {
+      toast.error(
+        error ?? 'Error al eliminar la declaración jurada. Intente nuevamente.'
+      );
+    }
+  };
+
   const columns: ColumnDef<AffidavitsWithRelations>[] = [
     {
       id: 'tax_id',
@@ -252,28 +264,24 @@ export function AffidavitsTable({
         <DataTableColumnHeader column={column} title='ACCIONES' />
       ),
       cell: ({ row }) => (
-        <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-          <DialogTrigger asChild>
-            <ActionButtons
-              row={row.original}
-              actions={[
-                {
-                  label: 'Ver detalles',
-                  icon: <FileText size={18} />,
-                  onClick: () => handleOpenDialog(row.original),
-                },
-              ]}
-            />
-          </DialogTrigger>
-          <DialogContent className='max-w-3xl'>
-            <DialogHeader>
-              <DialogTitle>Detalles de la Declaración Jurada</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className='h-[600px] pr-4'>
-              {selectedAffidavit && renderAffidavitDetails(selectedAffidavit)}
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+        <ActionButtons
+          row={row.original}
+          actions={[
+            {
+              label: 'Ver detalles',
+              icon: <FileText size={18} />,
+              onClick: () => handleOpenDialog(row.original),
+            },
+            {
+              label: 'Eliminar',
+              icon: <Trash size={18} className='text-red-500' />,
+              onClick: () => handleDeleteAffidavit(row.original.id),
+              requiresConfirmation: true,
+              confirmationMessage:
+                '¿Estás seguro de que deseas eliminar esta declaración?',
+            },
+          ]}
+        />
       ),
       enableSorting: false,
     },
@@ -299,24 +307,38 @@ export function AffidavitsTable({
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={items}
-      tableTitle='Declaraciones Juradas'
-      pagination={pagination}
-      getRowId={(row) => row.id}
-      filterableColumns={filterableColumns}
-      searchParams={{
-        page: String(currentPage),
-        limit: String(currentLimit),
-        sort_by: currentSortBy || undefined,
-        sort_direction: currentSortDirection || undefined,
-        filters: activeFilters,
-      }}
-      onPageChange={handlePageChange}
-      onLimitChange={handleLimitChange}
-      onSortingChange={handleSortingChange}
-      onFilterChange={handleFilterChange}
-    />
+    <>
+      <Toaster />
+      <DataTable
+        columns={columns}
+        data={items}
+        tableTitle='Declaraciones Juradas'
+        pagination={pagination}
+        getRowId={(row) => row.id}
+        filterableColumns={filterableColumns}
+        searchParams={{
+          page: String(currentPage),
+          limit: String(currentLimit),
+          sort_by: currentSortBy || undefined,
+          sort_direction: currentSortDirection || undefined,
+          filters: activeFilters,
+        }}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
+        onSortingChange={handleSortingChange}
+        onFilterChange={handleFilterChange}
+      />
+
+      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+        <DialogContent className='max-w-3xl'>
+          <DialogHeader>
+            <DialogTitle>Detalles de la Declaración Jurada</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className='h-[600px] pr-4'>
+            {selectedAffidavit && renderAffidavitDetails(selectedAffidavit)}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
