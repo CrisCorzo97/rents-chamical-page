@@ -34,8 +34,8 @@ const formSchema = z.object({
   last_name: z
     .string()
     .min(3, { message: 'El apellido debe tener al menos 3 caracteres' })
-    .regex(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ]+$/, {
-      message: 'El apellido solo puede contener letras',
+    .regex(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/, {
+      message: 'El apellido solo puede contener letras y espacios',
     }),
   email: z.string().email({ message: 'Correo electrónico inválido' }),
   tax_id: z.string().regex(/^\d{2}-\d{8}-\d{1}$/, {
