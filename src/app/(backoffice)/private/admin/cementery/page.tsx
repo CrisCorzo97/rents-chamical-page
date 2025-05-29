@@ -10,6 +10,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from 'next/link';
 import { getCementeryRecords } from './actions.cementery';
 import { CementeryTable } from './cementery-table';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 export default async function CementeryPage({
   searchParams,
@@ -61,6 +63,15 @@ export default async function CementeryPage({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div className='flex justify-end'>
+        <Link href='/private/admin/cementery/create' prefetch>
+          <Button className='flex items-center gap-2'>
+            <Plus size={16} />
+            Nuevo registro
+          </Button>
+        </Link>
+      </div>
 
       <CementeryTable items={data.data ?? []} pagination={data.pagination} />
     </ScrollArea>
