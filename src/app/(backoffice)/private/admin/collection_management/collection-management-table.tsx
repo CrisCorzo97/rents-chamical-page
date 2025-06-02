@@ -1,5 +1,6 @@
 'use client';
 
+import { Banknote } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
 import { InvoiceWithRelations } from './collection_management.interface';
 import { formatName, formatNumberToCurrency } from '@/lib/formatters';
@@ -32,6 +33,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/toaster';
+import { ReceiptPDF, ReceiptPDFProps } from './components/receiptPDF';
+import { BlobProvider, PDFViewer } from '@react-pdf/renderer';
 
 dayjs.locale(locale);
 dayjs.extend(utc);
@@ -64,6 +67,16 @@ export function CollectionManagementTable({
   } | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
   const [isUploading, startUploading] = useTransition();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
+  const [isConfirmingCashPayment, startConfirmingCashPayment] = useTransition();
+  const [contentDialog, setContentDialog] = useState<ReceiptPDFProps['data']>({
+    receiptId: '',
+    taxpayer: '',
+    taxId: '',
+    taxOrContibution: '',
+    observations: '',
+    amount: 0,
+  });
 
   const {
     currentPage,
@@ -267,13 +280,69 @@ export function CollectionManagementTable({
     }));
   };
 
-  const handleUploadFile = () => {
+  const handleAcceptCashPayment = (record: InvoiceWithRelations) => {
+    startConfirmingCashPayment(async () => {
+      try {
+        const { data, error } = await acceptPayment(record);
+
+        if (error || !data) {
+          throw new Error(error ?? 'Hubo un error al aprobar el pago');
+        }
+
+        setContentDialog({
+          receiptId: record.id,
+          taxpayer: formatName(
+            `${record.user?.first_name ?? '-'} ${record.user?.last_name ?? ''}`
+          ),
+          taxId: record.user?.cuil ?? '',
+          taxOrContibution: record.affidavit?.[0]?.declarable_tax?.name ?? '',
+          observations: '',
+          amount: record.total_amount,
+        });
+
+        setSelectedRecord(record);
+
+        // const blob = await generatePdfBlob({
+        //   receiptId: record.id,
+        //   taxpayer: formatName(
+        //     `${record.user?.first_name ?? '-'} ${record.user?.last_name ?? ''}`
+        //   ),
+        //   taxId: record.user?.cuil ?? '',
+        //   taxOrContibution: record.affidavit?.[0]?.declarable_tax?.name ?? '',
+        //   observations: '',
+        //   amount: record.total_amount,
+        // });
+
+        // const attachment = new File([blob], `${record.id}.pdf`, {
+        //   type: 'application/pdf',
+        // });
+
+        // console.log({ attachment });
+
+        // handleUploadFile({ file: attachment, invoice: record });
+
+        toast.success('Pago aprobado correctamente');
+        setConfirmDialogOpen(true);
+      } catch (error) {
+        console.error(error);
+        if (error instanceof Error) {
+          toast.error(error.message);
+        }
+        toast.error('Hubo un error al aprobar el pago');
+      }
+    });
+  };
+
+  const handleUploadFile = (input?: {
+    file?: File;
+    invoice?: InvoiceWithRelations;
+  }) => {
     startUploading(async () => {
-      if (fileToUpload) {
+      if (fileToUpload || input) {
         try {
           const { error } = await uploadAttachment({
-            invoice: fileToUpload.invoice!,
-            attachment: fileToUpload.attachment!,
+            invoice: input?.invoice! ?? fileToUpload?.invoice!,
+            attachment: input?.file! ?? fileToUpload?.attachment!,
           });
 
           if (error) {
@@ -281,8 +350,11 @@ export function CollectionManagementTable({
           }
 
           toast.success('Comprobante de pago subido correctamente');
-          setUploadDialogOpen(false);
-          setFileToUpload(null);
+
+          if (!input?.file) {
+            setUploadDialogOpen(false);
+            setFileToUpload(null);
+          }
         } catch (error) {
           console.error(error);
           if (error instanceof Error) {
@@ -413,6 +485,12 @@ export function CollectionManagementTable({
             disabled: row.original.attached_receipt !== null,
           },
           {
+            label: 'Cobro en efectivo',
+            icon: <Banknote className='h-4 w-4' />,
+            onClick: () => handleAcceptCashPayment(row.original),
+            disabled: row.original.status === 'approved',
+          },
+          {
             label: 'Aprobar',
             icon: <Check className='h-4 w-4' />,
             onClick: () => acceptPayment(row.original),
@@ -490,7 +568,7 @@ export function CollectionManagementTable({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={uploadDialogOpen}>
+      <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
         <DialogContent className='sm:max-w-[425px] space-y-4' hiddenCloseButton>
           <DialogHeader>
             <DialogTitle>Cargar comprobante de pago</DialogTitle>
@@ -526,11 +604,49 @@ export function CollectionManagementTable({
             </Button>
             <Button
               disabled={!fileToUpload}
-              onClick={handleUploadFile}
+              onClick={() => handleUploadFile()}
               loading={isUploading}
             >
               Subir
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+        <DialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
+          <DialogHeader>
+            <DialogTitle>Comprobante de pago</DialogTitle>
+            <DialogDescription>
+              Imprime y entrega el comprobante de pago al contribuyente.
+            </DialogDescription>
+          </DialogHeader>
+
+          <BlobProvider document={<ReceiptPDF data={contentDialog} />}>
+            {({ blob, url, loading, error }) => {
+              if (loading || !blob) return <p>Cargando...</p>;
+              if (error) return <p>Error: {error.message}</p>;
+
+              console.log({ blob });
+              const attachment = new File(
+                [blob!],
+                `${selectedRecord!.id}.pdf`,
+                {
+                  type: 'application/pdf',
+                }
+              );
+
+              handleUploadFile({ file: attachment, invoice: selectedRecord! });
+              return (
+                <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
+                  <ReceiptPDF data={contentDialog} />
+                </PDFViewer>
+              );
+            }}
+          </BlobProvider>
+
+          <DialogFooter className='flex-none'>
+            <Button onClick={() => setConfirmDialogOpen(false)}>Cerrar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
