@@ -488,7 +488,7 @@ export function CollectionManagementTable({
             label: 'Cobro en efectivo',
             icon: <Banknote className='h-4 w-4' />,
             onClick: () => handleAcceptCashPayment(row.original),
-            disabled: row.original.status === 'approved',
+            disabled: true,
           },
           {
             label: 'Aprobar',
