@@ -180,6 +180,8 @@ export const acceptPayment = async (invoice: InvoiceWithRelations) => {
     }
 
     response.data = updated;
+
+    revalidatePath('/private/admin/collection_management');
   } catch (error) {
     console.error(error);
     response.success = false;
