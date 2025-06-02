@@ -9,6 +9,7 @@ import {
 } from '@react-pdf/renderer';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
+import React from 'react';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -127,7 +128,7 @@ export interface ReceiptPDFProps {
 }
 
 // Create Document Component
-export const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
+const ReceiptPDF = ({ data }: ReceiptPDFProps) => {
   return (
     <Document
       title='Comprobante de pago de Factura en efectivo'
@@ -493,3 +494,7 @@ const Receipt = ({ data }: ReceiptPDFProps) => {
     </View>
   );
 };
+
+export default React.memo(ReceiptPDF, (prev, next) => {
+  return JSON.stringify(prev.data) === JSON.stringify(next.data);
+});
