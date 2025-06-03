@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Info } from 'lucide-react';
 import Link from 'next/link';
-import { TaxCalculatorCard } from '../components/tax-calculator-card';
 import { getUserAndCommercialEnablement } from '../affidavit.actions';
+import { TaxCalculatorCard } from '../components/tax-calculator-card';
 
 export default async function CreateAffidavitPage({
   searchParams,
@@ -110,9 +110,9 @@ export default async function CreateAffidavitPage({
               <Link
                 target='_blank'
                 className='underline text-blue-600 font-semibold'
-                href='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//RG%204_2025%20-%20Tramos.pdf'
+                href='https://fjksfkvauwungomvrlhm.supabase.co/storage/v1/object/public/documents//Ordenanza%20Nro%20552%20Tributaria%20Impositiva.pdf'
               >
-                RG 04/2025
+                Ordenanza Nro 552
               </Link>
             </p>
           </AlertDescription>
