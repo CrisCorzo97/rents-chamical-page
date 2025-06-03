@@ -2,7 +2,7 @@
 
 import { generateReceiptCode } from '@/lib/code-generator';
 import dbSupabase from '@/lib/prisma/prisma';
-import { Envelope } from '@/types/envelope';
+import { Envelope, PaginationParams } from '@/types/envelope';
 import {
   affidavit,
   declarable_tax,
@@ -561,3 +561,81 @@ export const generateDailyBoxReport = async (date: string) => {
     return response;
   }
 };
+
+export async function getReceipts({
+  page = 1,
+  limit = 8,
+  sort_by,
+  sort_direction,
+  filters,
+}: PaginationParams): Promise<Envelope<receipt[]>> {
+  const response: Envelope<receipt[]> = {
+    success: true,
+    data: [],
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const queries: Prisma.receiptFindManyArgs = {
+      where: {
+        confirmed_at: {
+          not: null,
+        },
+      },
+      orderBy: {
+        confirmed_at: 'desc',
+      },
+      take: limit ?? 8,
+    };
+
+    if (page) {
+      queries.skip = (+page - 1) * (queries.take ?? 8);
+    }
+
+    if (filters) {
+      const { id, taxpayer } = filters;
+      queries.where = {
+        ...queries.where,
+        ...(id && {
+          id: {
+            contains: id as string,
+            mode: 'insensitive',
+          },
+        }),
+        ...(taxpayer && {
+          taxpayer: {
+            contains: taxpayer as string,
+            mode: 'insensitive',
+          },
+        }),
+      };
+    }
+
+    if (sort_by) {
+      queries.orderBy = {
+        [sort_by]: sort_direction ?? 'desc',
+      };
+    }
+
+    const [total, items] = await Promise.all([
+      dbSupabase.receipt.count({ where: queries.where }),
+      dbSupabase.receipt.findMany(queries),
+    ]);
+
+    response.data = items;
+    response.pagination = {
+      totalItems: total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / (limit ?? 8)),
+    };
+  } catch (error) {
+    console.error({ error });
+
+    response.success = false;
+    response.error = 'Hubo un error al obtener los comprobantes de pago.';
+  } finally {
+    return response;
+  }
+}
