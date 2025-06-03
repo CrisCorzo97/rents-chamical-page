@@ -1,6 +1,6 @@
 'use server';
 import dbSupabase from '@/lib/prisma/prisma';
-import { Envelope } from '@/types/envelope';
+import { Envelope, PaginationParams } from '@/types/envelope';
 import {
   city_section,
   commercial_activity,
@@ -31,23 +31,13 @@ export const getCommercialEnablementById = async (
   return commercialEnablementRecord;
 };
 
-interface GetComercialEnablementsParams {
-  page?: number;
-  limit?: number;
-  sort_by?: string;
-  sort_direction?: 'asc' | 'desc';
-  filters?: Record<string, string>;
-}
-
 export async function getComercialEnablements({
   page = 1,
   limit = 8,
   sort_by,
   sort_direction,
   filters,
-}: GetComercialEnablementsParams): Promise<
-  Envelope<CommercialEnablementWithRelations[]>
-> {
+}: PaginationParams): Promise<Envelope<CommercialEnablementWithRelations[]>> {
   const response: Envelope<CommercialEnablementWithRelations[]> = {
     success: true,
     data: [],

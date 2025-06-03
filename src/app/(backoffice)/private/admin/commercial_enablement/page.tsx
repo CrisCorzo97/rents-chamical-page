@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { CommercialEnablementTable } from './commercial-enablement-table';
 import { getComercialEnablements } from './actions.commercial_enablement';
-import { Suspense } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -76,9 +75,7 @@ export default async function CommercialEnablementPage({
         </Link>
       </div>
 
-      <Suspense fallback={<div>Cargando...</div>}>
-        <CommercialEnablementTable items={data ?? []} pagination={pagination} />
-      </Suspense>
+      <CommercialEnablementTable items={data ?? []} pagination={pagination} />
     </ScrollArea>
   );
 }
