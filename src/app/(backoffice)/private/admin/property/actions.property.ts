@@ -1,9 +1,88 @@
 'use server';
 import dbSupabase from '@/lib/prisma/prisma';
-import { Envelope } from '@/types/envelope';
+import { Envelope, PaginationParams } from '@/types/envelope';
 import { city_section, neighborhood, Prisma, property } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { PropertyRecordWithRelations } from './property.interface';
+
+export async function getProperties({
+  page = 1,
+  limit = 8,
+  sort_by,
+  sort_direction,
+  filters,
+}: PaginationParams): Promise<Envelope<PropertyRecordWithRelations[]>> {
+  const response: Envelope<PropertyRecordWithRelations[]> = {
+    success: true,
+    data: [],
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const queries: Prisma.propertyFindManyArgs = {
+      orderBy: {
+        taxpayer: 'asc',
+      },
+      take: limit ?? 8,
+    };
+
+    if (page) {
+      queries.skip = (+page - 1) * (queries.take ?? 8);
+    }
+
+    if (filters) {
+      const { taxpayer, enrollment } = filters;
+      queries.where = {
+        ...queries.where,
+        ...(taxpayer && {
+          taxpayer: {
+            contains: taxpayer as string,
+            mode: 'insensitive',
+          },
+        }),
+        ...(enrollment && {
+          enrollment: {
+            contains: enrollment as string,
+            mode: 'insensitive',
+          },
+        }),
+      };
+    }
+
+    if (sort_by) {
+      queries.orderBy = {
+        [sort_by]: sort_direction ?? 'desc',
+      };
+    }
+
+    const [total, items] = await Promise.all([
+      dbSupabase.property.count({ where: queries.where }),
+      dbSupabase.property.findMany({
+        ...queries,
+        include: {
+          neighborhood: true,
+          city_section: true,
+        },
+      }),
+    ]);
+
+    response.data = items;
+    response.pagination = {
+      totalItems: total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / (limit ?? 8)),
+    };
+  } catch (error) {
+    console.error({ error });
+
+    response.success = false;
+    response.error = 'Hubo un error al obtener los registros de propiedades.';
+  } finally {
+    return response;
+  }
+}
 
 export const getPropertyRecordById = async (
   id: string
@@ -17,68 +96,6 @@ export const getPropertyRecordById = async (
   });
 
   return propertyRecord;
-};
-
-export const getProperties = async (input: {
-  limit?: number;
-  page?: number;
-  order_by?: Prisma.propertyOrderByWithRelationInput;
-  filter?: Prisma.propertyWhereInput;
-}): Promise<Envelope<PropertyRecordWithRelations[]>> => {
-  const response: Envelope<PropertyRecordWithRelations[]> = {
-    success: true,
-    data: null,
-    error: null,
-    pagination: null,
-  };
-  try {
-    const inputQuery: Prisma.propertyFindManyArgs = {
-      take: 5,
-      orderBy: {
-        taxpayer: 'asc',
-      },
-    };
-
-    if (input.filter) {
-      inputQuery.where = input.filter;
-    }
-    if (input.page) {
-      inputQuery.skip = (+input.page - 1) * (input?.limit ?? 5);
-    }
-    if (input.limit) {
-      inputQuery.take = +input.limit;
-    }
-    if (input.order_by) {
-      inputQuery.orderBy = input.order_by;
-    }
-
-    const properties = await dbSupabase.property.findMany({
-      ...inputQuery,
-      include: {
-        city_section: true,
-        neighborhood: true,
-      },
-    });
-
-    const propertiesCounted = await dbSupabase.property.count({
-      where: inputQuery.where,
-    });
-
-    response.data = properties;
-    response.pagination = {
-      totalPages: Math.ceil(propertiesCounted / (inputQuery.take ?? 5)),
-      totalItems: propertiesCounted,
-      page: input.page ? +input.page : 1,
-      limit: inputQuery.take ?? 5,
-    };
-  } catch (error) {
-    console.error({ error });
-
-    response.success = false;
-    response.error = 'Hubo un error al obtener los registros de inmuebles.';
-  }
-
-  return response;
 };
 
 export const createProperty = async (

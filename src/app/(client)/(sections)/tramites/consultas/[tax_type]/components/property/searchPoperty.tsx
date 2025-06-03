@@ -31,11 +31,8 @@ const SearchPoperty = () => {
       try {
         const properties = await getProperties({
           limit: 50,
-          filter: {
-            OR: [
-              { enrollment: { contains: search?.toUpperCase() ?? '' } },
-              { taxpayer: { contains: search?.toUpperCase() ?? '' } },
-            ],
+          filters: {
+            enrollment: search,
           },
         });
 
@@ -61,14 +58,13 @@ const SearchPoperty = () => {
           <CardHeader>
             <CardTitle>Buscar registro de Inmueble</CardTitle>
             <CardDescription>
-              Ingresá tu nombre o tu matrícula catastral para buscar el
-              registro.
+              Ingrese su matrícula para buscar el registro.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
-                <Label>Apellido y Nombre o Matrícula</Label>
+                <Label>Matrícula</Label>
                 <Input type='text' name='search' required />
               </FormItem>
 
