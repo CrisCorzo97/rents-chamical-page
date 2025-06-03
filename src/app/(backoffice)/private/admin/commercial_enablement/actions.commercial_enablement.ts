@@ -61,8 +61,18 @@ export async function getComercialEnablements({
       const { taxpayer, company_name } = filters;
       queries.where = {
         ...queries.where,
-        ...(taxpayer && { taxpayer: taxpayer as string }),
-        ...(company_name && { company_name: company_name as string }),
+        ...(taxpayer && {
+          taxpayer: {
+            contains: taxpayer as string,
+            mode: 'insensitive',
+          },
+        }),
+        ...(company_name && {
+          company_name: {
+            contains: company_name as string,
+            mode: 'insensitive',
+          },
+        }),
       };
     }
 
