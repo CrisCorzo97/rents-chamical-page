@@ -31,66 +31,79 @@ export const getCommercialEnablementById = async (
   return commercialEnablementRecord;
 };
 
-export const getComercialEnablements = async (input: {
-  limit?: number;
+interface GetComercialEnablementsParams {
   page?: number;
-  order_by?: Prisma.commercial_enablementOrderByWithRelationInput;
-  filter?: Prisma.commercial_enablementWhereInput;
-}): Promise<Envelope<CommercialEnablementWithRelations[]>> => {
+  limit?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  filters?: Record<string, string>;
+}
+
+export async function getComercialEnablements({
+  page = 1,
+  limit = 8,
+  sort_by,
+  sort_direction,
+  filters,
+}: GetComercialEnablementsParams): Promise<
+  Envelope<CommercialEnablementWithRelations[]>
+> {
   const response: Envelope<CommercialEnablementWithRelations[]> = {
     success: true,
-    data: null,
+    data: [],
     error: null,
     pagination: null,
   };
+
   try {
-    const inputQuery: Prisma.commercial_enablementFindManyArgs = {
-      take: 5,
+    const queries: Prisma.commercial_enablementFindManyArgs = {
       orderBy: {
-        taxpayer: 'asc',
+        taxpayer: 'desc',
       },
+      take: limit ?? 8,
     };
 
-    if (input.filter) {
-      inputQuery.where = input.filter;
-    }
-    if (input.page) {
-      inputQuery.skip = (+input.page - 1) * (input?.limit ?? 5);
-    }
-    if (input.limit) {
-      inputQuery.take = +input.limit;
-    }
-    if (input.order_by) {
-      inputQuery.orderBy = input.order_by;
+    if (page) {
+      queries.skip = (+page - 1) * (queries.take ?? 8);
     }
 
-    const commercialEnablements =
-      await dbSupabase.commercial_enablement.findMany({
-        ...inputQuery,
+    if (filters) {
+      const { taxpayer, company_name } = filters;
+      queries.where = {
+        ...queries.where,
+        ...(taxpayer && { taxpayer: taxpayer as string }),
+        ...(company_name && { company_name: company_name as string }),
+      };
+    }
+
+    if (sort_by) {
+      queries.orderBy = {
+        [sort_by]: sort_direction ?? 'desc',
+      };
+    }
+
+    const [total, items] = await Promise.all([
+      dbSupabase.commercial_enablement.count({ where: queries.where }),
+      dbSupabase.commercial_enablement.findMany({
+        ...queries,
         include: {
-          city_section: true,
-          neighborhood: true,
           commercial_activity: true,
           commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity:
             true,
           commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
             true,
+          neighborhood: true,
+          city_section: true,
         },
-      });
+      }),
+    ]);
 
-    const commercialEnablementsCounted =
-      await dbSupabase.commercial_enablement.count({
-        where: inputQuery.where,
-      });
-
-    response.data = commercialEnablements;
+    response.data = items;
     response.pagination = {
-      totalPages: Math.ceil(
-        commercialEnablementsCounted / (inputQuery.take ?? 5)
-      ),
-      totalItems: commercialEnablementsCounted,
-      page: input.page ? +input.page : 1,
-      limit: inputQuery.take ?? 5,
+      totalItems: total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / (limit ?? 8)),
     };
   } catch (error) {
     console.error({ error });
@@ -98,10 +111,10 @@ export const getComercialEnablements = async (input: {
     response.success = false;
     response.error =
       'Hubo un error al obtener los registros de habilitaciones comerciales.';
+  } finally {
+    return response;
   }
-
-  return response;
-};
+}
 
 export const createCommercialEnablement = async (
   input: Prisma.commercial_enablementCreateInput
