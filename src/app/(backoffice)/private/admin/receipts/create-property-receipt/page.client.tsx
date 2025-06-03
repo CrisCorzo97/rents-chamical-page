@@ -39,11 +39,8 @@ export const GeneratePropertyReceiptClientPage = () => {
       try {
         const properties = await getProperties({
           limit: 50,
-          filter: {
-            OR: [
-              { enrollment: { contains: search?.toUpperCase() ?? '' } },
-              { taxpayer: { contains: search?.toUpperCase() ?? '' } },
-            ],
+          filters: {
+            enrollment: search,
           },
         });
 
@@ -69,13 +66,13 @@ export const GeneratePropertyReceiptClientPage = () => {
           <CardHeader>
             <CardTitle>Buscar registro de Inmueble</CardTitle>
             <CardDescription>
-              Ingrese un nombre o matrícula para buscar el registro.
+              Ingrese su matrícula para buscar el registro.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
-                <Label>Nombre o matrícula</Label>
+                <Label>Matrícula</Label>
                 <Input type='text' name='search' required />
               </FormItem>
 
