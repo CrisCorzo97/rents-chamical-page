@@ -1,4 +1,6 @@
-import { Button } from '@/components/ui';
+import { Metadata } from 'next';
+import { ReceiptsTable } from './receipts-table';
+import { getReceipts } from './receipt-actions';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,56 +9,57 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { sortByToState } from '@/lib/table';
-import { ChevronDown, CirclePlus } from 'lucide-react';
 import Link from 'next/link';
-import { ConfirmModal, DailyBoxReport } from './components';
-import { ReceiptClientPage } from './page.client';
-import { getConfirmedReceipts } from './receipt-actions';
+import { CirclePlus, ChevronDown } from 'lucide-react';
+import {
+  Button,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenu,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui';
+import { DailyBoxReport } from './components/dailyBoxReport';
+import { ConfirmModal } from './components/confirmModal';
 
-export default async function ReceiptPage({
+export const metadata: Metadata = {
+  title: 'Comprobantes de Pago',
+  description: 'Gestión de comprobantes de pago',
+};
+
+export default async function ReceiptsPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    page?: number;
-    limit?: number;
-    sort_by?: string;
-    sort_direction?: string;
-    filter?: string;
-  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { page, limit, sort_by, sort_direction, filter } = await searchParams;
-
-  let order_by;
-
-  const sortingState = sortByToState({
-    sort_by: sort_by ?? '',
-    sort_direction: sort_direction ?? '',
-  });
-
-  if (sort_by && sort_direction) {
-    order_by = {
-      [sort_by]: sort_direction,
-    };
-  }
-
-  const data = await getConfirmedReceipts({
+  const {
     page,
     limit,
-    order_by,
-    filter: {
-      taxpayer: {
-        contains: filter?.toUpperCase() ?? '',
-      },
-    },
+    sort_by,
+    sort_direction,
+    'filter.id': id,
+    'filter.taxpayer': taxpayer,
+  } = await searchParams;
+
+  const { data, pagination } = await getReceipts({
+    page: typeof page === 'string' ? parseInt(page) : undefined,
+    limit: typeof limit === 'string' ? parseInt(limit) : 8,
+    sort_by: typeof sort_by === 'string' ? sort_by : undefined,
+    sort_direction:
+      typeof sort_direction === 'string'
+        ? (sort_direction as 'asc' | 'desc')
+        : undefined,
+    filters:
+      id || taxpayer
+        ? {
+            id: id as string,
+            taxpayer: taxpayer as string,
+          }
+        : undefined,
   });
 
   return (
@@ -74,21 +77,19 @@ export default async function ReceiptPage({
           <BreadcrumbItem>Portal Administrativo</BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Comprobantes</BreadcrumbPage>
+            <BreadcrumbPage>Comprobantes de Pago</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <article>
-        <h1 className='text-2xl font-bold'>Comprobantes de pago</h1>
-
-        <Card className='mt-6 flex flex-col items-center justify-center border-dashed border-gray-300 '>
+      <article className='pr-3 mb-10'>
+        <Card className='my-4 flex flex-col items-center justify-center border-dashed border-gray-300 '>
           <CardHeader>
             <CardTitle className='text-lg font-semibold'>
               Acciones rápidas
             </CardTitle>
           </CardHeader>
-          <CardContent className='flex gap-2 mt-4'>
+          <CardContent className='flex gap-2'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size='lg' className='flex gap-2'>
@@ -152,11 +153,7 @@ export default async function ReceiptPage({
           </CardContent>
         </Card>
 
-        <ReceiptClientPage
-          data={data}
-          sorting={sortingState}
-          filter={filter ?? ''}
-        />
+        <ReceiptsTable items={data ?? []} pagination={pagination} />
       </article>
     </ScrollArea>
   );
