@@ -35,11 +35,8 @@ export const GenerateCommercialEnablementReceiptClient = () => {
       try {
         const commercialEnablement = await getComercialEnablements({
           limit: 50,
-          filter: {
-            OR: [
-              { taxpayer: { contains: search?.toUpperCase() ?? '' } },
-              { company_name: { contains: search?.toUpperCase() ?? '' } },
-            ],
+          filters: {
+            company_name: search?.toUpperCase() ?? '',
           },
         });
 
@@ -65,14 +62,14 @@ export const GenerateCommercialEnablementReceiptClient = () => {
           <CardHeader>
             <CardTitle>Buscar registro de habilitación comercial</CardTitle>
             <CardDescription>
-              Ingrese el nombre del contribuyente o razón social para buscar el
-              registro de la habilitación comercial.
+              Ingrese la razón social para buscar el registro de la habilitación
+              comercial.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
-                <Label>Apellido y Nombre</Label>
+                <Label>Razón social</Label>
                 <Input type='text' name='search' required />
               </FormItem>
 
