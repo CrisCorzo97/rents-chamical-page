@@ -82,10 +82,7 @@ export function CollectionManagementTable({
     () => contentDialog,
     [JSON.stringify(contentDialog)]
   );
-  const stableInvoice = useMemo(
-    () => selectedRecord,
-    [selectedRecord?.id]
-  );
+  const stableInvoice = useMemo(() => selectedRecord, [selectedRecord?.id]);
 
   const {
     currentPage,
@@ -486,6 +483,7 @@ export function CollectionManagementTable({
             icon: <Eye className='h-4 w-4' />,
             onClick: () => {},
             href: row.original.attached_receipt ?? '',
+            targetBlank: true,
           },
           {
             label: 'Subir comprobante',

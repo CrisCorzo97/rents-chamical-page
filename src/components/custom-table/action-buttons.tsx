@@ -33,6 +33,7 @@ interface Action {
   disabled?: boolean;
   onClick: (row: any) => void;
   href?: string;
+  targetBlank?: boolean;
   requiresConfirmation?: boolean;
   confirmationMessage?: string;
 }
@@ -74,7 +75,7 @@ const ActionButton = ({ action, row }: { action: Action; row: any }) => {
   }
 
   return action.href ? (
-    <Link href={action.href} target='_blank'>
+    <Link href={action.href} target={action.targetBlank ? '_blank' : undefined}>
       {buttonContent}
     </Link>
   ) : (
