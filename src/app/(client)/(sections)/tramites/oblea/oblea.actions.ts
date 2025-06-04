@@ -331,8 +331,8 @@ async function validateOblea(input: {
         .add(3, 'month')
         .add(9, 'day');
 
-      // Si la vigencia es posterior a hoy, este bimestre es válido
-      if (bimesterValidUntil.isAfter(currentDate)) {
+      // Si la vigencia es posterior a la fecha actual + 10 días, este bimestre es válido
+      if (bimesterValidUntil.isAfter(currentDate.add(10, 'day'))) {
         validBimesterFound = true;
         validUntil = bimesterValidUntil.toISOString();
         break;
