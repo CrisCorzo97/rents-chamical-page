@@ -26,8 +26,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/cn';
 
-interface Action {
+export interface Action {
   label: string;
   icon: React.ReactNode;
   disabled?: boolean;
@@ -133,7 +134,14 @@ export function ActionButtons({ row, actions }: ActionButtonsProps) {
           >
             {action.requiresConfirmation ? (
               <AlertDialog>
-                <AlertDialogTrigger asChild>
+                <AlertDialogTrigger
+                  asChild
+                  className={cn(
+                    'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-accent hover:text-accent-foreground',
+                    action.disabled && 'opacity-50 pointer-events-none'
+                  )}
+                  disabled={action.disabled}
+                >
                   <div className='flex items-center gap-2'>
                     {action.icon}
                     <span>{action.label}</span>

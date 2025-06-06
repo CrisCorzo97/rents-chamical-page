@@ -8,6 +8,8 @@ import dayjs from 'dayjs';
 import { uploadPaymentProof } from '@/app/(client)/(sections)/tramites/DDJJ-actividad-comercial/affidavit.actions';
 import { revalidatePath } from 'next/cache';
 import { formatCuilInput } from '@/lib/formatters';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 export const getInvoicesWithRelations = async ({
   page,
@@ -146,38 +148,61 @@ export const acceptPayment = async (invoice: InvoiceWithRelations) => {
       },
       data: {
         status: 'approved',
-        payment_date: dayjs().toDate(),
-        updated_at: dayjs().toDate(),
-      },
-    });
-
-    if (updated) {
-      try {
-        Promise.all([
-          dbSupabase.affidavit.updateMany({
+        payment_date: dayjs.utc().toDate(),
+        updated_at: dayjs.utc().toDate(),
+        affidavit: {
+          updateMany: {
             where: {
               invoice_id: invoice.id,
             },
             data: {
               status: 'approved',
-              approved_at: dayjs().toDate(),
-              updated_at: dayjs().toDate(),
+              approved_at: dayjs.utc().toDate(),
+              updated_at: dayjs.utc().toDate(),
             },
-          }),
-          dbSupabase.tax_penalties.updateMany({
+          },
+        },
+        tax_penalties: {
+          updateMany: {
             where: {
               invoice_id: invoice.id,
             },
             data: {
-              payment_date: dayjs().toDate(),
-              updated_at: dayjs().toDate(),
+              payment_date: dayjs.utc().toDate(),
+              updated_at: dayjs.utc().toDate(),
             },
-          }),
-        ]);
-      } catch (error) {
-        console.error(error);
-      }
-    }
+          },
+        },
+      },
+    });
+
+    // if (updated) {
+    //   try {
+    //     Promise.all([
+    //       dbSupabase.affidavit.updateMany({
+    //         where: {
+    //           invoice_id: invoice.id,
+    //         },
+    //         data: {
+    //           status: 'approved',
+    //           approved_at: dayjs().toDate(),
+    //           updated_at: dayjs().toDate(),
+    //         },
+    //       }),
+    //       dbSupabase.tax_penalties.updateMany({
+    //         where: {
+    //           invoice_id: invoice.id,
+    //         },
+    //         data: {
+    //           payment_date: dayjs().toDate(),
+    //           updated_at: dayjs().toDate(),
+    //         },
+    //       }),
+    //     ]);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
     response.data = updated;
 
@@ -212,7 +237,7 @@ export const rejectPayment = async (invoice: InvoiceWithRelations) => {
       data: {
         status: 'refused',
         payment_date: null,
-        updated_at: dayjs().toDate(),
+        updated_at: dayjs.utc().toDate(),
       },
     });
 
@@ -225,7 +250,7 @@ export const rejectPayment = async (invoice: InvoiceWithRelations) => {
             },
             data: {
               status: 'refused',
-              updated_at: dayjs().toDate(),
+              updated_at: dayjs.utc().toDate(),
             },
           }),
           dbSupabase.tax_penalties.updateMany({
@@ -234,7 +259,7 @@ export const rejectPayment = async (invoice: InvoiceWithRelations) => {
             },
             data: {
               payment_date: null,
-              updated_at: dayjs().toDate(),
+              updated_at: dayjs.utc().toDate(),
             },
           }),
         ]);
@@ -284,8 +309,8 @@ export const uploadAttachment = async (input: {
       data: {
         attached_receipt: uploadedAttachment,
         status: 'approved',
-        payment_date: dayjs().toDate(),
-        updated_at: dayjs().toDate(),
+        payment_date: dayjs.utc().toDate(),
+        updated_at: dayjs.utc().toDate(),
       },
     });
 
@@ -298,8 +323,8 @@ export const uploadAttachment = async (input: {
             },
             data: {
               status: 'approved',
-              approved_at: dayjs().toDate(),
-              updated_at: dayjs().toDate(),
+              approved_at: dayjs.utc().toDate(),
+              updated_at: dayjs.utc().toDate(),
             },
           }),
           dbSupabase.tax_penalties.updateMany({
@@ -307,8 +332,8 @@ export const uploadAttachment = async (input: {
               invoice_id: invoice.id,
             },
             data: {
-              payment_date: dayjs().toDate(),
-              updated_at: dayjs().toDate(),
+              payment_date: dayjs.utc().toDate(),
+              updated_at: dayjs.utc().toDate(),
             },
           }),
         ]);

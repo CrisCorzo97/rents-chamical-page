@@ -10,7 +10,10 @@ import locale from 'dayjs/locale/es';
 import { DataTable, DataTableColumnHeader } from '@/components/custom-table';
 import { TableData } from '@/types/envelope';
 import { useDataTableURLParams } from '@/hooks/useDataTableURLParams';
-import { ActionButtons } from '@/components/custom-table/action-buttons';
+import {
+  ActionButtons,
+  Action,
+} from '@/components/custom-table/action-buttons';
 import {
   Dialog,
   DialogContent,
@@ -308,25 +311,6 @@ export function CollectionManagementTable({
 
         setSelectedRecord(record);
 
-        // const blob = await generatePdfBlob({
-        //   receiptId: record.id,
-        //   taxpayer: formatName(
-        //     `${record.user?.first_name ?? '-'} ${record.user?.last_name ?? ''}`
-        //   ),
-        //   taxId: record.user?.cuil ?? '',
-        //   taxOrContibution: record.affidavit?.[0]?.declarable_tax?.name ?? '',
-        //   observations: '',
-        //   amount: record.total_amount,
-        // });
-
-        // const attachment = new File([blob], `${record.id}.pdf`, {
-        //   type: 'application/pdf',
-        // });
-
-        // console.log({ attachment });
-
-        // handleUploadFile({ file: attachment, invoice: record });
-
         toast.success('Pago aprobado correctamente');
         setConfirmDialogOpen(true);
       } catch (error) {
@@ -472,7 +456,7 @@ export function CollectionManagementTable({
         <DataTableColumnHeader column={column} title='ACCIONES' />
       ),
       cell: ({ row }) => {
-        const actions = [
+        const actions: Action[] = [
           {
             label: 'Ver detalles',
             icon: <FileText className='h-4 w-4' />,
@@ -502,12 +486,16 @@ export function CollectionManagementTable({
             icon: <Check className='h-4 w-4' />,
             onClick: () => acceptPayment(row.original),
             disabled: row.original.status === 'approved',
+            requiresConfirmation: true,
+            confirmationMessage: '¿Estás seguro de querer aprobar este pago?',
           },
           {
             label: 'Rechazar',
             icon: <X className='h-4 w-4' />,
             onClick: () => rejectPayment(row.original),
             disabled: row.original.status === 'refused',
+            requiresConfirmation: true,
+            confirmationMessage: '¿Estás seguro de querer rechazar este pago?',
           },
         ];
 
