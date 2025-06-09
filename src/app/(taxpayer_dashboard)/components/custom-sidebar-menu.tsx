@@ -50,7 +50,7 @@ export const CustomSidebarContent = () => {
               onClick={() => router.push(item.href)}
               size='lg'
               className={cn(
-                'data-[active=true]:bg-primary data-[active=true]:text-primary-foreground [&>svg]:size-6',
+                'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground [&>svg]:size-6',
                 state === 'collapsed' && 'justify-center'
               )}
             >
