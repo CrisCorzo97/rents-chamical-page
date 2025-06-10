@@ -58,7 +58,7 @@ export async function getComercialEnablements({
     }
 
     if (filters) {
-      const { taxpayer, company_name } = filters;
+      const { taxpayer, company_name, search } = filters;
       queries.where = {
         ...queries.where,
         ...(taxpayer && {
@@ -72,6 +72,14 @@ export async function getComercialEnablements({
             contains: company_name as string,
             mode: 'insensitive',
           },
+        }),
+        ...(search && {
+          OR: [
+            { taxpayer: { contains: search as string, mode: 'insensitive' } },
+            {
+              company_name: { contains: search as string, mode: 'insensitive' },
+            },
+          ],
         }),
       };
     }
