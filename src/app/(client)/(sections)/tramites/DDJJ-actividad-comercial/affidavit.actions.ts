@@ -1101,7 +1101,7 @@ export const getUserAndCommercialEnablement = async () => {
       };
 
       c_e_records.forEach((c_e_record) => {
-        if (Number(c_e_record.commercial_activity?.id) === 50) {
+        if (c_e_record.commercial_activity?.code === '641930') {
           categories.financial = true;
         } else {
           categories.commercial = true;
