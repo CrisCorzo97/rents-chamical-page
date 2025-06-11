@@ -117,7 +117,9 @@ export function PeriodSelectionCard({ concepts }: PeriodSelectionCardProps) {
               </div>
             ))}
             <div className='col-span-4 flex items-center justify-between border-t pt-4'>
-              <div className='text-sm font-medium'>Total a abonar:</div>
+              <div className='text-sm font-medium'>
+                Total a abonar sin intereses:
+              </div>
               <div className='text-lg font-bold'>
                 {formatNumberToCurrency(totalAmount)}
               </div>

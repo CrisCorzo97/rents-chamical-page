@@ -14,6 +14,9 @@ import {
 import { updateInvoice } from '../affidavit.actions';
 import { toast, Toaster } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { InvoiceWithRelations } from '../types';
+import { ConceptToPay } from '../types';
+import { formatNumberToCurrency } from '@/lib/formatters';
 
 interface BankDetails {
   bank: string;
@@ -25,12 +28,12 @@ interface BankDetails {
 }
 
 interface PaymentInstructionsCardProps {
-  invoiceId: string;
+  invoice: InvoiceWithRelations & { concepts: ConceptToPay[] };
   bankDetails: BankDetails;
 }
 
 export function PaymentInstructionsCard({
-  invoiceId,
+  invoice,
   bankDetails,
 }: PaymentInstructionsCardProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -48,7 +51,7 @@ export function PaymentInstructionsCard({
     startTransition(async () => {
       try {
         const { error } = await updateInvoice({
-          invoice_id: invoiceId,
+          invoice_id: invoice.id,
           attachment_file: selectedFile!,
         });
 
@@ -79,6 +82,31 @@ export function PaymentInstructionsCard({
           </CardTitle>
         </CardHeader>
         <CardContent className='space-y-4'>
+          <div className='rounded-lg border bg-sky-100 p-4 space-y-2'>
+            <div className='flex justify-between mb-4'>
+              <span className='font-medium'>Nro de factura:</span>
+              <span className='font-medium'>{invoice.id}</span>
+            </div>
+            <div className='flex justify-between text-gray-500'>
+              <span className='font-medium'>Importe seleccionado:</span>
+              <span>{formatNumberToCurrency(invoice.fee_amount)}</span>
+            </div>
+            <div className='flex justify-between text-gray-500'>
+              <span className='font-medium'>Intereses:</span>
+              <span>
+                {formatNumberToCurrency(invoice.compensatory_interest ?? 0)}
+              </span>
+            </div>
+            <div className='flex justify-between'>
+              <span className='text-lg font-medium'>
+                Importe total a abonar:
+              </span>
+              <span className='text-lg font-medium'>
+                {formatNumberToCurrency(invoice.total_amount)}
+              </span>
+            </div>
+          </div>
+
           <div className='rounded-lg border bg-card p-4'>
             <div className='space-y-2'>
               <div className='flex justify-between'>
@@ -109,7 +137,9 @@ export function PaymentInstructionsCard({
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='file-upload'>Selecciona un archivo:</Label>
+            <Label htmlFor='file-upload' className='text-md font-medium'>
+              Selecciona un archivo:
+            </Label>
             <Input
               id='file-upload'
               type='file'
