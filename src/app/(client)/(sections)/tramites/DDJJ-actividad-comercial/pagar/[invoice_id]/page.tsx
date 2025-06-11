@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import Link from 'next/link';
 import { PaymentInstructionsCard } from '../../components/payment-instruction-card';
+import { getInvoice } from '../../affidavit.actions';
 
 export default async function PaymentInstructionsPage({
   params,
@@ -17,6 +18,10 @@ export default async function PaymentInstructionsPage({
   }>;
 }) {
   const { invoice_id } = await params;
+
+  const { data: invoice } = await getInvoice({
+    invoice_id,
+  });
 
   return (
     <article className='max-w-6xl mx-auto mb-8'>
@@ -61,7 +66,7 @@ export default async function PaymentInstructionsPage({
       </Breadcrumb>
 
       <PaymentInstructionsCard
-        invoiceId={invoice_id}
+        invoice={invoice!}
         bankDetails={{
           bank: 'Banco Rioja SAU',
           tax_id: '30-61490356-9',
