@@ -1,13 +1,30 @@
-export function TableSkeleton() {
+import { Skeleton } from '../ui/skeleton';
+
+export function TableSkeleton({
+  title,
+  columns = 4,
+  rows = 4,
+}: {
+  title?: string;
+  columns?: number;
+  rows?: number;
+}) {
   return (
-    <div className="w-full animate-pulse">
-      <div className="h-10 w-1/4 bg-muted rounded mb-4"></div>
-      <div className="space-y-4">
-        <div className="h-12 bg-muted rounded"></div>
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-16 bg-muted rounded"></div>
+    <div className='w-full space-y-4'>
+      {title ? (
+        <h2 className='text-xl font-semibold tracking-tight py-4'>{title}</h2>
+      ) : (
+        <Skeleton className='h-5 w-1/5 bg-border rounded py-4 mt-6' />
+      )}
+      <div className='space-y-2 animate-pulse'>
+        {[...Array(rows)].map((_, i) => (
+          <div key={i} className='flex gap-2'>
+            {[...Array(columns)].map((_, j) => (
+              <Skeleton key={j} className='h-10 flex-1 bg-border rounded' />
+            ))}
+          </div>
         ))}
       </div>
     </div>
-  )
+  );
 }

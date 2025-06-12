@@ -254,7 +254,7 @@ export async function validateOblea(): Promise<ObleaValidation> {
 }
 
 // Función para generar la oblea (podría ser un PDF o documento)
-export async function generateOblea(tax_id: string): Promise<{
+export async function generateOblea(): Promise<{
   data: LicenseData | null;
   error: string | null;
 }> {
@@ -301,7 +301,7 @@ export async function generateOblea(tax_id: string): Promise<{
         .filter((item) => item !== '')
         .join(' / '),
       taxpayerName: formatName(commercial_enablements[0].taxpayer!),
-      cuit: tax_id,
+      cuit: commercial_enablements[0].tax_id!,
       validUntil: dayjs(validation.validUntil).format('DD/MM/YYYY'),
       mainActivity: commercial_enablements[0].commercial_activity?.activity!,
       otherActivities: otherActivities.filter((activity) => activity !== null),

@@ -1,4 +1,5 @@
 'use client';
+import { use } from 'react';
 import {
   Card,
   CardContent,
@@ -10,8 +11,34 @@ import { CreditCard } from 'lucide-react';
 import { formatNumberToCurrency } from '@/lib/formatters';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { Envelope } from '@/types/envelope';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export const CardBalance = ({ amount }: { amount: number }) => {
+export const CardBalanceSkeleton = () => {
+  return (
+    <Card className='h-52 flex flex-col justify-between md:col-span-6 xl:col-span-5 xl:col-start-1'>
+      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <CardTitle>Balance General</CardTitle>
+        <CreditCard className='h-6 w-6 text-muted-foreground' />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className='h-10 w-32 bg-border' />
+      </CardContent>
+      <CardFooter className='flex gap-4'>
+        <Skeleton className='h-10 flex-1 bg-border' />
+        <Skeleton className='h-10 flex-1 bg-border' />
+      </CardFooter>
+    </Card>
+  );
+};
+
+export const CardBalance = ({
+  balance,
+}: {
+  balance: Promise<Envelope<number>>;
+}) => {
+  const { data: amount } = use(balance);
+
   const router = useRouter();
   return (
     <Card className='h-52 flex flex-col justify-between md:col-span-6 xl:col-span-5 xl:col-start-1'>
@@ -20,7 +47,7 @@ export const CardBalance = ({ amount }: { amount: number }) => {
         <CreditCard className='h-6 w-6 text-muted-foreground' />
       </CardHeader>
       <CardContent className='text-3xl font-bold text-gray-700'>
-        {formatNumberToCurrency(amount)}
+        {formatNumberToCurrency(amount ?? 0)}
       </CardContent>
       <CardFooter className='flex gap-4'>
         <Button
@@ -40,7 +67,7 @@ export const CardBalance = ({ amount }: { amount: number }) => {
           onClick={() => {
             router.push('/pagos/nuevo-pago');
           }}
-          disabled={amount === 0}
+          disabled={amount === 0 || amount === null}
         >
           Pagar
         </Button>

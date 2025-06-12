@@ -9,7 +9,7 @@ export const CustomSidebarHeader = () => {
   return (
     <SidebarHeader
       className={cn(
-        'flex items-center justify-between bg-sidebar-primary border-b px-4 py-3',
+        'flex items-center justify-between bg-sidebar-primary border-b px-4 py-3 h-14',
         state === 'collapsed' && 'justify-center px-2'
       )}
     >

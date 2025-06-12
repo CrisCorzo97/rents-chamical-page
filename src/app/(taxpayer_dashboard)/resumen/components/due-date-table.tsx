@@ -2,25 +2,42 @@
 import { DataTableColumnHeader } from '@/components/custom-table';
 import { DataTable } from '@/components/custom-table/data-table';
 import { Card, CardContent } from '@/components/ui/card';
-import { TableData } from '@/types/envelope';
+import { Envelope } from '@/types/envelope';
 import { declarable_tax, declarable_tax_period } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { formatName } from '@/lib/formatters';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import locale from 'dayjs/locale/es';
+import { TableSkeleton } from '@/components/custom-table/table-skeleton';
+import { use } from 'react';
 
 dayjs.locale(locale);
 dayjs.extend(utc);
 
+export const DueDateTableSkeleton = () => {
+  return (
+    <Card className='md:col-span-12 xl:col-span-10 xl:col-start-1'>
+      <CardContent>
+        <TableSkeleton rows={5} columns={4} />
+      </CardContent>
+    </Card>
+  );
+};
+
 export const DueDateTable = ({
-  items,
-  pagination,
-}: TableData<
-  declarable_tax_period & {
-    declarable_tax: declarable_tax;
-  }
->) => {
+  periodsDueDate,
+}: {
+  periodsDueDate: Promise<
+    Envelope<
+      (declarable_tax_period & {
+        declarable_tax: declarable_tax;
+      })[]
+    >
+  >;
+}) => {
+  const { data: items, pagination } = use(periodsDueDate);
+
   const columns: ColumnDef<
     declarable_tax_period & {
       declarable_tax: declarable_tax;
@@ -72,7 +89,8 @@ export const DueDateTable = ({
         <DataTable
           tableTitle='Próximos Vencimientos'
           columns={columns}
-          data={items}
+          data={items ?? []}
+          getRowId={(row) => row.id}
           pagination={pagination}
         />
       </CardContent>

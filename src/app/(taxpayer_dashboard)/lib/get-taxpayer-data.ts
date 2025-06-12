@@ -1,10 +1,11 @@
 'use server';
-import { redirect } from 'next/navigation';
+import { cache } from 'react';
 import { TaxpayerData } from '../types/types';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import dbSupabase from '@/lib/prisma/prisma';
+import { redirect } from 'next/navigation';
 
-export async function getTaxpayerData(): Promise<TaxpayerData> {
+export const getTaxpayerData = cache(async (): Promise<TaxpayerData> => {
   try {
     const supabase = await createSupabaseServerClient();
 
@@ -59,4 +60,4 @@ export async function getTaxpayerData(): Promise<TaxpayerData> {
   } catch (error) {
     redirect('/');
   }
-}
+});
