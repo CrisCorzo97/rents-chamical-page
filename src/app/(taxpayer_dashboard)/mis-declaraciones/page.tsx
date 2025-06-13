@@ -9,6 +9,8 @@ import {
 import { getAffidavits } from './services/affidavits.actions';
 import Link from 'next/link';
 import { AffidavitsTable } from './components/affidavits-table';
+import { CreateAffidavitButton } from './components/create-affidavit-button';
+import dayjs from 'dayjs';
 
 export default async function MisDeclaracionesPage({
   searchParams,
@@ -58,6 +60,16 @@ export default async function MisDeclaracionesPage({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div className='flex justify-end'>
+        <CreateAffidavitButton
+          year={
+            period
+              ? dayjs(period as string).format('YYYY')
+              : dayjs().format('YYYY')
+          }
+        />
+      </div>
 
       <div className='grid grid-cols-1 gap-4 md:grid-cols-12'>
         <AffidavitsTable items={affidavits ?? []} pagination={pagination} />

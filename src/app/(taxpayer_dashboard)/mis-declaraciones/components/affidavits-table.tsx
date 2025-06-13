@@ -25,6 +25,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/toaster';
 import { Card, CardContent } from '@/components/ui';
+import { TableSkeleton } from '@/components/custom-table/table-skeleton';
 dayjs.locale(locale);
 dayjs.extend(utc);
 
@@ -42,6 +43,16 @@ const STATUS_OPTIONS = [
   { value: 'approved', label: 'Aprobado' },
   { value: 'refused', label: 'Rechazado' },
 ];
+
+export const AffidavitsTableSkeleton = () => {
+  return (
+    <Card className='col-span-12 2xl:col-span-10'>
+      <CardContent>
+        <TableSkeleton title='Declaraciones Juradas' columns={6} rows={5} />
+      </CardContent>
+    </Card>
+  );
+};
 
 export function AffidavitsTable({
   items,
