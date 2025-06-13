@@ -8,11 +8,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { getAffidavits } from './services/affidavits.actions';
 import Link from 'next/link';
-import {
-  AffidavitsTable,
-  AffidavitsTableSkeleton,
-} from './components/affidavits-table';
-import { Suspense } from 'react';
+import { AffidavitsTable } from './components/affidavits-table';
 
 export default async function MisDeclaracionesPage({
   searchParams,
@@ -28,7 +24,7 @@ export default async function MisDeclaracionesPage({
     'filter.period': period,
   } = await searchParams;
 
-  const data = getAffidavits({
+  const { data: affidavits, pagination } = await getAffidavits({
     page: typeof page === 'string' ? parseInt(page) : undefined,
     limit: typeof limit === 'string' ? parseInt(limit) : undefined,
     sort_by: typeof sort_by === 'string' ? sort_by : undefined,
@@ -63,9 +59,9 @@ export default async function MisDeclaracionesPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <Suspense fallback={<AffidavitsTableSkeleton />}>
-        <AffidavitsTable data={data} />
-      </Suspense>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-12'>
+        <AffidavitsTable items={affidavits ?? []} pagination={pagination} />
+      </div>
     </div>
   );
 }

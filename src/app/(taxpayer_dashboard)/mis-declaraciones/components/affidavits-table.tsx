@@ -10,7 +10,7 @@ import { affidavit_status } from '@prisma/client';
 import locale from 'dayjs/locale/es';
 import { FileText } from 'lucide-react';
 import { DataTable, DataTableColumnHeader } from '@/components/custom-table';
-import { Envelope } from '@/types/envelope';
+import { TableData } from '@/types/envelope';
 import { useDataTableURLParams } from '@/hooks/useDataTableURLParams';
 import { FilterableColumn } from '@/components/custom-table/data-table-toolbar';
 import { ActionButtons } from '@/components/custom-table/action-buttons';
@@ -20,11 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/toaster';
-import { TableSkeleton } from '@/components/custom-table/table-skeleton';
+import { Card, CardContent } from '@/components/ui';
 dayjs.locale(locale);
 dayjs.extend(utc);
 
@@ -43,17 +43,10 @@ const STATUS_OPTIONS = [
   { value: 'refused', label: 'Rechazado' },
 ];
 
-export const AffidavitsTableSkeleton = () => {
-  return <TableSkeleton title='Declaraciones Juradas' columns={6} rows={8} />;
-};
-
 export function AffidavitsTable({
-  data,
-}: {
-  data: Promise<Envelope<AffidavitWithRelations[]>>;
-}) {
-  const { data: items, pagination } = use(data);
-
+  items,
+  pagination,
+}: TableData<AffidavitWithRelations>) {
   const [selectedAffidavit, setSelectedAffidavit] =
     useState<AffidavitWithRelations | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -75,17 +68,17 @@ export function AffidavitsTable({
       <div className='space-y-4'>
         <div className='grid grid-cols-2 gap-4'>
           <div>
+            <h4 className='text-sm font-medium text-muted-foreground'>Tasa</h4>
+            <p className='text-sm'>
+              {formatName(affidavit.declarable_tax?.name ?? '-')}
+            </p>
+          </div>
+          <div>
             <h4 className='text-sm font-medium text-muted-foreground'>
               Período
             </h4>
             <p className='text-sm'>
               {formatName(dayjs(affidavit.period).utc().format('MMMM YYYY'))}
-            </p>
-          </div>
-          <div>
-            <h4 className='text-sm font-medium text-muted-foreground'>Tasa</h4>
-            <p className='text-sm'>
-              {formatName(affidavit.declarable_tax?.name ?? '-')}
             </p>
           </div>
           <div>
@@ -124,6 +117,38 @@ export function AffidavitsTable({
         <Separator />
         <div>
           <DialogTitle className='mb-4'>Detalles Adicionales</DialogTitle>
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <h4 className='text-sm font-medium text-muted-foreground'>
+                Fecha de Aprobación
+              </h4>
+              <p className='text-sm'>
+                {affidavit.approved_at
+                  ? dayjs(affidavit.approved_at).format('DD/MM/YYYY HH:mm')
+                  : '-'}
+              </p>
+            </div>
+            <div>
+              <h4 className='text-sm font-medium text-muted-foreground'>
+                Tipo
+              </h4>
+              <p className='text-sm'>
+                {affidavit.is_rectifying ? 'Rectificativa' : 'Original'}
+              </p>
+            </div>
+            {affidavit.is_rectifying && (
+              <div>
+                <h4 className='text-sm font-medium text-muted-foreground'>
+                  Versión
+                </h4>
+                <p className='text-sm'>{affidavit.version}</p>
+              </div>
+            )}
+          </div>
+        </div>
+        <Separator />
+        <div>
+          <DialogTitle className='mb-4'>Información del Sistema</DialogTitle>
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <h4 className='text-sm font-medium text-muted-foreground'>
@@ -189,7 +214,7 @@ export function AffidavitsTable({
       id: 'declarable_tax',
       accessorKey: 'declarable_tax',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='TASA' />
+        <DataTableColumnHeader column={column} title='TASA / CONTRIBUCIÓN' />
       ),
       cell: ({ row }) => formatName(row.original.declarable_tax?.name ?? '-'),
       enableSorting: false,
@@ -200,7 +225,7 @@ export function AffidavitsTable({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='IMPORTE DECLARADO' />
       ),
-      cell: ({ row }) => formatNumberToCurrency(row.original.fee_amount),
+      cell: ({ row }) => formatNumberToCurrency(row.original.declared_amount),
       enableSorting: true,
     },
     {
@@ -266,38 +291,40 @@ export function AffidavitsTable({
   ];
 
   return (
-    <>
-      <Toaster />
-      <DataTable
-        columns={columns}
-        data={items ?? []}
-        tableTitle='Declaraciones Juradas'
-        pagination={pagination}
-        getRowId={(row) => row.id}
-        filterableColumns={filterableColumns}
-        searchParams={{
-          page: String(currentPage),
-          limit: String(currentLimit),
-          sort_by: currentSortBy || undefined,
-          sort_direction: currentSortDirection || undefined,
-          filters: activeFilters,
-        }}
-        onPageChange={handlePageChange}
-        onLimitChange={handleLimitChange}
-        onSortingChange={handleSortingChange}
-        onFilterChange={handleFilterChange}
-      />
+    <Card className='col-span-12 2xl:col-span-10'>
+      <CardContent>
+        <Toaster />
+        <DataTable
+          columns={columns}
+          data={items ?? []}
+          tableTitle='Declaraciones Juradas'
+          pagination={pagination}
+          getRowId={(row) => row.id}
+          filterableColumns={filterableColumns}
+          searchParams={{
+            page: String(currentPage),
+            limit: String(currentLimit),
+            sort_by: currentSortBy || undefined,
+            sort_direction: currentSortDirection || undefined,
+            filters: activeFilters,
+          }}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
+          onSortingChange={handleSortingChange}
+          onFilterChange={handleFilterChange}
+        />
 
-      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-        <DialogContent className='max-w-3xl'>
-          <DialogHeader>
-            <DialogTitle>Detalles de la Declaración Jurada</DialogTitle>
-          </DialogHeader>
-          <ScrollArea className='h-[600px] pr-4'>
-            {selectedAffidavit && renderAffidavitDetails(selectedAffidavit)}
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
-    </>
+        <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+          <DialogContent className='max-w-3xl max-h-[90vh]'>
+            <DialogHeader>
+              <DialogTitle>Detalles de la Declaración Jurada</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className='h-[calc(90vh-8rem)] pr-4'>
+              {selectedAffidavit && renderAffidavitDetails(selectedAffidavit)}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   );
 }

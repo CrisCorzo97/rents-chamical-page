@@ -46,13 +46,10 @@ export const getAffidavits = async ({
     }
 
     if (filters) {
-      const { status, period } = filters;
+      const { status } = filters;
       queries.where = {
         ...queries.where,
         status: status as affidavit_status,
-        period: {
-          contains: period as string,
-        },
       };
     }
 
