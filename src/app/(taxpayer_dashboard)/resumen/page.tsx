@@ -6,14 +6,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { CardBalance, CardBalanceSkeleton } from './components/card-balance';
-import { CardStatus, CardStatusSkeleton } from './components/card-status';
-import {
-  DueDateTable,
-  DueDateTableSkeleton,
-} from './components/due-date-table';
+import { CardBalance } from './components/card-balance';
+import { CardStatus } from './components/card-status';
+import { DueDateTable } from './components/due-date-table';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import {
   getBalance,
   getPeriodsDueDate,
@@ -21,9 +17,11 @@ import {
 } from './services/overview.action';
 
 export default async function ResumenPage() {
-  const balance = getBalance();
-  const validateTaxpayerOblea = validateOblea();
-  const periodsDueDate = getPeriodsDueDate();
+  const [
+    { data: balance },
+    { data: periodsDueDate, pagination },
+    { canGenerate },
+  ] = await Promise.all([getBalance(), getPeriodsDueDate(), validateOblea()]);
 
   return (
     <div className='flex flex-col gap-4'>
@@ -44,20 +42,11 @@ export default async function ResumenPage() {
       </Breadcrumb>
 
       <div className='grid grid-cols-1 gap-4 md:grid-cols-12'>
-        {/* Card de Balance */}
-        <Suspense fallback={<CardBalanceSkeleton />}>
-          <CardBalance balance={balance} />
-        </Suspense>
+        <CardBalance balance={balance ?? 0} />
 
-        {/* Card de Estado */}
-        <Suspense fallback={<CardStatusSkeleton />}>
-          <CardStatus validateOblea={validateTaxpayerOblea} />
-        </Suspense>
+        <CardStatus canGenerate={canGenerate} />
 
-        {/* Tabla de Próximos Vencimientos */}
-        <Suspense fallback={<DueDateTableSkeleton />}>
-          <DueDateTable periodsDueDate={periodsDueDate} />
-        </Suspense>
+        <DueDateTable items={periodsDueDate ?? []} pagination={pagination} />
       </div>
     </div>
   );

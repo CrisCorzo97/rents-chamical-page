@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/card';
 import { BadgeCheck } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { use, useState, useTransition } from 'react';
-import { LicenseData, ObleaValidation } from '../../types/types';
+import { useState, useTransition } from 'react';
+import { LicenseData } from '../../types/types';
 import { generateOblea } from '../services/overview.action';
 import { Toaster, toast } from 'sonner';
 import {
@@ -26,7 +26,7 @@ import { PDFViewer } from '@react-pdf/renderer';
 
 export const CardStatusSkeleton = () => {
   return (
-    <Card className='h-52 flex flex-col justify-between md:col-span-6 xl:col-span-5'>
+    <Card className='h-52 flex flex-col justify-between md:col-span-6 2xl:col-span-5'>
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
         <CardTitle>Estado del Contribuyente</CardTitle>
         <BadgeCheck className='h-6 w-6 text-muted-foreground' />
@@ -41,11 +41,7 @@ export const CardStatusSkeleton = () => {
   );
 };
 
-export const CardStatus = ({
-  validateOblea,
-}: {
-  validateOblea: Promise<ObleaValidation>;
-}) => {
+export const CardStatus = ({ canGenerate }: { canGenerate: boolean }) => {
   const [isGenerating, startTransition] = useTransition();
   const [licenseData, setLicenseData] = useState<LicenseData | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -53,8 +49,6 @@ export const CardStatus = ({
     null
   );
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
-
-  const { canGenerate } = use(validateOblea);
 
   const handleGenerateOblea = () => {
     startTransition(async () => {
@@ -82,7 +76,7 @@ export const CardStatus = ({
   };
 
   return (
-    <section className='md:col-span-6 xl:col-span-5'>
+    <section className='md:col-span-6 2xl:col-span-5'>
       <Toaster />
       <Card className='h-52 flex flex-col justify-between'>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
