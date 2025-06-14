@@ -31,3 +31,10 @@ export type CalculateInfo = {
   minimun_tax_amount: number;
   compensatory_interest: number;
 };
+
+export type PeriodToSubmit = {
+  nextToSubmit: boolean;
+  label: string;
+  value: string;
+  enabled: boolean;
+};

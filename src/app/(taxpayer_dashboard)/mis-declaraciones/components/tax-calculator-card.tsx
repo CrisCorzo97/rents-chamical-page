@@ -173,7 +173,7 @@ export function TaxCalculatorCard({
             duration: 5000,
           });
 
-          replace(`/tramites/DDJJ-actividad-comercial`);
+          replace(`/mis-declaraciones`);
         }
       } catch (error) {
         toast.error(

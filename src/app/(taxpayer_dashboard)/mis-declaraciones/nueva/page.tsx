@@ -8,16 +8,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { getAffidavit } from '../services/affidavits.actions';
+import {
+  getAffidavit,
+  getDeclarableTaxPeriod,
+} from '../services/affidavits.actions';
 import dayjs from 'dayjs';
 import locale from 'dayjs/locale/es';
 import utc from 'dayjs/plugin/utc';
 import { formatName } from '@/lib/formatters';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
+import { Info, TriangleAlert } from 'lucide-react';
 import { TaxCalculatorCard } from '../components/tax-calculator-card';
 import { getTaxpayerData } from '../../lib/get-taxpayer-data';
 import {
+  Badge,
   Card,
   CardContent,
   CardDescription,
@@ -34,8 +38,16 @@ export default async function NuevaDeclaracionPage({
   searchParams: Promise<{ period: string }>;
 }) {
   const { period } = await searchParams;
-  const { data: affidavit } = await getAffidavit({ period });
-  const { include_both_categories } = await getTaxpayerData();
+
+  const [
+    { data: affidavit },
+    { data: declarableTaxPeriod },
+    { include_both_categories },
+  ] = await Promise.all([
+    getAffidavit({ period }),
+    getDeclarableTaxPeriod(period),
+    getTaxpayerData(),
+  ]);
 
   return (
     <div className='flex flex-col gap-4'>
@@ -69,10 +81,27 @@ export default async function NuevaDeclaracionPage({
             <CardTitle className='text-2xl font-bold '>
               Nueva Declaración
             </CardTitle>
-            <CardDescription className='text-sm text-muted-foreground'>
-              Período: {formatName(dayjs(period).format('MMMM YYYY'))}
+            <CardDescription
+              className='text-lg
+            '
+            >
+              <b>Período:</b>{' '}
+              {formatName(
+                dayjs(declarableTaxPeriod?.period).format('MMMM YYYY')
+              )}
               {affidavit ? ' - Rectificativa' : ''}
             </CardDescription>
+            {dayjs().isAfter(
+              dayjs(declarableTaxPeriod?.submission_due_date)
+            ) && (
+              <Badge
+                variant='warning'
+                className='mt-2 w-fit text-white text-sm flex items-center gap-2'
+              >
+                <TriangleAlert size={18} />
+                Presentación fuera de plazo
+              </Badge>
+            )}
           </CardHeader>
           <CardContent>
             <Alert className='bg-blue-100 border-blue-600 2xl:col-span-10'>

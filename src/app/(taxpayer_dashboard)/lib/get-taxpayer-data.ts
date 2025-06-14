@@ -35,6 +35,9 @@ export const getTaxpayerData = cache(async (): Promise<TaxpayerData> => {
         commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
           true,
       },
+      orderBy: {
+        registration_date: 'asc',
+      },
     });
 
     if (c_e_records.length > 1) {

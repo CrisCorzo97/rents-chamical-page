@@ -1,39 +1,67 @@
+'use server';
 import { Envelope, PaginationParams } from '@/types/envelope';
 import { getTaxpayerData } from '../../lib/get-taxpayer-data';
 import { dbSupabase } from '@/lib/prisma/prisma';
 import {
   affidavit,
   affidavit_status,
-  declaration_period,
+  declarable_tax_period,
   Prisma,
 } from '@prisma/client';
 import {
   AffidavitWithRelations,
   CalculateInfo,
+  PeriodToSubmit,
 } from '../types/affidavits.types';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
 import { getFirstBusinessDay } from '@/lib/providers';
 import { revalidatePath } from 'next/cache';
+import { formatName } from '@/lib/formatters';
+import locale from 'dayjs/locale/es';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(customParseFormat);
+dayjs.locale(locale);
+dayjs.extend(utc);
 
 const FINANCIAL_ACTIVITIES_CODE = ['641930'];
-
-export const PERIOD_MAP: Record<declaration_period, number> = {
-  month: 1,
-  bimester: 2,
-  quarter: 3,
-  four_month: 4,
-  semester: 6,
-  year: 12,
-};
 
 const DAYS_TO_ADD_BY_TAX_ID = {
   0: [0, 1, 2],
   1: [3, 4, 5],
   2: [6, 7],
   3: [8, 9],
+};
+
+export const getDeclarableTaxPeriod = async (period: string) => {
+  const response: Envelope<declarable_tax_period> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const declarableTaxPeriod =
+      await dbSupabase.declarable_tax_period.findFirst({
+        where: {
+          declarable_tax_id: 'commercial_activity',
+          period,
+        },
+      });
+
+    response.data = declarableTaxPeriod;
+  } catch (error) {
+    response.success = false;
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Error al obtener la información del período a';
+    }
+  } finally {
+    return response;
+  }
 };
 
 export const getAffidavits = async ({
@@ -288,13 +316,11 @@ export const createAffidavit = async (input: {
   try {
     const { user } = await getTaxpayerData();
 
-    const declarableTax = await getDeclarableTax();
+    const { data: declarableTaxPeriod } = await getDeclarableTaxPeriod(period);
 
-    const paymentPeriodicity = PERIOD_MAP[declarableTax.payment_periodicity];
-
-    const monthsToAdd =
-      paymentPeriodicity -
-      (dayjs(period, 'MMMM-YYYY').month() % paymentPeriodicity === 0 ? 0 : 1);
+    if (!declarableTaxPeriod) {
+      throw new Error('No se encontró el período de declaración');
+    }
 
     let daysToAdd = 0;
 
@@ -307,23 +333,9 @@ export const createAffidavit = async (input: {
       }
     }
 
-    let tentativePaymentDueDate = dayjs(period, 'MMMM-YYYY')
-      .add(monthsToAdd, 'month')
-      .date(Number(declarableTax.procedure_expiration_day))
+    let tentativePaymentDueDate = dayjs(declarableTaxPeriod.payment_due_date)
       .add(daysToAdd, 'day')
       .format('YYYY-MM-DD');
-
-    if (tentativePaymentDueDate.split('-')[1] === '03') {
-      tentativePaymentDueDate = dayjs(tentativePaymentDueDate)
-        .add(13, 'day')
-        .format('YYYY-MM-DD');
-    }
-
-    if (tentativePaymentDueDate.split('-')[1] === '05') {
-      tentativePaymentDueDate = dayjs(tentativePaymentDueDate)
-        .add(10, 'day')
-        .format('YYYY-MM-DD');
-    }
 
     const paymentDueDate = await getFirstBusinessDay(tentativePaymentDueDate);
 
@@ -334,11 +346,8 @@ export const createAffidavit = async (input: {
       },
       declared_amount,
       fee_amount,
-      payment_due_date: dayjs(paymentDueDate)
-        .endOf('day')
-        .subtract(3, 'hour')
-        .toDate(),
-      period: dayjs(period, 'MMMM-YYYY').format('YYYY-MM-DD'),
+      payment_due_date: dayjs(paymentDueDate).toDate(),
+      period,
       status: 'pending_payment',
       user: {
         connect: { id: user.id },
@@ -358,6 +367,84 @@ export const createAffidavit = async (input: {
       response.error = error.message;
     } else {
       response.error = 'Hubo un error al crear la declaración';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const getPeriodsToSubmit = async (year: string) => {
+  const response: Envelope<PeriodToSubmit[]> = {
+    success: true,
+    data: [],
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const declarablePeriods = await dbSupabase.declarable_tax_period.findMany({
+      where: {
+        declarable_tax_id: 'commercial_activity',
+        period: {
+          contains: year,
+        },
+      },
+    });
+
+    const { data: affidavits } = await getAffidavits({
+      filters: {
+        period: year,
+      },
+      sort_by: 'period',
+      sort_direction: 'asc',
+    });
+
+    const { commercial_enablements } = await getTaxpayerData();
+
+    const periods = declarablePeriods.map((period) => {
+      const isEnabled =
+        dayjs(period.period)
+          .utc()
+          .isAfter(
+            dayjs(commercial_enablements[0]!.registration_date)
+              .utc()
+              .startOf('month')
+              .subtract(1, 'day')
+          ) && dayjs().utc().isAfter(dayjs(period.start_date).utc());
+
+      return {
+        label: formatName(dayjs(period.period).utc().format('MMMM YYYY')),
+        value: period.period,
+        enabled: isEnabled,
+        nextToSubmit: false,
+      };
+    });
+
+    let nextToSubmitAssigned = false;
+
+    periods.forEach((period) => {
+      const wasSubmitted = affidavits?.some(
+        (affidavit) => affidavit.period === period.value
+      );
+
+      if (!wasSubmitted && period.enabled) {
+        if (!nextToSubmitAssigned) {
+          period.nextToSubmit = true;
+          nextToSubmitAssigned = true;
+        } else {
+          period.enabled = false;
+        }
+      }
+    });
+
+    response.data = periods;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al obtener los períodos a presentar';
     }
   } finally {
     return response;

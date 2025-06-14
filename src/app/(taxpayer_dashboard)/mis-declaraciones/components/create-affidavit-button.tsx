@@ -1,6 +1,7 @@
 'use client';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -19,45 +20,28 @@ import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import locale from 'dayjs/locale/es';
 import utc from 'dayjs/plugin/utc';
-import { formatName } from '@/lib/formatters';
 import Link from 'next/link';
+import { PeriodToSubmit } from '../types/affidavits.types';
 dayjs.locale(locale);
 dayjs.extend(utc);
 
-export const CreateAffidavitButton = ({ year }: { year: string }) => {
+export const CreateAffidavitButton = ({
+  periods,
+}: {
+  periods: PeriodToSubmit[];
+}) => {
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
 
-  const periods = useMemo(() => {
-    const periods = [];
-    for (let i = 0; i < 12; i++) {
-      const period = dayjs().utc().month(i).year(Number(year)).startOf('month');
-      periods.push({
-        label: formatName(period.format('MMMM YYYY')),
-        value: period.format('YYYY-MM-DD'),
-        enabled: period.isBefore(dayjs().utc().endOf('month')),
-      });
-    }
-    return periods;
-  }, [year]);
-
   const defaultPeriod = useMemo(() => {
-    const currentYear = dayjs().utc().year();
-
-    if (currentYear === Number(year)) {
-      return dayjs().utc().startOf('month').format('YYYY-MM-DD');
-    }
-
-    return dayjs()
-      .utc()
-      .year(Number(year))
-      .startOf('year')
-      .format('YYYY-MM-DD');
-  }, [year]);
+    return periods.find((period) => period.nextToSubmit)!.value;
+  }, [periods]);
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size='sm'>Nueva Declaración</Button>
+        <Button size='sm' className='w-full md:w-fit'>
+          Nueva Declaración
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -87,7 +71,9 @@ export const CreateAffidavitButton = ({ year }: { year: string }) => {
           </div>
         </div>
         <DialogFooter>
-          <Button variant='outline'>Cancelar</Button>
+          <DialogClose asChild>
+            <Button variant='outline'>Cancelar</Button>
+          </DialogClose>
           <Link
             href={`/mis-declaraciones/nueva?period=${
               selectedPeriod ?? defaultPeriod

@@ -6,7 +6,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { getAffidavits } from './services/affidavits.actions';
+import {
+  getAffidavits,
+  getPeriodsToSubmit,
+} from './services/affidavits.actions';
 import Link from 'next/link';
 import { AffidavitsTable } from './components/affidavits-table';
 import { CreateAffidavitButton } from './components/create-affidavit-button';
@@ -43,6 +46,10 @@ export default async function MisDeclaracionesPage({
         : undefined,
   });
 
+  const { data: periods } = await getPeriodsToSubmit(
+    period ? dayjs(period as string).format('YYYY') : dayjs().format('YYYY')
+  );
+
   return (
     <div className='flex flex-col gap-4'>
       <Breadcrumb className='mt-6 md:h-10'>
@@ -61,17 +68,10 @@ export default async function MisDeclaracionesPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className='flex justify-end'>
-        <CreateAffidavitButton
-          year={
-            period
-              ? dayjs(period as string).format('YYYY')
-              : dayjs().format('YYYY')
-          }
-        />
-      </div>
-
       <div className='grid grid-cols-1 gap-4 md:grid-cols-12'>
+        <div className='md:col-span-12 2xl:col-span-10 flex justify-end'>
+          <CreateAffidavitButton periods={periods ?? []} />
+        </div>
         <AffidavitsTable items={affidavits ?? []} pagination={pagination} />
       </div>
     </div>
