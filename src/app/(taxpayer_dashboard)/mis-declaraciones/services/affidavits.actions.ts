@@ -322,6 +322,20 @@ export const createAffidavit = async (input: {
       throw new Error('No se encontró el período de declaración');
     }
 
+    const previousAffidavit = await dbSupabase.affidavit.findMany({
+      where: {
+        period,
+        taxpayer_id: user.id,
+        declarable_tax: {
+          id: 'commercial_activity',
+        },
+      },
+      orderBy: {
+        version: 'desc',
+      },
+      take: 1,
+    });
+
     let daysToAdd = 0;
 
     for (const [key, value] of Object.entries(DAYS_TO_ADD_BY_TAX_ID)) {
@@ -353,6 +367,16 @@ export const createAffidavit = async (input: {
         connect: { id: user.id },
       },
     };
+
+    if (previousAffidavit.length > 0) {
+      affidavitData.is_rectifying = true;
+      affidavitData.version = previousAffidavit[0].version + 1;
+      affidavitData.affidavit = {
+        connect: {
+          id: previousAffidavit[0].original_affidavit_id!,
+        },
+      };
+    }
 
     response.data = await dbSupabase.affidavit.create({
       data: affidavitData,
