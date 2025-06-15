@@ -29,7 +29,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TableSkeleton } from '@/components/custom-table/table-skeleton';
 import { InvoiceWithRelations } from '../types/types';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 dayjs.locale(locale);
 dayjs.extend(utc);
 
@@ -50,12 +50,9 @@ const STATUS_OPTIONS = [
 
 export const InvoicesTableSkeleton = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Facturas</CardTitle>
-      </CardHeader>
+    <Card className='col-span-12 2xl:col-span-10'>
       <CardContent>
-        <TableSkeleton title='Facturas' columns={6} rows={8} />
+        <TableSkeleton title='Facturas' columns={6} rows={5} />
       </CardContent>
     </Card>
   );
