@@ -8,11 +8,8 @@ import {
 } from '@/components/ui/breadcrumb';
 import Link from 'next/link';
 import { getInvoices } from './services/invoices.actions';
-import {
-  InvoicesTable,
-  InvoicesTableSkeleton,
-} from './components/invoices-table';
-import { Suspense } from 'react';
+import { InvoicesTable } from './components/invoices-table';
+import { Button } from '@/components/ui/button';
 
 export default async function MisPagosPage({
   searchParams,
@@ -27,7 +24,7 @@ export default async function MisPagosPage({
     'filter.status': status,
   } = await searchParams;
 
-  const data = getInvoices({
+  const { data, pagination } = await getInvoices({
     page: typeof page === 'string' ? parseInt(page) : undefined,
     limit: typeof limit === 'string' ? parseInt(limit) : undefined,
     sort_by: typeof sort_by === 'string' ? sort_by : undefined,
@@ -60,9 +57,16 @@ export default async function MisPagosPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <Suspense fallback={<InvoicesTableSkeleton />}>
-        <InvoicesTable data={data} />
-      </Suspense>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-12'>
+        <div className='md:col-span-12 2xl:col-span-10 flex justify-end'>
+          <Link href='/mis-pagos/nuevo-pago'>
+            <Button size='sm' className='w-full md:w-fit'>
+              Nuevo Pago
+            </Button>
+          </Link>
+        </div>
+        <InvoicesTable items={data ?? []} pagination={pagination} />
+      </div>
     </div>
   );
 }

@@ -17,3 +17,11 @@ export interface InvoiceWithRelations extends invoice {
       })[]
     | null;
 }
+
+export type ConceptToPay = {
+  id: string;
+  concept: string;
+  period: string;
+  dueDate: string;
+  amount: number;
+};

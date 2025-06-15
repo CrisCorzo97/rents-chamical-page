@@ -9,7 +9,7 @@ import { affidavit_status } from '@prisma/client';
 import locale from 'dayjs/locale/es';
 import { Eye, FileText, Upload } from 'lucide-react';
 import { DataTable, DataTableColumnHeader } from '@/components/custom-table';
-import { Envelope } from '@/types/envelope';
+import { TableData } from '@/types/envelope';
 import { useDataTableURLParams } from '@/hooks/useDataTableURLParams';
 import { FilterableColumn } from '@/components/custom-table/data-table-toolbar';
 import {
@@ -22,13 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { use, useCallback, useState, useTransition } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/toaster';
 import { TableSkeleton } from '@/components/custom-table/table-skeleton';
 import { InvoiceWithRelations } from '../types/types';
 import { toast } from 'sonner';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 dayjs.locale(locale);
 dayjs.extend(utc);
 
@@ -48,16 +49,22 @@ const STATUS_OPTIONS = [
 ];
 
 export const InvoicesTableSkeleton = () => {
-  return <TableSkeleton title='Facturas' columns={6} rows={8} />;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Facturas</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <TableSkeleton title='Facturas' columns={6} rows={8} />
+      </CardContent>
+    </Card>
+  );
 };
 
 export function InvoicesTable({
-  data,
-}: {
-  data: Promise<Envelope<InvoiceWithRelations[]>>;
-}) {
-  const { data: items, pagination } = use(data);
-
+  items,
+  pagination,
+}: TableData<InvoiceWithRelations>) {
   const [selectedInvoice, setSelectedInvoice] =
     useState<InvoiceWithRelations | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -124,11 +131,19 @@ export function InvoicesTable({
         <div className='grid grid-cols-2 gap-4'>
           <div>
             <h4 className='text-sm font-medium text-muted-foreground'>
-              Estado
+              Importe seleccionado
             </h4>
-            <Badge variant={getStatusVariant(record.status)}>
-              {STATUS_DICTIONARY[record.status]}
-            </Badge>
+            <p className='text-sm'>
+              {formatNumberToCurrency(record.fee_amount)}
+            </p>
+          </div>
+          <div>
+            <h4 className='text-sm font-medium text-muted-foreground'>
+              Intereses
+            </h4>
+            <p className='text-sm'>
+              {formatNumberToCurrency(record.compensatory_interest ?? 0)}
+            </p>
           </div>
           <div>
             <h4 className='text-sm font-medium text-muted-foreground'>
@@ -140,11 +155,19 @@ export function InvoicesTable({
           </div>
           <div>
             <h4 className='text-sm font-medium text-muted-foreground'>
+              Estado
+            </h4>
+            <Badge variant={getStatusVariant(record.status)}>
+              {STATUS_DICTIONARY[record.status]}
+            </Badge>
+          </div>
+          <div>
+            <h4 className='text-sm font-medium text-muted-foreground'>
               Fecha de Pago
             </h4>
             <p className='text-sm'>
               {record.payment_date
-                ? dayjs(record.payment_date).utc().format('DD/MM/YYYY HH:mm')
+                ? dayjs(record.payment_date).format('DD/MM/YYYY HH:mm')
                 : '-'}
             </p>
           </div>
@@ -154,40 +177,49 @@ export function InvoicesTable({
           <DialogTitle className='mb-4'>Declaraciones Juradas</DialogTitle>
           <div className='space-y-4'>
             {record.affidavit?.map((affidavit) => (
-              <div key={affidavit.id} className='grid grid-cols-2 gap-4'>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Tipo de Declaración
-                  </h4>
-                  <p className='text-sm'>
-                    {formatName(affidavit.declarable_tax?.name ?? '-')}
-                  </p>
-                </div>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Estado
-                  </h4>
-                  <Badge variant={getStatusVariant(affidavit.status)}>
-                    {STATUS_DICTIONARY[affidavit.status]}
-                  </Badge>
-                </div>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Período
-                  </h4>
-                  <p className='text-sm'>
-                    {formatName(
-                      dayjs(affidavit.period).utc().format('MMMM YYYY')
-                    )}
-                  </p>
-                </div>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Importe determinado
-                  </h4>
-                  <p className='text-sm'>
-                    {formatNumberToCurrency(affidavit.fee_amount)}
-                  </p>
+              <div key={affidavit.id} className='flex flex-col gap-4'>
+                <div className='rounded-md border'>
+                  <table className='w-full'>
+                    <thead className='bg-muted'>
+                      <tr className='border-b'>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Período
+                        </th>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Tasa / Contribución
+                        </th>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Importe determinado
+                        </th>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Estado
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className='px-4 py-2 text-sm'>
+                          {formatName(
+                            dayjs(affidavit.period).utc().format('MMMM YYYY')
+                          )}
+                        </td>
+                        <td className='px-4 py-2 text-sm'>
+                          {formatName(affidavit.declarable_tax?.name ?? '-')}
+                        </td>
+                        <td className='px-4 py-2 text-sm'>
+                          {formatNumberToCurrency(affidavit.fee_amount)}
+                        </td>
+                        <td className='px-4 py-2 text-sm'>
+                          <Badge
+                            variant={getStatusVariant(affidavit.status)}
+                            className='text-xs'
+                          >
+                            {STATUS_DICTIONARY[affidavit.status]}
+                          </Badge>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             ))}
@@ -214,9 +246,7 @@ export function InvoicesTable({
                         Período
                       </h4>
                       <p className='text-sm'>
-                        {formatName(
-                          dayjs(penalty.period).utc().format('MMMM YYYY')
-                        )}
+                        {formatName(dayjs(penalty.period).format('MMMM YYYY'))}
                       </p>
                     </div>
                     <div>
@@ -242,7 +272,7 @@ export function InvoicesTable({
                 Fecha de Creación
               </h4>
               <p className='text-sm'>
-                {dayjs(record.created_at).utc().format('DD/MM/YYYY HH:mm')}
+                {dayjs(record.created_at).format('DD/MM/YYYY HH:mm')}
               </p>
             </div>
             <div>
@@ -251,7 +281,7 @@ export function InvoicesTable({
               </h4>
               <p className='text-sm'>
                 {record.updated_at
-                  ? dayjs(record.updated_at).utc().format('DD/MM/YYYY HH:mm')
+                  ? dayjs(record.updated_at).format('DD/MM/YYYY HH:mm')
                   : '-'}
               </p>
             </div>
@@ -304,8 +334,7 @@ export function InvoicesTable({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='VENCIMIENTO DE PAGO' />
       ),
-      cell: ({ row }) =>
-        dayjs(row.original.due_date).utc().format('DD/MM/YYYY'),
+      cell: ({ row }) => dayjs(row.original.due_date).format('DD/MM/YYYY'),
       enableSorting: true,
     },
     {
@@ -316,7 +345,7 @@ export function InvoicesTable({
       ),
       cell: ({ row }) =>
         row.original.payment_date
-          ? dayjs(row.original.payment_date).utc().format('DD/MM/YYYY HH:mm')
+          ? dayjs(row.original.payment_date).format('DD/MM/YYYY HH:mm')
           : '-',
       enableSorting: true,
     },
@@ -355,7 +384,7 @@ export function InvoicesTable({
             onClick: () => handleOpenDialog(row.original),
           },
           {
-            label: 'Ver comprobante',
+            label: 'Ver comprobante adjunto',
             icon: <Eye className='h-4 w-4' />,
             onClick: () => {},
             href: row.original.attached_receipt ?? '',
@@ -384,38 +413,40 @@ export function InvoicesTable({
   ];
 
   return (
-    <>
-      <Toaster />
-      <DataTable
-        columns={columns}
-        data={items ?? []}
-        tableTitle='Facturas'
-        pagination={pagination}
-        getRowId={(row) => row.id}
-        filterableColumns={filterableColumns}
-        searchParams={{
-          page: String(currentPage),
-          limit: String(currentLimit),
-          sort_by: currentSortBy || undefined,
-          sort_direction: currentSortDirection || undefined,
-          filters: activeFilters,
-        }}
-        onPageChange={handlePageChange}
-        onLimitChange={handleLimitChange}
-        onSortingChange={handleSortingChange}
-        onFilterChange={handleFilterChange}
-      />
+    <Card className='col-span-12 2xl:col-span-10'>
+      <CardContent>
+        <Toaster />
+        <DataTable
+          columns={columns}
+          data={items ?? []}
+          tableTitle='Facturas'
+          pagination={pagination}
+          getRowId={(row) => row.id}
+          filterableColumns={filterableColumns}
+          searchParams={{
+            page: String(currentPage),
+            limit: String(currentLimit),
+            sort_by: currentSortBy || undefined,
+            sort_direction: currentSortDirection || undefined,
+            filters: activeFilters,
+          }}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
+          onSortingChange={handleSortingChange}
+          onFilterChange={handleFilterChange}
+        />
 
-      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-        <DialogContent className='max-w-3xl'>
-          <DialogHeader>
-            <DialogTitle>Detalles de la Factura</DialogTitle>
-          </DialogHeader>
-          <ScrollArea className='h-[600px] pr-4'>
-            {selectedInvoice && renderInvoiceDetails(selectedInvoice)}
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
-    </>
+        <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+          <DialogContent className='max-w-3xl'>
+            <DialogHeader>
+              <DialogTitle>Detalles de la Factura</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className='h-[calc(90vh-8rem)] pr-4'>
+              {selectedInvoice && renderInvoiceDetails(selectedInvoice)}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   );
 }
