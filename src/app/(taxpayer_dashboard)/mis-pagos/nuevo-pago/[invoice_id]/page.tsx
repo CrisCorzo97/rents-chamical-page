@@ -9,6 +9,12 @@ import {
 import Link from 'next/link';
 import { PaymentInstructionsCard } from '../../components/payment-instruction-card';
 import { getInvoice } from '../../services/invoices.actions';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Instrucciones para el pago',
+  description: 'Instrucciones para el pago de impuestos y multas',
+};
 
 export default async function PaymentInstructionsPage({
   params,

@@ -9,6 +9,12 @@ import {
 import Link from 'next/link';
 import { PeriodSelectionCard } from '../components/period-selection-card';
 import { getConceptsToPay } from '../services/invoices.actions';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Nuevo Pago',
+  description: 'Pago de impuestos y multas',
+};
 
 export default async function NewInvoicePage() {
   const { data: concepts } = await getConceptsToPay();

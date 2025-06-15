@@ -14,6 +14,12 @@ import Link from 'next/link';
 import { AffidavitsTable } from './components/affidavits-table';
 import { CreateAffidavitButton } from './components/create-affidavit-button';
 import dayjs from 'dayjs';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Mis Declaraciones',
+  description: 'Gestión de declaraciones de impuestos',
+};
 
 export default async function MisDeclaracionesPage({
   searchParams,

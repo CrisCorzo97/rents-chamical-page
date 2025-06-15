@@ -15,6 +15,12 @@ import {
   getPeriodsDueDate,
   validateOblea,
 } from './services/overview.action';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Resumen',
+  description: 'Portal de contribuyentes',
+};
 
 export default async function ResumenPage() {
   const [

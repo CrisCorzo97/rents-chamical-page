@@ -28,9 +28,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui';
+import { Metadata } from 'next';
 
 dayjs.locale(locale);
 dayjs.extend(utc);
+
+export const metadata: Metadata = {
+  title: 'Nueva Declaración',
+  description: 'Presentación de nueva declaración',
+};
 
 export default async function NuevaDeclaracionPage({
   searchParams,

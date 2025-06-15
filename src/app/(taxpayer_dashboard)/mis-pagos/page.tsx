@@ -10,6 +10,12 @@ import Link from 'next/link';
 import { getInvoices } from './services/invoices.actions';
 import { InvoicesTable } from './components/invoices-table';
 import { Button } from '@/components/ui/button';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Mis Pagos',
+  description: 'Gestión de pagos de impuestos y multas',
+};
 
 export default async function MisPagosPage({
   searchParams,
