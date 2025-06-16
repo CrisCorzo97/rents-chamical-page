@@ -57,22 +57,27 @@ export async function updateSession(request: NextRequest) {
     const isLogged = !!user;
     const isTaxpayerUser = isLogged && user.user_metadata.role_id === 5;
 
+    const parsedRedirectTo = request.nextUrl.pathname.replaceAll('/', '_');
+
     // Redirigir usuarios no autenticados
     if (!isLogged && (isAdminRoute || isTaxpayerRoute)) {
       url.pathname = isAdminRoute
-        ? '/auth/ingresar'
-        : '/auth/portal-contribuyente/ingresar';
+        ? `/auth/ingresar`
+        : `/auth/portal-contribuyente/ingresar`;
+      url.searchParams.set('redirect_to', parsedRedirectTo);
       return NextResponse.redirect(url);
     }
 
     // Redirigir usuarios autenticados pero sin los permisos correctos
     if (isLogged && isAdminRoute && isTaxpayerUser) {
-      url.pathname = '/auth/ingresar';
+      url.pathname = `/auth/ingresar`;
+      url.searchParams.set('redirect_to', parsedRedirectTo);
       return NextResponse.redirect(url);
     }
 
     if (isLogged && isTaxpayerRoute && !isTaxpayerUser) {
-      url.pathname = '/auth/portal-contribuyente/ingresar';
+      url.pathname = `/auth/portal-contribuyente/ingresar`;
+      url.searchParams.set('redirect_to', parsedRedirectTo);
       return NextResponse.redirect(url);
     }
 
