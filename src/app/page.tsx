@@ -6,145 +6,190 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import { MainHeader } from './ui';
-import { ChevronRight, Info, KeyRound } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui';
+import { CreditCard, FileText, Info, User, Building } from 'lucide-react';
+import { Button } from '@/components/ui';
+import dayjs from 'dayjs';
 
 export default async function Home() {
   return (
     <main className='min-h-screen flex flex-col'>
       <MainHeader />
-      <section className='grow p-4 mb-8'>
-        <div className='h-12' />
-
-        <article className='max-w-6xl mx-auto mb-8'>
-          <h1 className='text-4xl font-semibold pb-4'>
-            ¡Bienvenido a la Dirección de Rentas Municipales!
+      {/* Hero Section */}
+      <section className='bg-gradient-to-b from-gray-900 to-gray-300 py-20 px-6'>
+        <div className='max-w-5xl mx-auto text-center'>
+          <h1 className='text-4xl md:text-5xl font-bold mb-6 text-primary-foreground'>
+            Te damos la bienvenida a Rentas Digital
           </h1>
-          <p className='text-lg font-light pb-4'>
-            Este sistema ha sido diseñado para ofrecerte información clara,
-            precisa y accesible sobre tus trámites y contribuciones tributarias.
-            Desde aquí, podrás explorar todas las opciones disponibles,
-            consultar el estado de tus tasas y acceder a novedades importantes.
+          <p className='text-xl opacity-90 mb-8 max-w-3xl mx-auto text-primary-foreground'>
+            Gestioná tus tributos municipales de forma rápida, segura y desde
+            cualquier lugar
           </p>
-          <p className='text-lg font-light pb-4'>
-            Elige una de las siguientes opciones para comenzar:
-          </p>
+          <div className='flex flex-col sm:flex-row gap-4 justify-center'>
+            <Link href='/auth/portal-contribuyente/ingresar'>
+              <Button size='lg' variant='outline'>
+                Portal de Contribuyentes
+              </Button>
+            </Link>
+            <Link href='/auth/ingresar'>
+              <Button size='lg' variant='outline'>
+                Portal Administrativo
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-          <div className='mb-8 flex flex-wrap gap-4'>
-            <Link href='/tramites/DDJJ-actividad-comercial' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
-                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
-                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
-                    <CardTitle className='text-xl'>
-                      Presentación de DDJJ
-                    </CardTitle>
-                    <CardDescription>
-                      Realiza la presentación de tu Declaración Jurada de
-                      Actividad Comercial de forma rápida y sencilla.
-                    </CardDescription>
+      {/* Features Section */}
+      <section className='py-16 px-6 bg-card'>
+        <div className='max-w-6xl mx-auto'>
+          <h2 className='text-3xl font-bold text-center mb-12'>
+            ¿Qué puede hacer en nuestra plataforma?
+          </h2>
+
+          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {/* Feature 1 - DDJJ */}
+            <Link href='/mis-declaraciones' prefetch>
+              <Card className='h-full hover:shadow-md transition-all'>
+                <CardContent className='p-6 flex flex-col items-center text-center'>
+                  <div className='bg-pink-100 p-3 rounded-full mb-4'>
+                    <FileText className='h-8 w-8 text-primary' />
                   </div>
-                  <ChevronRight className='w-8 h-8' />
+                  <CardTitle className='text-xl font-semibold mb-2'>
+                    Declaraciones Juradas
+                  </CardTitle>
+                  <CardDescription>
+                    Presente y gestione sus declaraciones juradas de manera
+                    simple y eficiente.
+                  </CardDescription>
                 </CardContent>
               </Card>
             </Link>
+
+            {/* Feature 2 - Oblea */}
             <Link href='/tramites/oblea/generar' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer relative transition-all hover:text-primary'>
-                <Badge
-                  variant='info'
-                  className='text-white absolute -top-2 right-2 px-2'
-                >
-                  !
-                </Badge>
-                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
-                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden'>
-                    <CardTitle className='text-xl'>Generar Oblea</CardTitle>
-                    <CardDescription>
-                      Ingresa tu número de CUIT para generar la oblea
-                      correspondiente a tu licencia comercial.
-                    </CardDescription>
+              <Card className='h-full hover:shadow-md transition-all'>
+                <CardContent className='p-6 flex flex-col items-center text-center'>
+                  <div className='bg-pink-100 p-3 rounded-full mb-4'>
+                    <Building className='h-8 w-8 text-primary' />
                   </div>
-                  <ChevronRight className='w-8 h-8' />
+                  <CardTitle className='text-xl font-semibold mb-2'>
+                    Oblea de Habilitación Comercial
+                  </CardTitle>
+                  <CardDescription>
+                    Genere y descargue su oblea de habilitación comercial de
+                    manera ágil.
+                  </CardDescription>
                 </CardContent>
               </Card>
             </Link>
+
+            {/* Feature 3 - Estado Impositivo */}
             <Link href='/tramites/consultas' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
-                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
-                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
-                    <CardTitle className='text-xl'>Consulta</CardTitle>
-                    <CardDescription>
-                      Verifica el estado impositivo de tus tasas y
-                      contribuciones. Simplemente ingresa el identificador
-                      correspondiente para acceder a la información de tus
-                      obligaciones tributarias.
-                    </CardDescription>
+              <Card className='h-full hover:shadow-md transition-all'>
+                <CardContent className='p-6 flex flex-col items-center text-center'>
+                  <div className='bg-pink-100 p-3 rounded-full mb-4'>
+                    <FileText className='h-8 w-8 text-primary' />
                   </div>
-                  <ChevronRight className='w-8 h-8' />
+                  <CardTitle className='text-xl font-semibold mb-2'>
+                    Estado Impositivo
+                  </CardTitle>
+                  <CardDescription>
+                    Verifique la situación fiscal de sus tasas y contribuciones
+                    municipales de forma rápida y segura.
+                  </CardDescription>
                 </CardContent>
               </Card>
             </Link>
-            <Link href='/informacion/novedades' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
-                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
-                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
-                    <CardTitle className='text-xl'>Novedades</CardTitle>
-                    <CardDescription>
-                      Entérate de las últimas noticias y actualizaciones
-                      relacionadas con la Dirección de Rentas y sus servicios.
-                      Consulta los comunicados oficiales y novedades destacadas.
-                    </CardDescription>
+
+            {/* Feature 4 - Historial de Pagos */}
+            <Link href='/mis-pagos' prefetch>
+              <Card className='h-full hover:shadow-md transition-all'>
+                <CardContent className='p-6 flex flex-col items-center text-center'>
+                  <div className='bg-pink-100 p-3 rounded-full mb-4'>
+                    <CreditCard className='h-8 w-8 text-primary' />
                   </div>
-                  <ChevronRight className='w-8 h-8' />
+                  <CardTitle className='text-xl font-semibold mb-2'>
+                    Historial de Pagos
+                  </CardTitle>
+                  <CardDescription>
+                    Acceda a un registro detallado de sus pagos realizados y
+                    descargue los comprobantes correspondientes.
+                  </CardDescription>
                 </CardContent>
               </Card>
             </Link>
+
+            {/* Feature 5 - Fechas Importantes */}
+            <Link href='/informacion/calendario' prefetch>
+              <Card className='h-full hover:shadow-md transition-all'>
+                <CardContent className='p-6 flex flex-col items-center text-center'>
+                  <div className='bg-pink-100 p-3 rounded-full mb-4'>
+                    <Info className='h-8 w-8 text-primary' />
+                  </div>
+                  <CardTitle className='text-xl font-semibold mb-2'>
+                    Fechas Importantes
+                  </CardTitle>
+                  <CardDescription>
+                    Consulte el calendario con los plazos relevantes para el
+                    pago de tasas y contribuciones municipales.
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Feature 6 - Atención al Ciudadano */}
             <Link href='/centro-de-ayuda/contacto' prefetch>
-              <Card className='min-h-40 w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
-                <CardContent className='w-full p-4 py-4 flex gap-4 items-start'>
-                  <div className='w-full flex flex-col justify-between gap-2 overflow-hidden '>
-                    <CardTitle className='text-xl'>Contacto</CardTitle>
-                    <CardDescription>
-                      ¿Tienes preguntas o necesitas ayuda? Comunícate con
-                      nosotros a través de los distintos canales disponibles o
-                      consulta las respuestas a las preguntas frecuentes.
-                    </CardDescription>
+              <Card className='h-full hover:shadow-md transition-all md:col-span-2 lg:col-span-1'>
+                <CardContent className='p-6 flex flex-col items-center text-center'>
+                  <div className='bg-pink-100 p-3 rounded-full mb-4'>
+                    <User className='h-8 w-8 text-primary' />
                   </div>
-                  <ChevronRight className='w-8 h-8' />
+                  <CardTitle className='text-xl font-semibold mb-2'>
+                    Atención al Ciudadano
+                  </CardTitle>
+                  <CardDescription>
+                    Brindamos información clara y precisa sobre tasas y trámites
+                    disponibles para facilitar su gestión.
+                  </CardDescription>
                 </CardContent>
               </Card>
             </Link>
           </div>
-
-          <h3 className='text-2xl font-semibold pb-4'>Acceso Administrativo</h3>
-          <Alert className='mb-8 w-full bg-blue-100 border-blue-500'>
-            <Info className='w-4 h-4' />
-            <AlertTitle>
-              Zona Exclusiva para Usuarios Administrativos
-            </AlertTitle>
-            <AlertDescription>
-              Este espacio está reservado para el personal autorizado de la
-              Dirección de Rentas. Si eres un usuario administrativo, ingresa
-              tus credenciales para acceder al sistema de backoffice.
-            </AlertDescription>
-          </Alert>
-
-          <Link href='/auth/callback' prefetch={false}>
-            <Card className='w-full max-w-md flex items-start cursor-pointer transition-all hover:text-primary'>
-              <CardContent className='w-full p-4 py-4 flex gap-4 items-center justify-between'>
-                <KeyRound className='w-12 h-12' />
-                <div className='w-full flex gap-4'>
-                  <CardTitle className='text-xl'>
-                    Panel administrativo
-                  </CardTitle>
-                </div>
-                <ChevronRight className='w-8 h-8' />
-              </CardContent>
-            </Card>
-          </Link>
-        </article>
+        </div>
       </section>
-      {/* <footer className='w-full h-28 bg-slate-200 grow-0 mt-8' /> */}
+
+      <footer className='bg-border py-8 px-6 mt-auto'>
+        <div className='max-w-6xl mx-auto'>
+          <div className='flex flex-col md:flex-row justify-between items-center gap-4'>
+            <div className='flex items-center gap-2'>
+              <Building className='h-6 w-6' />
+              <span className='font-semibold'>
+                Municipalidad de Chamical © {dayjs().year()}
+              </span>
+            </div>
+            <div className='flex gap-8'>
+              {/* <Link
+                href='/terms'
+                className='text-muted-foreground hover:text-foreground transition'
+              >
+                Términos y Condiciones
+              </Link>
+              <Link
+                href='/privacy'
+                className='text-muted-foreground hover:text-foreground transition'
+              >
+                Política de Privacidad
+              </Link> */}
+              <Link
+                href='/contact'
+                className='text-muted-foreground hover:text-foreground transition'
+              >
+                Contacto
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
