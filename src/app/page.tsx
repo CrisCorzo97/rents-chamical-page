@@ -15,8 +15,9 @@ export default async function Home() {
     <main className='min-h-screen flex flex-col'>
       <MainHeader />
       {/* Hero Section */}
-      <section className='bg-gradient-to-b from-gray-900 to-gray-300 py-20 px-6'>
-        <div className='max-w-5xl mx-auto text-center'>
+      <section className='relative bg-[url("/banner.jpg")] bg-cover bg-center py-20 px-6'>
+        <div className='absolute inset-0 bg-gradient-to-b from-zinc-950/80 to-zinc-600/60'></div>
+        <div className='relative max-w-5xl mx-auto text-center'>
           <h1 className='text-4xl md:text-5xl font-bold mb-6 text-primary-foreground'>
             Te damos la bienvenida a Rentas Digital
           </h1>
@@ -25,12 +26,12 @@ export default async function Home() {
             cualquier lugar
           </p>
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-            <Link href='/auth/portal-contribuyente/ingresar'>
+            <Link href='/resumen'>
               <Button size='lg' variant='outline'>
                 Portal de Contribuyentes
               </Button>
             </Link>
-            <Link href='/auth/ingresar'>
+            <Link href='/private/admin/receipts'>
               <Button size='lg' variant='outline'>
                 Portal Administrativo
               </Button>
@@ -162,7 +163,6 @@ export default async function Home() {
         <div className='max-w-6xl mx-auto'>
           <div className='flex flex-col md:flex-row justify-between items-center gap-4'>
             <div className='flex items-center gap-2'>
-              <Building className='h-6 w-6' />
               <span className='font-semibold'>
                 Municipalidad de Chamical © {dayjs().year()}
               </span>
