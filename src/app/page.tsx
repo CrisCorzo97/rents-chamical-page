@@ -181,7 +181,13 @@ export default async function Home() {
                 Política de Privacidad
               </Link> */}
               <Link
-                href='/contact'
+                href='/organismo/sobre-rentas'
+                className='text-muted-foreground hover:text-foreground transition'
+              >
+                Sobre Nosotros
+              </Link>
+              <Link
+                href='/centro-de-ayuda/contacto'
                 className='text-muted-foreground hover:text-foreground transition'
               >
                 Contacto
