@@ -23,11 +23,9 @@ export const metadata: Metadata = {
 };
 
 export default async function ResumenPage() {
-  const [
-    { data: balance },
-    { data: periodsDueDate, pagination },
-    { canGenerate },
-  ] = await Promise.all([getBalance(), getPeriodsDueDate(), validateOblea()]);
+  const { data: balance } = await getBalance();
+  const { data: periodsDueDate, pagination } = await getPeriodsDueDate();
+  const { canGenerate } = await validateOblea();
 
   return (
     <div className='flex flex-col gap-4'>

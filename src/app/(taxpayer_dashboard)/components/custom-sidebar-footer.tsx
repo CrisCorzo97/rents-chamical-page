@@ -10,7 +10,7 @@ export const CustomSidebarFooter = () => {
   return (
     <SidebarFooter>
       <SidebarMenu>
-        <SidebarMenuItem>
+        <SidebarMenuItem data-tour='ajustes-cuenta'>
           <SidebarMenuButton
             size='lg'
             className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground [&>svg]:size-6'

@@ -16,6 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui';
+import { TourProvider } from '@/components/tour/tour-provider';
 
 export default async function TaxpayerDashboardLayout({
   children,
@@ -24,52 +25,57 @@ export default async function TaxpayerDashboardLayout({
 }) {
   const taxpayerData = await getTaxpayerData();
   return (
-    <TaxpayerDataProvider taxpayerData={taxpayerData}>
-      <SidebarProvider defaultOpen>
-        <CustomSidebar />
-        <SidebarInset>
-          <header className='flex h-14 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-13'>
-            <div className='flex w-full items-center justify-between gap-2 px-4'>
-              <SidebarTrigger className='-ml-1' />
+    <TourProvider>
+      <TaxpayerDataProvider taxpayerData={taxpayerData}>
+        <SidebarProvider defaultOpen>
+          <CustomSidebar />
+          <SidebarInset>
+            <header className='flex h-14 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-13'>
+              <div className='flex w-full items-center justify-between gap-2 px-4'>
+                <SidebarTrigger className='-ml-1' />
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className='flex items-center gap-2 outline-none hover:bg-sidebar-border rounded-lg px-2 py-1 transition-colors'>
-                  <CircleUserRound size={24} />
-                  <div className='flex flex-col items-start'>
-                    <span className='text-sm font-medium'>
-                      {`${formatName(
-                        taxpayerData?.user.user_metadata.first_name ?? '-'
-                      )} ${formatName(
-                        taxpayerData?.user.user_metadata.last_name ?? '-'
-                      )}`}
-                    </span>
-                    <span className='text-xs text-muted-foreground'>
-                      {taxpayerData?.user.user_metadata.tax_id ?? '-'}
-                    </span>
-                  </div>
-                  <ChevronDown className='h-4 w-4' />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side='bottom' align='end'>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href='/auth/logout'
-                      className='rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10'
-                    >
-                      {/* <Button variant='destructive' size='sm'> */}
-                      <LogOut className='h-4 w-4 mr-2' />
-                      Cerrar Sesión
-                      {/* </Button> */}
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className='flex items-center gap-2 outline-none hover:bg-sidebar-border rounded-lg px-2 py-1 transition-colors'
+                    data-tour='datos-contribuyente'
+                  >
+                    <CircleUserRound size={24} />
+                    <div className='flex flex-col items-start'>
+                      <span className='text-sm font-medium'>
+                        {`${formatName(
+                          taxpayerData?.user.user_metadata.first_name ?? '-'
+                        )} ${formatName(
+                          taxpayerData?.user.user_metadata.last_name ?? '-'
+                        )}`}
+                      </span>
+                      <span className='text-xs text-muted-foreground'>
+                        {taxpayerData?.user.user_metadata.tax_id ?? '-'}
+                      </span>
+                    </div>
+                    <ChevronDown className='h-4 w-4' />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side='bottom' align='end'>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href='/auth/logout'
+                        className='rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10'
+                      >
+                        {/* <Button variant='destructive' size='sm'> */}
+                        <LogOut className='h-4 w-4 mr-2' />
+                        Cerrar Sesión
+                        {/* </Button> */}
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </header>
+            <div className='flex flex-1 bg-zinc-200 flex-col gap-4 p-4 pt-4'>
+              {children}
             </div>
-          </header>
-          <div className='flex flex-1 bg-zinc-200 flex-col gap-4 p-4 pt-4'>
-            {children}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </TaxpayerDataProvider>
+          </SidebarInset>
+        </SidebarProvider>
+      </TaxpayerDataProvider>
+    </TourProvider>
   );
 }

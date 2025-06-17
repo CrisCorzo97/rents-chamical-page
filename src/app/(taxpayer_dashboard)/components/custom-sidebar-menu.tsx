@@ -16,21 +16,25 @@ const menuItems: {
   title: string;
   icon: React.ElementType;
   href: string;
+  id: string;
 }[] = [
   {
     title: 'Resumen',
     icon: BarChart3,
     href: '/resumen',
+    id: 'resumen',
   },
   {
     title: 'Mis DDJJ',
     icon: FileText,
     href: '/mis-declaraciones',
+    id: 'mis-declaraciones',
   },
   {
     title: 'Mis Pagos',
     icon: Wallet,
     href: '/mis-pagos',
+    id: 'mis-pagos',
   },
 ];
 
@@ -43,7 +47,7 @@ export const CustomSidebarContent = () => {
     <SidebarContent>
       <SidebarMenu>
         {menuItems.map((item) => (
-          <SidebarMenuItem key={item.href}>
+          <SidebarMenuItem key={item.href} data-tour={item.id}>
             <SidebarMenuButton
               isActive={pathname === item.href}
               tooltip={item.title}
