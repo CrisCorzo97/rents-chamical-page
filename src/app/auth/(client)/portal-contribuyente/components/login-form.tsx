@@ -28,7 +28,7 @@ const formSchema = z.object({
     .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' }),
 });
 
-export function LoginForm() {
+export function LoginForm({ redirect_to }: { redirect_to?: string }) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [taxId, setTaxId] = useState<string>('');
@@ -49,7 +49,11 @@ export function LoginForm() {
       try {
         formSchema.parse({ tax_id, password });
 
-        const { error, data } = await login({ tax_id, password });
+        const { error, data } = await login({
+          tax_id,
+          password,
+          redirect_to,
+        });
 
         if (error) {
           throw new Error(error);

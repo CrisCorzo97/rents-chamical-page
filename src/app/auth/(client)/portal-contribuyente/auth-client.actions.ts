@@ -10,9 +10,11 @@ import { buildQuery } from '@/lib/url';
 export const login = async ({
   tax_id,
   password,
+  redirect_to,
 }: {
   tax_id: string;
   password: string;
+  redirect_to?: string;
 }): Promise<Envelope<{ redirectUrl: string }>> => {
   const response: Envelope<{ redirectUrl: string }> = {
     success: false,
@@ -48,7 +50,7 @@ export const login = async ({
     response.success = true;
     response.data = {
       redirectUrl: `/auth/portal-contribuyente/callback${buildQuery({
-        redirect_to: '/tramites/DDJJ-actividad-comercial',
+        redirect_to: redirect_to?.replaceAll('_', '/') || '/resumen',
       })}`,
     };
   } catch (error) {

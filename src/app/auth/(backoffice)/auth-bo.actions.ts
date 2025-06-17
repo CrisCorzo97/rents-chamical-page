@@ -7,13 +7,16 @@ import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
 import { role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { buildQuery } from '@/lib/url';
 
 export const login = async ({
   email,
   password,
+  redirect_to,
 }: {
   email: string;
   password: string;
+  redirect_to?: string;
 }): Promise<Envelope<{ redirectUrl: string }>> => {
   const response: Envelope<{ redirectUrl: string }> = {
     success: false,
@@ -36,7 +39,12 @@ export const login = async ({
     }
 
     response.success = true;
-    response.data = { redirectUrl: '/auth/callback' };
+    response.data = {
+      redirectUrl: `/auth/callback${buildQuery({
+        redirect_to:
+          redirect_to?.replaceAll('_', '/') || '/private/admin/receipts',
+      })}`,
+    };
   } catch (error) {
     console.error(error);
     response.success = false;

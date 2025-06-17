@@ -1,7 +1,14 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const taxpayerProtectedRoutes = ['/tramites/DDJJ-actividad-comercial'];
+// Rutas protegidas que requieren autenticación de contribuyente (role_id = 5)
+const taxpayerProtectedRoutes = [
+  '/tramites/DDJJ-actividad-comercial',
+  '/resumen',
+  '/mis-declaraciones',
+  '/mis-pagos',
+  '/mi-cuenta',
+];
 
 export async function updateSession(request: NextRequest) {
   try {
@@ -37,8 +44,8 @@ export async function updateSession(request: NextRequest) {
     // issues with users being randomly logged out.
 
     const isAdminRoute = request.nextUrl.pathname.startsWith('/private');
-    const isTaxpayerProtectedRoute = taxpayerProtectedRoutes.includes(
-      request.nextUrl.pathname
+    const isTaxpayerRoute = taxpayerProtectedRoutes.some((route) =>
+      request.nextUrl.pathname.startsWith(route)
     );
 
     let url = request.nextUrl.clone();
@@ -48,23 +55,29 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     const isLogged = !!user;
-
     const isTaxpayerUser = isLogged && user.user_metadata.role_id === 5;
 
-    if (!isLogged && (isAdminRoute || isTaxpayerProtectedRoute)) {
+    const parsedRedirectTo = request.nextUrl.pathname.replaceAll('/', '_');
+
+    // Redirigir usuarios no autenticados
+    if (!isLogged && (isAdminRoute || isTaxpayerRoute)) {
       url.pathname = isAdminRoute
-        ? '/auth/ingresar'
-        : '/auth/portal-contribuyente/ingresar';
+        ? `/auth/ingresar`
+        : `/auth/portal-contribuyente/ingresar`;
+      url.searchParams.set('redirect_to', parsedRedirectTo);
       return NextResponse.redirect(url);
     }
 
+    // Redirigir usuarios autenticados pero sin los permisos correctos
     if (isLogged && isAdminRoute && isTaxpayerUser) {
-      url.pathname = '/auth/ingresar';
+      url.pathname = `/auth/ingresar`;
+      url.searchParams.set('redirect_to', parsedRedirectTo);
       return NextResponse.redirect(url);
     }
 
-    if (isLogged && isTaxpayerProtectedRoute && !isTaxpayerUser) {
-      url.pathname = '/auth/portal-contribuyente/ingresar';
+    if (isLogged && isTaxpayerRoute && !isTaxpayerUser) {
+      url.pathname = `/auth/portal-contribuyente/ingresar`;
+      url.searchParams.set('redirect_to', parsedRedirectTo);
       return NextResponse.redirect(url);
     }
 
