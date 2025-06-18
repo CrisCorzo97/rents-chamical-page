@@ -317,7 +317,6 @@ async function validateOblea(input: {
         const periodMonth = dayjs(affidavit.period).month();
         return periodMonth === month && affidavit.status === 'approved';
       });
-      console.log({ month, affidavit });
       return affidavit !== undefined;
     });
 
