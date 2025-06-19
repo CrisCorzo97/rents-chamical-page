@@ -281,15 +281,15 @@ const PageComponent = ({
                 <Text
                   style={{
                     ...styles.contentTableHeaderCell,
-                    width: '30%',
+                    width: '25%',
                   }}
                 >
                   Contribuyente
                 </Text>
                 <Text
-                  style={{ ...styles.contentTableHeaderCell, width: '30%' }}
+                  style={{ ...styles.contentTableHeaderCell, width: '35%' }}
                 >
-                  Tasa
+                  Concepto
                 </Text>
                 <Text
                   style={{ ...styles.contentTableHeaderCell, width: '15%' }}
@@ -320,13 +320,13 @@ const PageComponent = ({
                       <Text
                         style={{
                           ...styles.contentTableBodyCell,
-                          width: '30%',
+                          width: '25%',
                         }}
                       >
                         {formatName(item.taxpayer)}
                       </Text>
                       <Text
-                        style={{ ...styles.contentTableBodyCell, width: '30%' }}
+                        style={{ ...styles.contentTableBodyCell, width: '35%' }}
                       >
                         {formatName(item.tax_type)}
                       </Text>
@@ -400,11 +400,7 @@ const PageComponent = ({
                         width: '15%',
                       }}
                     >
-                      $
-                      {(amount || 0).toLocaleString('es-AR', {
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2,
-                      })}
+                      {formatNumberToCurrency(amount || 0)}
                     </Text>
                   </View>
                 ))}
@@ -433,11 +429,7 @@ const PageComponent = ({
                   width: '15%',
                 }}
               >
-                $
-                {(totalAmountCollectedAllPages || 0).toLocaleString('es-AR', {
-                  maximumFractionDigits: 2,
-                  minimumFractionDigits: 2,
-                })}
+                {formatNumberToCurrency(totalAmountCollectedAllPages || 0)}
               </Text>
             </View>
           )}
