@@ -5,6 +5,7 @@ import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope, PaginationParams } from '@/types/envelope';
 import {
   affidavit,
+  invoice,
   declarable_tax,
   Prisma,
   receipt,
@@ -17,15 +18,29 @@ import { DailyBoxContent } from './components/dailyBoxReport';
 
 type AllReceipts =
   | (receipt & { type: 'receipt' })
-  | (affidavit & {
-      user: user;
-      declarable_tax: declarable_tax;
-      type: 'affidavit';
-    })
-  | (tax_penalties & {
-      user: user;
-      declarable_tax: declarable_tax;
-      type: 'tax_penalty';
+  // | (affidavit & {
+  //     user: user;
+  //     declarable_tax: declarable_tax;
+  //     type: 'affidavit';
+  //   })
+  // | (tax_penalties & {
+  //     user: user;
+  //     declarable_tax: declarable_tax;
+  //     type: 'tax_penalty';
+  //   })
+  | (invoice & {
+      user: user | null;
+      tax_penalties:
+        | (tax_penalties & {
+            declarable_tax: declarable_tax;
+          })[]
+        | null;
+      affidavit:
+        | (affidavit & {
+            declarable_tax: declarable_tax;
+          })[]
+        | null;
+      type: 'invoice';
     });
 
 export const getReceiptById = async (input: { id: string }) => {
@@ -316,25 +331,7 @@ export const generateDailyBoxReport = async (date: string) => {
       },
     });
 
-    const affidavits = await dbSupabase.affidavit.findMany({
-      where: {
-        status: 'approved',
-        approved_at: {
-          not: null,
-          gte: dayjs(date).startOf('day').toISOString(),
-          lte: dayjs(date).endOf('day').toISOString(),
-        },
-      },
-      orderBy: {
-        approved_at: 'asc',
-      },
-      include: {
-        declarable_tax: true,
-        user: true,
-      },
-    });
-
-    const taxPenalties = await dbSupabase.tax_penalties.findMany({
+    const invoices = await dbSupabase.invoice.findMany({
       where: {
         payment_date: {
           not: null,
@@ -346,16 +343,21 @@ export const generateDailyBoxReport = async (date: string) => {
         payment_date: 'asc',
       },
       include: {
-        declarable_tax: true,
         user: true,
+        affidavit: {
+          include: {
+            declarable_tax: true,
+          },
+        },
+        tax_penalties: {
+          include: {
+            declarable_tax: true,
+          },
+        },
       },
     });
 
-    if (
-      !confirmedReceipts.length &&
-      !affidavits.length &&
-      !taxPenalties.length
-    ) {
+    if (!confirmedReceipts.length && !invoices.length) {
       response.data = {
         total_amount_collected: 0,
         total_receipts: 0,
@@ -396,29 +398,43 @@ export const generateDailyBoxReport = async (date: string) => {
       }
     }
 
-    for (const affidavit of affidavits) {
-      allReceipts.push({ ...affidavit, type: 'affidavit' });
-      total_amount += affidavit.fee_amount;
+    for (const invoice of invoices) {
+      allReceipts.push({ ...invoice, type: 'invoice' });
+      total_amount += invoice.total_amount;
 
-      const taxType = `DDJJ MENSUAL ${affidavit.declarable_tax.name.toUpperCase()}`;
+      const taxType = 'INTERESES';
 
       if (details[taxType]) {
-        details[taxType] += affidavit.fee_amount;
+        details[taxType] += invoice.compensatory_interest ?? 0;
       } else {
-        details[taxType] = affidavit.fee_amount;
+        details[taxType] = invoice.compensatory_interest ?? 0;
       }
-    }
 
-    for (const taxPenalty of taxPenalties) {
-      allReceipts.push({ ...taxPenalty, type: 'tax_penalty' });
-      total_amount += taxPenalty.amount;
+      const includeAffidavit = !!invoice.affidavit;
+      const includeTaxPenalty = !!invoice.tax_penalties;
 
-      const taxType = `MULTA ${taxPenalty.declarable_tax.name.toUpperCase()}`;
+      if (includeAffidavit) {
+        for (const affidavit of invoice.affidavit) {
+          const taxType = `DDJJ MENSUAL ${affidavit.declarable_tax.name.toUpperCase()}`;
 
-      if (details[taxType]) {
-        details[taxType] += taxPenalty.amount;
-      } else {
-        details[taxType] = taxPenalty.amount;
+          if (details[taxType]) {
+            details[taxType] += affidavit.fee_amount;
+          } else {
+            details[taxType] = affidavit.fee_amount;
+          }
+        }
+      }
+
+      if (includeTaxPenalty) {
+        for (const taxPenalty of invoice.tax_penalties) {
+          const taxType = `MULTA ${taxPenalty.declarable_tax.name.toUpperCase()}`;
+
+          if (details[taxType]) {
+            details[taxType] += taxPenalty.amount;
+          } else {
+            details[taxType] = taxPenalty.amount;
+          }
+        }
       }
     }
 
@@ -452,32 +468,17 @@ export const generateDailyBoxReport = async (date: string) => {
             ],
             totalItems: 1,
           });
-        } else if (rec.type === 'affidavit') {
+        } else if (rec.type === 'invoice') {
           pageData.push({
             page: pageData.length + 1,
-            subtotal: rec.fee_amount,
+            subtotal: rec.total_amount,
             receipts: [
               {
-                id: rec.invoice_id!,
-                paid_at: rec.approved_at!,
-                taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
-                tax_type: `DDJJ MENSUAL ${rec.declarable_tax.name.toUpperCase()}`,
-                amount: rec.fee_amount,
-              },
-            ],
-            totalItems: 1,
-          });
-        } else if (rec.type === 'tax_penalty') {
-          pageData.push({
-            page: pageData.length + 1,
-            subtotal: rec.amount,
-            receipts: [
-              {
-                id: rec.invoice_id!,
+                id: rec.id,
                 paid_at: rec.payment_date!,
-                taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
-                tax_type: `MULTA ${rec.declarable_tax.name.toUpperCase()}`,
-                amount: rec.amount,
+                taxpayer: `${rec.user?.first_name.toUpperCase()} ${rec.user?.last_name.toUpperCase()}`,
+                tax_type: 'FACTURA PAGO ACTIVIDAD COMERCIAL',
+                amount: rec.total_amount,
               },
             ],
             totalItems: 1,
@@ -496,24 +497,14 @@ export const generateDailyBoxReport = async (date: string) => {
             amount: rec.amount,
           });
           lastPage!.totalItems += 1;
-        } else if (rec.type === 'affidavit') {
-          lastPage!.subtotal += rec.fee_amount;
+        } else if (rec.type === 'invoice') {
+          lastPage!.subtotal += rec.total_amount;
           lastPage!.receipts.push({
-            id: rec.invoice_id!,
-            paid_at: rec.approved_at!,
-            taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
-            tax_type: `DDJJ MENSUAL ${rec.declarable_tax.name.toUpperCase()}`,
-            amount: rec.fee_amount,
-          });
-          lastPage!.totalItems += 1;
-        } else if (rec.type === 'tax_penalty') {
-          lastPage!.subtotal += rec.amount;
-          lastPage!.receipts.push({
-            id: rec.invoice_id!,
+            id: rec.id,
             paid_at: rec.payment_date!,
-            taxpayer: `${rec.user.first_name.toUpperCase()} ${rec.user.last_name.toUpperCase()}`,
-            tax_type: `MULTA ${rec.declarable_tax.name.toUpperCase()}`,
-            amount: rec.amount,
+            taxpayer: `${rec.user?.first_name.toUpperCase()} ${rec.user?.last_name.toUpperCase()}`,
+            tax_type: 'FACTURA PAGO ACTIVIDAD COMERCIAL',
+            amount: rec.total_amount,
           });
           lastPage!.totalItems += 1;
         }
