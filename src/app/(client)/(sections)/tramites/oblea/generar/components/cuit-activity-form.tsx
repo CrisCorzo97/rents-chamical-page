@@ -203,7 +203,7 @@ export default function CuitActivityForm() {
                 disabled={!selectedActivity}
                 loading={isGenerating}
               >
-                Confirmar Selección
+                Generar Oblea
               </Button>
             </>
           )}

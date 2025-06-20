@@ -9,7 +9,7 @@ import {
   Image,
 } from '@react-pdf/renderer';
 import { generateQRCode } from '@/lib/code-generator';
-import { LicenseData } from '../oblea.actions';
+import { LicenseData } from '../../oblea.actions';
 
 const styles = StyleSheet.create({
   page: {

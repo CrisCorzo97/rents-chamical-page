@@ -254,7 +254,9 @@ export async function validateOblea(): Promise<ObleaValidation> {
 }
 
 // Función para generar la oblea (podría ser un PDF o documento)
-export async function generateOblea(): Promise<{
+export async function generateOblea(input: {
+  commercial_enablement_id: string;
+}): Promise<{
   data: LicenseData | null;
   error: string | null;
 }> {
@@ -275,6 +277,11 @@ export async function generateOblea(): Promise<{
       return response;
     }
 
+    const commercial_enablement = commercial_enablements?.find(
+      (commercial_enablement) =>
+        commercial_enablement.id === input.commercial_enablement_id
+    );
+
     const validation = await validateOblea();
 
     if (!validation.canGenerate) {
@@ -285,35 +292,29 @@ export async function generateOblea(): Promise<{
     }
 
     const otherActivities = [
-      commercial_enablements[0]
-        .commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity
+      commercial_enablement
+        ?.commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
-      commercial_enablements[0]
-        .commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity
+      commercial_enablement
+        ?.commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity
         ?.activity ?? null,
     ];
 
     const licenseData: LicenseData = {
-      commercialEnablementId: commercial_enablements[0].id,
-      registrationNumber: commercial_enablements[0].registration_receipt!,
-      businessName: commercial_enablements
-        .map((item) => formatName(item.company_name ?? ''))
-        .filter((item) => item !== '')
-        .join(' / '),
-      taxpayerName: formatName(commercial_enablements[0].taxpayer!),
-      cuit: commercial_enablements[0].tax_id!,
+      commercialEnablementId: commercial_enablement?.id!,
+      registrationNumber: commercial_enablement?.registration_receipt!,
+      businessName: formatName(commercial_enablement?.company_name ?? ''),
+      taxpayerName: formatName(commercial_enablement?.taxpayer!),
+      cuit: commercial_enablement?.tax_id!,
       validUntil: dayjs(validation.validUntil).format('DD/MM/YYYY'),
-      mainActivity: commercial_enablements[0].commercial_activity?.activity!,
+      mainActivity: commercial_enablement?.commercial_activity?.activity!,
       otherActivities: otherActivities.filter((activity) => activity !== null),
       issueDate: dayjs().format('DD/MM/YYYY'),
-      address: commercial_enablements
-        .map((item) =>
-          formatName(
-            `${item.address ?? ''} ${item.address_number ?? ''}`
-          ).trim()
-        )
-        .filter((item) => item !== '')
-        .join(' / '),
+      address: formatName(
+        `${commercial_enablement?.address ?? '-'} ${
+          commercial_enablement?.address_number ?? ''
+        }`
+      ).trim(),
     };
 
     response.data = licenseData;

@@ -10,19 +10,16 @@ import {
 import { BadgeCheck } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useTransition } from 'react';
-import { LicenseData } from '../../types/types';
-import { generateOblea } from '../services/overview.action';
-import { Toaster, toast } from 'sonner';
+import { Toaster } from 'sonner';
 import {
   Dialog,
-  DialogTitle,
-  DialogHeader,
   DialogContent,
-  DialogFooter,
   DialogDescription,
+  DialogTitle,
 } from '@/components/ui';
-import CommercialLicense from './CommercialLicense';
-import { PDFViewer } from '@react-pdf/renderer';
+import CuitActivityForm from './cuit-activity-form';
+import { getTaxpayerData } from '../../lib/get-taxpayer-data';
+import { commercial_activity, commercial_enablement } from '@prisma/client';
 
 export const CardStatusSkeleton = () => {
   return (
@@ -42,38 +39,42 @@ export const CardStatusSkeleton = () => {
 };
 
 export const CardStatus = ({ canGenerate }: { canGenerate: boolean }) => {
-  const [isGenerating, startTransition] = useTransition();
-  const [licenseData, setLicenseData] = useState<LicenseData | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogContent, setDialogContent] = useState<'pdf' | 'message' | null>(
-    null
-  );
-  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [isSelectActivityDialogOpen, setIsSelectActivityDialogOpen] =
+    useState(false);
+  const [isSearching, startSearchingTransition] = useTransition();
+  const [activities, setActivities] = useState<
+    (commercial_enablement & {
+      commercial_activity: commercial_activity | null;
+    })[]
+  >([]);
 
-  const handleGenerateOblea = () => {
-    startTransition(async () => {
-      try {
-        const { data, error } = await generateOblea();
-
-        if (error) {
-          setErrorDetails(error);
-          setDialogContent('message'); // Mostrar mensaje de error en el diálogo
-          setIsDialogOpen(true);
-        } else {
-          setLicenseData(data);
-          setDialogContent('pdf'); // Mostrar el PDF en el diálogo
-          setIsDialogOpen(true);
-        }
-      } catch (error) {
-        toast.error('Error al procesar la solicitud.');
-      }
+  const handleOpenSelectActivityDialog = () => {
+    startSearchingTransition(async () => {
+      const { commercial_enablements } = await getTaxpayerData();
+      setActivities(commercial_enablements);
+      setIsSelectActivityDialogOpen(true);
     });
   };
 
-  const closeDialog = () => {
-    setIsDialogOpen(false);
-    setDialogContent(null);
-  };
+  // const handleGenerateOblea = () => {
+  //   startTransition(async () => {
+  //     try {
+  //       const { data, error } = await generateOblea();
+
+  //       if (error) {
+  //         setErrorDetails(error);
+  //         setDialogContent('message'); // Mostrar mensaje de error en el diálogo
+  //         setIsDialogOpen(true);
+  //       } else {
+  //         setLicenseData(data);
+  //         setDialogContent('pdf'); // Mostrar el PDF en el diálogo
+  //         setIsDialogOpen(true);
+  //       }
+  //     } catch (error) {
+  //       toast.error('Error al procesar la solicitud.');
+  //     }
+  //   });
+  // };
 
   return (
     <section className='md:col-span-6 2xl:col-span-5'>
@@ -99,42 +100,26 @@ export const CardStatus = ({ canGenerate }: { canGenerate: boolean }) => {
           <Button
             className='w-full'
             disabled={!canGenerate}
-            onClick={handleGenerateOblea}
-            loading={isGenerating}
+            onClick={handleOpenSelectActivityDialog}
+            loading={isSearching}
           >
-            {isGenerating ? 'Generando...' : 'Generar Oblea'}
+            Generar Oblea
           </Button>
         </CardFooter>
       </Card>
 
-      {/* Dialog para mostrar el PDF o mensaje */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        {dialogContent === 'pdf' && licenseData && (
-          <DialogContent className='flex flex-col min-h-[90vh] min-w-screen max-w-screen-2xl'>
-            <DialogHeader>
-              <DialogTitle>Oblea Generada</DialogTitle>
-            </DialogHeader>
-            <PDFViewer className='flex-1 h-[95%] w-[95%] m-auto'>
-              <CommercialLicense licenseData={licenseData} />
-            </PDFViewer>
-            <DialogFooter>
-              <Button onClick={closeDialog}>Cerrar</Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-        {dialogContent === 'message' && errorDetails && (
-          <DialogContent className='flex flex-col'>
-            <DialogHeader>
-              <DialogTitle>No se puede generar la oblea</DialogTitle>
-            </DialogHeader>
-            <DialogDescription className='mb-4'>
-              {errorDetails}
-            </DialogDescription>
-            <DialogFooter>
-              <Button onClick={closeDialog}>Cerrar</Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
+      {/* Dialog para seleccionar la actividad */}
+      <Dialog
+        open={isSelectActivityDialogOpen}
+        onOpenChange={setIsSelectActivityDialogOpen}
+      >
+        <DialogContent>
+          <DialogTitle>Seleccionar Actividad</DialogTitle>
+          <DialogDescription>
+            Selecciona una actividad de la lista para continuar.
+          </DialogDescription>
+          <CuitActivityForm activities={activities} />
+        </DialogContent>
       </Dialog>
     </section>
   );
