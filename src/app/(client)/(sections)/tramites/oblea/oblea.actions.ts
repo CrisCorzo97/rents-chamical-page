@@ -276,14 +276,10 @@ export async function generateObleaV2(input: {
       return response;
     }
 
-    const oldestCommercialEnablement = commercial_enablement.sort((a, b) =>
-      dayjs(a.registration_date!).diff(dayjs(b.registration_date!))
-    )[0];
-
     const validation = await validateOblea({
       taxId: tax_id,
       commercialEnablementRegistrationDate:
-        oldestCommercialEnablement.registration_date!,
+        commercial_enablement[0].registration_date!,
     });
 
     if (!validation.canGenerate) {
