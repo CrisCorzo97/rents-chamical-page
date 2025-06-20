@@ -49,11 +49,17 @@ const getCurrentBimester = () => {
   return [firstMonth, secondMonth];
 };
 
-const getCommercialEnablement = async (tax_id: string) => {
+export const getCommercialEnablement = async (input: {
+  tax_id: string;
+  commercial_enablement_id?: string;
+}) => {
+  const { tax_id, commercial_enablement_id } = input;
+
   const commercial_enablement = await dbSupabase.commercial_enablement.findMany(
     {
       where: {
         tax_id,
+        ...(commercial_enablement_id && { id: commercial_enablement_id }),
       },
       include: {
         commercial_activity: true,
@@ -101,155 +107,6 @@ const getAffidavits = async (input: {
   });
 
   return { affidavits, requiredPeriods, secondMonth };
-};
-
-export const generateOblea = async (tax_id: string) => {
-  const response: {
-    data: LicenseData | null;
-    error: string | null;
-  } = {
-    data: null,
-    error: null,
-  };
-  try {
-    const { commercial_enablement } = await getCommercialEnablement(tax_id);
-
-    if (commercial_enablement.length === 0) {
-      throw new Error(
-        'No se encontraron registros de habilitación comercial para este CUIT. Por favor, acercate a la oficina de rentas municipal para regularizar tu situación.'
-      );
-    }
-
-    const { affidavits, requiredPeriods, secondMonth } = await getAffidavits({
-      tax_id,
-      registration_date: commercial_enablement[0].registration_date!,
-    });
-
-    if (affidavits.length < requiredPeriods.length) {
-      throw new Error(
-        'El CUIT ingresado no está habilitado para generar una oblea. Por favor, verifica tu estado tributario.'
-      );
-    }
-
-    const isApproved = affidavits.every(
-      (affidavit) => affidavit.status === 'approved'
-    );
-
-    if (!isApproved || affidavits.length === 0) {
-      throw new Error(
-        'El CUIT ingresado no está habilitado para generar una oblea. Por favor, verifica tu estado tributario.'
-      );
-    }
-
-    const otherActivities = [
-      commercial_enablement[0]
-        .commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity
-        ?.activity ?? null,
-      commercial_enablement[0]
-        .commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity
-        ?.activity ?? null,
-    ];
-
-    const licenseData: LicenseData = {
-      commercialEnablementId: commercial_enablement[0].id,
-      registrationNumber: commercial_enablement[0].registration_receipt!,
-      businessName: commercial_enablement
-        .map((item) => item.company_name)
-        .join(' / '),
-      taxpayerName: formatName(commercial_enablement[0].taxpayer!),
-      cuit: tax_id,
-      validUntil: dayjs(secondMonth)
-        .add(2, 'month')
-        .endOf('month')
-        .format('DD/MM/YYYY'),
-      mainActivity: commercial_enablement[0].commercial_activity?.activity!,
-      otherActivities: otherActivities.filter((activity) => activity !== null),
-      issueDate: dayjs().format('DD/MM/YYYY'),
-      address: `${commercial_enablement[0].address} ${commercial_enablement[0].address_number}`,
-    };
-
-    response.data = licenseData;
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message);
-      response.error = error.message;
-    } else {
-      response.error =
-        'Error al consultar registros de habilitación comercial.';
-    }
-  } finally {
-    return response;
-  }
-};
-
-export const verifyOblea = async (tax_id: string) => {
-  const response: {
-    status: 'valid' | 'invalid';
-    licenseData: LicenseData | null;
-    error: string | null;
-  } = {
-    status: 'invalid',
-    licenseData: null,
-    error: null,
-  };
-
-  try {
-    const { commercial_enablement } = await getCommercialEnablement(tax_id);
-
-    if (!commercial_enablement) {
-      response.error =
-        'No se encontraron registros de habilitación comercial para este CUIT.';
-      return response;
-    }
-
-    const { affidavits, requiredPeriods, secondMonth } = await getAffidavits({
-      tax_id,
-      registration_date: commercial_enablement[0].registration_date!,
-    });
-
-    const isApproved = affidavits.every(
-      (affidavit) => affidavit.status === 'approved'
-    );
-
-    response.licenseData = {
-      commercialEnablementId: commercial_enablement[0].id,
-      registrationNumber: commercial_enablement[0].registration_receipt!,
-      businessName: commercial_enablement
-        .map((item) => item.company_name)
-        .join(' / '),
-      taxpayerName: formatName(commercial_enablement[0].taxpayer!),
-      cuit: tax_id,
-      validUntil: dayjs(secondMonth)
-        .add(2, 'month')
-        .endOf('month')
-        .format('DD/MM/YYYY'),
-      mainActivity: commercial_enablement[0].commercial_activity?.activity!,
-      otherActivities: [],
-      issueDate: dayjs().format('DD/MM/YYYY'),
-      address: `${commercial_enablement[0].address} ${commercial_enablement[0].address_number}`,
-    };
-
-    if (
-      affidavits.length === 0 ||
-      affidavits.length < requiredPeriods.length ||
-      !isApproved
-    ) {
-      response.error =
-        'El comercio no está habilitado para operar. Oblea no válida.';
-    } else {
-      response.status = 'valid';
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error);
-      response.status = 'invalid';
-      response.error = error.message;
-    } else {
-      response.error = 'Error al verificar la oblea.';
-    }
-  } finally {
-    return response;
-  }
 };
 
 interface ObleaValidation {
@@ -391,10 +248,14 @@ async function validateOblea(input: {
 }
 
 // Función para generar la oblea (podría ser un PDF o documento)
-export async function generateObleaV2(tax_id: string): Promise<{
+export async function generateObleaV2(input: {
+  tax_id: string;
+  commercial_enablement_id: string;
+}): Promise<{
   data: LicenseData | null;
   error: string | null;
 }> {
+  const { tax_id, commercial_enablement_id } = input;
   const response: {
     data: LicenseData | null;
     error: string | null;
@@ -404,7 +265,10 @@ export async function generateObleaV2(tax_id: string): Promise<{
   };
 
   try {
-    const { commercial_enablement } = await getCommercialEnablement(tax_id);
+    const { commercial_enablement } = await getCommercialEnablement({
+      tax_id,
+      commercial_enablement_id,
+    });
 
     if (commercial_enablement.length === 0) {
       response.error =
@@ -486,7 +350,9 @@ export const verifyObleaV2 = async (tax_id: string) => {
   };
 
   try {
-    const { commercial_enablement } = await getCommercialEnablement(tax_id);
+    const { commercial_enablement } = await getCommercialEnablement({
+      tax_id,
+    });
 
     if (commercial_enablement.length === 0) {
       response.error =
