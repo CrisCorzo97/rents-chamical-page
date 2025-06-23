@@ -57,7 +57,7 @@ export const CardBalance = ({ balance }: { balance: number }) => {
           key='pay'
           className='w-full'
           onClick={() => {
-            router.push('/pagos/nuevo-pago');
+            router.push('/mis-pagos/nuevo-pago');
           }}
           disabled={balance === 0 || balance === null}
         >

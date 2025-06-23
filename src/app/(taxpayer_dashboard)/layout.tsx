@@ -59,6 +59,7 @@ export default async function TaxpayerDashboardLayout({
                       <Link
                         href='/auth/logout'
                         className='rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10'
+                        prefetch={false}
                       >
                         {/* <Button variant='destructive' size='sm'> */}
                         <LogOut className='h-4 w-4 mr-2' />
