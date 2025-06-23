@@ -33,7 +33,13 @@ export const CreateAffidavitButton = ({
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
 
   const defaultPeriod = useMemo(() => {
-    return periods.find((period) => period.nextToSubmit)!.value;
+    const nextToSubmitPeriod = periods.find((period) => period.nextToSubmit);
+
+    if (!nextToSubmitPeriod) {
+      return periods.findLast((period) => period.enabled)?.value ?? '';
+    }
+
+    return nextToSubmitPeriod?.value ?? '';
   }, [periods]);
 
   return (

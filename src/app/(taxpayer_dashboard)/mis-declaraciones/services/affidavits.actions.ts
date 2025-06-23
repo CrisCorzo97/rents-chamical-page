@@ -427,17 +427,14 @@ export const getPeriodsToSubmit = async (year: string) => {
 
     const periods = declarablePeriods.map((period) => {
       const isEnabled =
-        dayjs(period.period)
-          .utc()
-          .isAfter(
-            dayjs(commercial_enablements[0]!.registration_date)
-              .utc()
-              .startOf('month')
-              .subtract(1, 'day')
-          ) && dayjs().utc().isAfter(dayjs(period.start_date).utc());
+        dayjs(period.period).isAfter(
+          dayjs(commercial_enablements[0]!.registration_date)
+            .startOf('month')
+            .subtract(1, 'day')
+        ) && dayjs().isAfter(dayjs(period.start_date));
 
       return {
-        label: formatName(dayjs(period.period).utc().format('MMMM YYYY')),
+        label: formatName(dayjs(period.period).format('MMMM YYYY')),
         value: period.period,
         enabled: isEnabled,
         nextToSubmit: false,
