@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { getInvoicesWithRelations } from './actions';
 import { CollectionManagementTable } from './collection-management-table';
 import { affidavit_status } from '@prisma/client';
+import { CreateInvoiceButton } from './components/create-invoice-button';
 
 export default async function CollectionManagementPage({
   searchParams,
@@ -66,6 +67,10 @@ export default async function CollectionManagementPage({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div className='flex justify-end mb-4'>
+        <CreateInvoiceButton />
+      </div>
 
       <CollectionManagementTable
         items={data.data ?? []}

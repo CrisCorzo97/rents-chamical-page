@@ -3,12 +3,20 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope, PaginationParams } from '@/types/envelope';
 import { InvoiceWithRelations } from './collection_management.interface';
-import { affidavit_status, invoice, Prisma } from '@prisma/client';
+import {
+  affidavit,
+  affidavit_status,
+  invoice,
+  Prisma,
+  user,
+} from '@prisma/client';
 import dayjs from 'dayjs';
 import { uploadPaymentProof } from '@/app/(client)/(sections)/tramites/DDJJ-actividad-comercial/affidavit.actions';
 import { revalidatePath } from 'next/cache';
 import { formatCuilInput } from '@/lib/formatters';
 import utc from 'dayjs/plugin/utc';
+import { CalculateInfo } from '@/app/(client)/(sections)/tramites/DDJJ-actividad-comercial/types';
+import { generateInvoiceCode } from '@/lib/code-generator';
 dayjs.extend(utc);
 
 export const getInvoicesWithRelations = async ({
@@ -356,5 +364,173 @@ export const uploadAttachment = async (input: {
     }
   } finally {
     return response;
+  }
+};
+
+export const getPendingAffidavits = async (taxId: string) => {
+  const response: Envelope<(affidavit & { user: user | null })[]> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const lte_payment_due_date = dayjs().endOf('month').toDate();
+
+    const affidavits = await dbSupabase.affidavit.findMany({
+      where: {
+        tax_id: taxId,
+        status: 'pending_payment',
+        payment_due_date: {
+          lte: lte_payment_due_date,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    response.data = affidavits;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al obtener las declaraciones pendientes';
+    }
+  } finally {
+    return response;
+  }
+};
+
+export const createInvoice = async (input: {
+  user_id: string;
+  affidavit_ids: string[];
+}) => {
+  const { user_id, affidavit_ids } = input;
+
+  const response: Envelope<invoice> = {
+    success: true,
+    data: null,
+    error: null,
+    pagination: null,
+  };
+
+  try {
+    const declarableTax = await dbSupabase.declarable_tax.findFirst({
+      where: {
+        id: 'commercial_activity',
+      },
+    });
+
+    if (!declarableTax) {
+      throw new Error('No se encontró el impuesto declarable');
+    }
+
+    const compensatoryInterest =
+      (declarableTax.calculate_info as CalculateInfo)?.compensatory_interest ??
+      0;
+
+    // Busco las declaraciones en base a los ids
+    const affidavits = await dbSupabase.affidavit.findMany({
+      where: {
+        id: {
+          in: affidavit_ids,
+        },
+        user: { id: user_id },
+      },
+      orderBy: {
+        payment_due_date: 'desc',
+      },
+    });
+
+    // Calculo el monto total de las declaraciones y lo sumo con las multas
+    const feeAmount = affidavits.reduce(
+      (acc, affidavit) => acc + affidavit.fee_amount,
+      0
+    );
+
+    // Calculo los intereses compensatorios
+    const interests = affidavits.reduce((acc, affidavit) => {
+      const days = dayjs().diff(dayjs(affidavit.payment_due_date), 'day');
+      if (days <= 0) return acc;
+      return acc + affidavit.fee_amount * compensatoryInterest * days;
+    }, 0);
+
+    // Calculo el monto total de la factura
+    const totalAmount = feeAmount + interests;
+
+    const invoiceId = await getLastInvoiceCode();
+
+    if (!invoiceId) {
+      throw new Error('No se pudo obtener el código de la factura');
+    }
+
+    const due_date = dayjs().isAfter(
+      dayjs(affidavits[0].payment_due_date),
+      'day'
+    )
+      ? dayjs().endOf('day').toDate()
+      : affidavits[0].payment_due_date;
+
+    const invoice = await dbSupabase.invoice.create({
+      data: {
+        id: invoiceId,
+        fee_amount: feeAmount,
+        compensatory_interest: interests,
+        total_amount: totalAmount,
+        due_date,
+        status: 'pending_payment',
+        user: {
+          connect: {
+            id: user_id,
+          },
+        },
+        affidavit: {
+          connect: affidavit_ids.map((id) => ({ id })),
+        },
+      },
+    });
+
+    response.data = invoice;
+  } catch (error) {
+    console.error(error);
+    response.success = false;
+
+    if (error instanceof Error) {
+      response.error = error.message;
+    } else {
+      response.error = 'Hubo un error al crear la factura';
+    }
+  } finally {
+    return response;
+  }
+};
+
+const getLastInvoiceCode = async () => {
+  try {
+    const lastInvoice = await dbSupabase.invoice.findFirst({
+      where: {
+        id: {
+          startsWith: `${dayjs().year()}-`,
+        },
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const code = generateInvoiceCode(lastInvoice?.id);
+
+    return code;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Hubo un error al obtener el último código de factura');
   }
 };
