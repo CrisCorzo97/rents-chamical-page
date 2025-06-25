@@ -32,7 +32,7 @@ export async function getProperties({
     }
 
     if (filters) {
-      const { taxpayer, enrollment } = filters;
+      const { taxpayer, enrollment, search } = filters;
       queries.where = {
         ...queries.where,
         ...(taxpayer && {
@@ -46,6 +46,12 @@ export async function getProperties({
             contains: enrollment as string,
             mode: 'insensitive',
           },
+        }),
+        ...(search && {
+          OR: [
+            { taxpayer: { contains: search as string, mode: 'insensitive' } },
+            { enrollment: { contains: search as string, mode: 'insensitive' } },
+          ],
         }),
       };
     }

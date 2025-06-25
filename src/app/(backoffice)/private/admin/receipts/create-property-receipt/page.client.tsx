@@ -40,7 +40,7 @@ export const GeneratePropertyReceiptClientPage = () => {
         const properties = await getProperties({
           limit: 50,
           filters: {
-            enrollment: search,
+            search,
           },
         });
 
@@ -66,13 +66,14 @@ export const GeneratePropertyReceiptClientPage = () => {
           <CardHeader>
             <CardTitle>Buscar registro de Inmueble</CardTitle>
             <CardDescription>
-              Ingrese su matrícula para buscar el registro.
+              Ingrese el nombre del contribuyente o su matrícula para buscar el
+              registro.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleSearch} className='flex gap-3'>
               <FormItem className='w-full'>
-                <Label>Matrícula</Label>
+                <Label>Nombre del contribuyente o matrícula</Label>
                 <Input type='text' name='search' required />
               </FormItem>
 
