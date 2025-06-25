@@ -142,6 +142,22 @@ export function CollectionManagementTable({
           </div>
           <div>
             <h4 className='text-sm font-medium text-muted-foreground'>
+              Importe Determinado (Períodos seleccionados)
+            </h4>
+            <p className='text-sm'>
+              {formatNumberToCurrency(record.fee_amount)}
+            </p>
+          </div>
+          <div>
+            <h4 className='text-sm font-medium text-muted-foreground'>
+              Intereses
+            </h4>
+            <p className='text-sm'>
+              {formatNumberToCurrency(record.compensatory_interest ?? 0)}
+            </p>
+          </div>
+          <div>
+            <h4 className='text-sm font-medium text-muted-foreground'>
               Importe Total
             </h4>
             <p className='text-sm'>
@@ -164,40 +180,49 @@ export function CollectionManagementTable({
           <DialogTitle className='mb-4'>Declaraciones Juradas</DialogTitle>
           <div className='space-y-4'>
             {record.affidavit?.map((affidavit) => (
-              <div key={affidavit.id} className='grid grid-cols-2 gap-4'>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Tipo de Declaración
-                  </h4>
-                  <p className='text-sm'>
-                    {formatName(affidavit.declarable_tax?.name ?? '-')}
-                  </p>
-                </div>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Estado
-                  </h4>
-                  <Badge variant={getStatusVariant(affidavit.status)}>
-                    {STATUS_DICTIONARY[affidavit.status]}
-                  </Badge>
-                </div>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Período
-                  </h4>
-                  <p className='text-sm'>
-                    {formatName(
-                      dayjs(affidavit.period).utc().format('MMMM YYYY')
-                    )}
-                  </p>
-                </div>
-                <div>
-                  <h4 className='text-sm font-medium text-muted-foreground'>
-                    Importe determinado
-                  </h4>
-                  <p className='text-sm'>
-                    {formatNumberToCurrency(affidavit.fee_amount)}
-                  </p>
+              <div key={affidavit.id} className='flex flex-col gap-4'>
+                <div className='rounded-md border'>
+                  <table className='w-full'>
+                    <thead className='bg-muted'>
+                      <tr className='border-b'>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Período
+                        </th>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Tasa / Contribución
+                        </th>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Importe determinado
+                        </th>
+                        <th className='px-4 py-2 text-sm font-medium text-muted-foreground'>
+                          Estado
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className='px-4 py-2 text-sm'>
+                          {formatName(
+                            dayjs(affidavit.period).utc().format('MMMM YYYY')
+                          )}
+                        </td>
+                        <td className='px-4 py-2 text-sm'>
+                          {formatName(affidavit.declarable_tax?.name ?? '-')}
+                        </td>
+                        <td className='px-4 py-2 text-sm'>
+                          {formatNumberToCurrency(affidavit.fee_amount)}
+                        </td>
+                        <td className='px-4 py-2 text-sm'>
+                          <Badge
+                            variant={getStatusVariant(affidavit.status)}
+                            className='text-xs'
+                          >
+                            {STATUS_DICTIONARY[affidavit.status]}
+                          </Badge>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             ))}
