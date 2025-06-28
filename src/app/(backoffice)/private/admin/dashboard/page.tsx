@@ -1,4 +1,4 @@
-import { WorkInProgressIllustration } from '@/assets/illustrations';
+import { Suspense } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,9 +10,17 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from 'next/link';
 
+// Importar componentes del dashboard
+import { DashboardContent, DashboardLoading } from './page.client';
+
+// ============================================================================
+// PÁGINA PRINCIPAL
+// ============================================================================
+
 export default async function DashboardPage() {
   return (
-    <ScrollArea className='mx-6 h-admin-scroll-area'>
+    <ScrollArea className='h-admin-scroll-area flex flex-col px-6 bg-neutral-100'>
+      {/* Breadcrumb */}
       <Breadcrumb className='h-12 mt-6'>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -31,15 +39,11 @@ export default async function DashboardPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className='flex flex-col items-center justify-center h-full'>
-        <WorkInProgressIllustration className='w-80 h-80 mx-auto mt-12' />
-        <h1 className='text-2xl font-bold text-center mt-6'>
-          ¡Estamos trabajando en esta página!
-        </h1>
-        <p className='text-center mt-2'>
-          Próximamente podrás disfrutar de todas las funcionalidades de esta
-          sección.
-        </p>
+      {/* Contenido del Dashboard */}
+      <div className='py-6'>
+        <Suspense fallback={<DashboardLoading />}>
+          <DashboardContent />
+        </Suspense>
       </div>
     </ScrollArea>
   );
