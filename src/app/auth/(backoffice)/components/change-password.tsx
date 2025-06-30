@@ -127,7 +127,7 @@ export function ChangePassword({ prevPassword }: { prevPassword?: string }) {
       <Card className='mt-16 mx-auto max-w-sm md:mt-0'>
         <CardHeader>
           {!prevPassword && (
-            <Link href='/auth/ingresar' passHref replace prefetch>
+            <Link href='/auth/ingresar' replace prefetch>
               <Button
                 variant='ghost'
                 className='flex items-center text-sm gap-2 px-2 -ml-2 mb-2'

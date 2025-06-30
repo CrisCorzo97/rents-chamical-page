@@ -194,7 +194,9 @@ export function DeclarationStatusChart({
   const totalAmount = data.reduce((sum, item) => sum + item.amount, 0);
 
   // Ordenar datos por cantidad
-  const sortedData = [...data].sort((a, b) => b.count - a.count);
+  const sortedData = [...data]
+    .filter((item) => item.status !== 'defeated')
+    .sort((a, b) => b.count - a.count);
 
   return (
     <Card className={cn('border-border', className)}>

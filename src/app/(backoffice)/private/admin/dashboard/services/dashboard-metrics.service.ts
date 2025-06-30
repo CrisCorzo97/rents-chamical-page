@@ -49,34 +49,50 @@ async function _getFinancialMetrics(): Promise<FinancialMetrics> {
     paidInvoices.reduce((sum, invoice) => sum + invoice.total_amount, 0);
 
   // 2. Total pendiente (declaraciones pendientes de pago + multas impagas)
-  const [pendingAffidavits, unpaidPenalties] = await Promise.all([
-    // Declaraciones pendientes de pago
-    dbSupabase.affidavit.findMany({
-      where: {
-        status: {
-          in: ['pending_payment', 'refused', 'under_review'],
+  const [pendingInvoices, pendingAffidavits, unpaidPenalties] =
+    await Promise.all([
+      // Facturas pendientes de pago
+      dbSupabase.invoice.findMany({
+        where: {
+          status: {
+            not: 'approved',
+          },
         },
-      },
-      select: {
-        fee_amount: true,
-      },
-    }),
-    // Multas impagas
-    dbSupabase.tax_penalties.findMany({
-      where: {
-        payment_date: null,
-      },
-      select: {
-        amount: true,
-      },
-    }),
-  ]);
+        select: {
+          total_amount: true,
+        },
+      }),
+      // Declaraciones pendientes de pago
+      dbSupabase.affidavit.findMany({
+        where: {
+          invoice_id: null,
+          status: {
+            not: 'approved',
+          },
+        },
+        select: {
+          fee_amount: true,
+        },
+      }),
+      // Multas impagas
+      dbSupabase.tax_penalties.findMany({
+        where: {
+          payment_date: null,
+          invoice_id: null,
+        },
+        select: {
+          amount: true,
+        },
+      }),
+    ]);
 
   const totalPending =
+    pendingInvoices.reduce((sum, invoice) => sum + invoice.total_amount, 0) +
     pendingAffidavits.reduce(
       (sum, affidavit) => sum + affidavit.fee_amount,
       0
-    ) + unpaidPenalties.reduce((sum, penalty) => sum + penalty.amount, 0);
+    ) +
+    unpaidPenalties.reduce((sum, penalty) => sum + penalty.amount, 0);
 
   // 3. Total de multas
   const totalPenalties = unpaidPenalties.reduce(

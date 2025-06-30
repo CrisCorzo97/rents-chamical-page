@@ -337,7 +337,7 @@ async function _getDailyCashFlow(
       },
     });
 
-    // Obtener egresos del día (facturas pagadas)
+    // Obtener ingresos por cobro de facturas del día (facturas cobradas)
     const invoices = await dbSupabase.invoice.findMany({
       where: {
         payment_date: {
@@ -351,11 +351,12 @@ async function _getDailyCashFlow(
       },
     });
 
-    const income = receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
-    const expenses = invoices.reduce(
-      (sum, invoice) => sum + invoice.total_amount,
-      0
-    );
+    const income =
+      invoices.reduce((sum, invoice) => sum + invoice.total_amount, 0) +
+      receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
+
+    const expenses = 0;
+
     const netFlow = income - expenses;
     cumulativeFlow += netFlow;
 
