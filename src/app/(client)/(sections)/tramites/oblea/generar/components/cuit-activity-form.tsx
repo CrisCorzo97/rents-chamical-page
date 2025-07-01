@@ -111,7 +111,7 @@ export default function CuitActivityForm() {
     <>
       <Card className='w-full max-w-md'>
         <CardHeader>
-          <Link href='/' passHref replace prefetch>
+          <Link href='/' replace prefetch>
             <Button
               variant='ghost'
               className='flex items-center text-sm gap-2 px-2 -ml-2 mb-2'

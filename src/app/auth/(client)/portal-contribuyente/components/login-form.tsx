@@ -79,7 +79,7 @@ export function LoginForm({ redirect_to }: { redirect_to?: string }) {
       <Toaster />
       <Card className='mx-auto max-w-sm'>
         <CardHeader>
-          <Link href='/' passHref replace prefetch>
+          <Link href='/' replace prefetch>
             <Button
               variant='ghost'
               className='flex items-center text-sm gap-2 px-2 -ml-2 mb-2'

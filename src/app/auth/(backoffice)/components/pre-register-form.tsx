@@ -98,7 +98,7 @@ export function PreRegisterForm({ roles }: PreRegisterFormProps) {
       <Toaster />
       <Card className='mt-2 mx-auto max-w-sm md:max-w-lg'>
         <CardHeader>
-          <Link href='/' passHref replace prefetch>
+          <Link href='/' replace prefetch>
             <Button
               variant='ghost'
               className='flex items-center text-sm gap-2 px-2 -ml-2 mb-2'

@@ -71,12 +71,7 @@ export function TaxpayerPasswordRecoveryRequest() {
       <Toaster />
       <Card className='mt-16 mx-auto max-w-sm md:mt-0'>
         <CardHeader>
-          <Link
-            href='/auth/portal-contribuyente/ingresar'
-            passHref
-            replace
-            prefetch
-          >
+          <Link href='/auth/portal-contribuyente/ingresar' replace prefetch>
             <Button
               variant='ghost'
               className='flex items-center text-sm gap-2 px-2 -ml-2 mb-2'

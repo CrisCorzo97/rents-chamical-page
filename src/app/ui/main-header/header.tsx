@@ -129,7 +129,7 @@ export const MainHeader = () => {
                 <NavigationMenuItem key={item.key}>
                   {item.subItems ? (
                     <>
-                      <Link href={item.href} prefetch legacyBehavior passHref>
+                      <Link href={item.href} prefetch passHref>
                         <NavigationMenuTrigger
                           className={navigationMenuTriggerStyle({
                             className:
@@ -167,7 +167,7 @@ export const MainHeader = () => {
                       </NavigationMenuContent>
                     </>
                   ) : (
-                    <Link href={item.href} prefetch legacyBehavior passHref>
+                    <Link href={item.href} prefetch passHref>
                       <NavigationMenuLink
                         className={navigationMenuTriggerStyle({
                           className:
