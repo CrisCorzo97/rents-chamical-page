@@ -34,7 +34,7 @@ export default async function AdminPageLayout({
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <Link href='/' prefetch passHref>
+                  <Link href='/' prefetch passHref legacyBehavior>
                     <NavigationMenuLink
                       className={navigationMenuTriggerStyle({
                         className:
