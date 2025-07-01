@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { invalidateDashboardCache } from '../services/cache.service';
 
 export interface DashboardState {
   isLoading: boolean;
@@ -88,6 +89,9 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
       updateState({ isRefreshing: true, error: null });
       console.log('Invalidating dashboard cache...');
 
+      // Invalidar cache del dashboard
+      await invalidateDashboardCache();
+
       const now = new Date();
       const nextRefresh = new Date(
         now.getTime() + state.refreshInterval * 1000
@@ -98,6 +102,8 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
         nextRefresh,
         isRefreshing: false,
       });
+
+      console.log('Dashboard cache invalidated successfully');
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Error desconocido';
@@ -105,6 +111,7 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
         error: errorMessage,
         isRefreshing: false,
       });
+      console.error('Error invalidating dashboard cache:', error);
     }
   }, [state.refreshInterval, updateState]);
 
@@ -113,6 +120,9 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
       updateState({ isLoading: true, error: null });
       console.log('Invalidating all dashboard caches...');
 
+      // Invalidar cache del dashboard
+      await invalidateDashboardCache();
+
       const now = new Date();
       const nextRefresh = new Date(
         now.getTime() + state.refreshInterval * 1000
@@ -123,6 +133,8 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
         nextRefresh,
         isLoading: false,
       });
+
+      console.log('All dashboard caches invalidated successfully');
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Error desconocido';
@@ -130,6 +142,7 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
         error: errorMessage,
         isLoading: false,
       });
+      console.error('Error invalidating all dashboard caches:', error);
     }
   }, [state.refreshInterval, updateState]);
 
@@ -138,8 +151,15 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
       try {
         updateState({ isExporting: true, error: null });
         console.log(`Exporting data in ${format} format...`);
+
+        // Simular proceso de exportación
         await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Aquí se implementaría la lógica real de exportación
+        // Por ahora solo simulamos el proceso
+
         updateState({ isExporting: false });
+        console.log(`Data exported successfully in ${format} format`);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Error desconocido';
@@ -147,6 +167,7 @@ export function useDashboardState(): [DashboardState, DashboardActions] {
           error: errorMessage,
           isExporting: false,
         });
+        console.error('Error exporting data:', error);
       }
     },
     [updateState]

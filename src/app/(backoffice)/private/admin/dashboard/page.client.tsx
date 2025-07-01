@@ -8,7 +8,7 @@ import {
   RefreshCw,
   TrendingUp,
 } from 'lucide-react';
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 import { DashboardSettings } from './components/dashboard-settings';
 import { FinancialMetricsCardsAuto } from './components/charts/financial-metrics-cards';
 import { CashFlowChartAuto } from './components/charts/cash-flow-chart';
@@ -16,6 +16,10 @@ import { DeclarationStatusChartAuto } from './components/charts/declaration-stat
 import { RevenueDistributionChartAuto } from './components/charts/revenue-distribution-chart';
 import { RevenueTimelineChartAuto } from './components/charts/revenue-timeline-chart';
 import { DateRangePicker } from './components/filters/date-range-picker';
+import { DashboardStatusSimple } from './components/ui/dashboard-status';
+import { useDashboardState } from './hooks/use-dashboard-state';
+import { useDashboardFilters } from './hooks/use-dashboard-filters';
+import { invalidateDashboardCache } from './services/cache.service';
 import dayjs from 'dayjs';
 
 // ============================================================================
@@ -67,35 +71,59 @@ export function DashboardError({ error }: { error: string }) {
 // ============================================================================
 
 export function DashboardContent() {
-  // Estados locales para la configuración
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(300);
-  const [selectedPeriod, setSelectedPeriod] = useState<
-    'daily' | 'weekly' | 'monthly' | 'yearly'
-  >('monthly');
-  const [visibleCharts, setVisibleCharts] = useState({
-    financialMetrics: true,
-    revenueTimeline: true,
-    revenueDistribution: true,
-    declarationStatus: true,
-    cashFlow: true,
-  });
+  // Usar el hook de estado global del dashboard
+  const [state, actions] = useDashboardState();
 
-  const handleRefresh = () => {
-    console.log('Refreshing dashboard...');
-    // Aquí se implementaría la lógica de refresh
+  // Usar el hook de filtros
+  const {
+    filters,
+    updateFilters,
+    resetFilters,
+    refreshAllData,
+    isLoading: filtersLoading,
+  } = useDashboardFilters();
+
+  // Función de refresh que invalida el cache y actualiza el estado
+  const handleRefresh = async () => {
+    try {
+      await actions.refresh();
+      // Invalidar cache del dashboard
+      await invalidateDashboardCache();
+      // Refrescar todos los datos
+      refreshAllData();
+      console.log('Dashboard refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing dashboard:', error);
+      actions.setError('Error al actualizar el dashboard');
+    }
   };
 
-  const handleExport = () => {
-    console.log('Exporting dashboard data...');
-    // Aquí se implementaría la lógica de exportación
+  // Función de exportación
+  const handleExport = async () => {
+    try {
+      await actions.exportData('csv');
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      actions.setError('Error al exportar datos');
+    }
   };
 
+  // Función para cambiar visibilidad de gráficos
   const handleChartVisibilityChange = (chartId: string, visible: boolean) => {
-    setVisibleCharts((prev) => ({
-      ...prev,
-      [chartId]: visible,
-    }));
+    actions.setChartVisibility(
+      chartId as keyof typeof state.visibleCharts,
+      visible
+    );
+  };
+
+  // Función para manejar cambios de fecha
+  const handleDateRangeChange = (startDate: Date, endDate: Date) => {
+    updateFilters({ startDate, endDate });
+  };
+
+  // Función para resetear filtros
+  const handleResetFilters = () => {
+    resetFilters();
   };
 
   return (
@@ -113,22 +141,33 @@ export function DashboardContent() {
         </div>
 
         <div className='flex items-center space-x-2'>
-          <Button variant='outline' size='sm' onClick={handleRefresh}>
-            <RefreshCw className='h-4 w-4 mr-2' />
-            Actualizar
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={handleRefresh}
+            disabled={state.isRefreshing || filtersLoading}
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${state.isRefreshing || filtersLoading ? 'animate-spin' : ''}`}
+            />
+            {state.isRefreshing || filtersLoading
+              ? 'Actualizando...'
+              : 'Actualizar'}
           </Button>
           <Button variant='outline' size='sm' onClick={handleExport} disabled>
-            <Download className='h-4 w-4 mr-2' />
-            Exportar
+            <Download
+              className={`h-4 w-4 mr-2 ${state.isExporting ? 'animate-spin' : ''}`}
+            />
+            {state.isExporting ? 'Exportando...' : 'Exportar'}
           </Button>
           <DashboardSettings
-            autoRefresh={autoRefresh}
-            refreshInterval={refreshInterval}
-            selectedPeriod={selectedPeriod}
-            visibleCharts={visibleCharts}
-            onAutoRefreshChange={setAutoRefresh}
-            onRefreshIntervalChange={setRefreshInterval}
-            onPeriodChange={setSelectedPeriod}
+            autoRefresh={state.autoRefresh}
+            refreshInterval={state.refreshInterval}
+            selectedPeriod={state.selectedPeriod}
+            visibleCharts={state.visibleCharts}
+            onAutoRefreshChange={actions.setAutoRefresh}
+            onRefreshIntervalChange={actions.setRefreshInterval}
+            onPeriodChange={actions.setSelectedPeriod}
             onChartVisibilityChange={handleChartVisibilityChange}
             onRefresh={handleRefresh}
             onExport={handleExport}
@@ -136,14 +175,17 @@ export function DashboardContent() {
         </div>
       </div>
 
-      {/* Información de última actualización */}
-      <div className='flex items-center justify-between text-xs text-muted-foreground'>
-        <span>Última actualización: {dayjs().format('HH:mm')}</span>
-        <span>Auto-refresh cada {refreshInterval / 60} minutos</span>
-      </div>
+      {/* Estado del Dashboard */}
+      <DashboardStatusSimple
+        isLoading={state.isLoading}
+        isRefreshing={state.isRefreshing || filtersLoading}
+        lastUpdated={state.lastUpdated}
+        error={state.error}
+        onRefresh={handleRefresh}
+      />
 
       {/* Cards de Métricas Financieras */}
-      {visibleCharts.financialMetrics && (
+      {state.visibleCharts.financialMetrics && (
         <section className='space-y-4'>
           <div className='flex items-center space-x-2'>
             <DollarSign className='h-5 w-5 text-primary' />
@@ -158,7 +200,7 @@ export function DashboardContent() {
       {/* Gráficos Principales */}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         {/* Gráfico de Evolución de Ingresos */}
-        {visibleCharts.revenueTimeline && (
+        {state.visibleCharts.revenueTimeline && (
           <Card className='h-full'>
             <CardContent className='p-0'>
               <Suspense fallback={<DashboardLoading />}>
@@ -169,7 +211,7 @@ export function DashboardContent() {
         )}
 
         {/* Gráfico de Distribución */}
-        {visibleCharts.revenueDistribution && (
+        {state.visibleCharts.revenueDistribution && (
           <Card className='h-full'>
             <CardContent className='p-0'>
               <Suspense fallback={<DashboardLoading />}>
@@ -183,7 +225,7 @@ export function DashboardContent() {
       {/* Gráficos Secundarios */}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         {/* Estado de Declaraciones */}
-        {visibleCharts.declarationStatus && (
+        {state.visibleCharts.declarationStatus && (
           <Card className='h-full'>
             <CardContent className='p-0'>
               <Suspense fallback={<DashboardLoading />}>
@@ -194,7 +236,7 @@ export function DashboardContent() {
         )}
 
         {/* Flujo de Caja Diario */}
-        {visibleCharts.cashFlow && (
+        {state.visibleCharts.cashFlow && (
           <Card className='h-full'>
             <CardContent className='p-0'>
               <Suspense fallback={<DashboardLoading />}>
@@ -211,17 +253,61 @@ export function DashboardContent() {
         <Card className='border-dashed'>
           <CardContent className='p-6'>
             <h3 className='text-sm font-medium mb-4'>Filtros de Fecha</h3>
-            <DateRangePicker />
+            <DateRangePicker
+              startDate={filters.startDate || undefined}
+              endDate={filters.endDate || undefined}
+              onDateChange={handleDateRangeChange}
+              onReset={handleResetFilters}
+              loading={state.isRefreshing || filtersLoading}
+            />
           </CardContent>
         </Card>
 
-        {/* Controles de Gráficos */}
-        {/* <Card className='border-dashed'>
+        {/* Información del Período */}
+        <Card className='border-dashed'>
           <CardContent className='p-6'>
-            <h3 className='text-sm font-medium mb-4'>Controles de Gráficos</h3>
-            <ChartControls />
+            <h3 className='text-sm font-medium mb-4'>
+              Información del Período
+            </h3>
+            <div className='space-y-2 text-sm'>
+              <div>
+                <span className='text-muted-foreground'>
+                  Período seleccionado:
+                </span>
+                <span className='ml-2 font-medium'>
+                  {filters.period === 'daily' && 'Diario'}
+                  {filters.period === 'weekly' && 'Semanal'}
+                  {filters.period === 'monthly' && 'Mensual'}
+                  {filters.period === 'yearly' && 'Anual'}
+                </span>
+              </div>
+              <div>
+                <span className='text-muted-foreground'>Rango de fechas:</span>
+                <span className='ml-2 font-medium'>
+                  {filters.startDate && filters.endDate
+                    ? `${dayjs(filters.startDate).format('DD/MM/YYYY')} - ${dayjs(filters.endDate).format('DD/MM/YYYY')}`
+                    : 'No seleccionado'}
+                </span>
+              </div>
+              <div>
+                <span className='text-muted-foreground'>
+                  Próxima actualización:
+                </span>
+                <span className='ml-2 font-medium'>
+                  {state.nextRefresh
+                    ? dayjs(state.nextRefresh).format('HH:mm:ss')
+                    : 'No programada'}
+                </span>
+              </div>
+              <div>
+                <span className='text-muted-foreground'>Auto-refresh:</span>
+                <span className='ml-2 font-medium'>
+                  {filters.autoRefresh ? 'Activado' : 'Desactivado'}
+                </span>
+              </div>
+            </div>
           </CardContent>
-        </Card> */}
+        </Card>
       </div>
     </div>
   );

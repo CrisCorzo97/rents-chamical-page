@@ -12,6 +12,7 @@ import Link from 'next/link';
 
 // Importar componentes del dashboard
 import { DashboardContent, DashboardLoading } from './page.client';
+import { DashboardProvider } from './hooks/use-dashboard-state';
 
 // ============================================================================
 // PÁGINA PRINCIPAL
@@ -41,9 +42,11 @@ export default async function DashboardPage() {
 
       {/* Contenido del Dashboard */}
       <div className='py-6'>
-        <Suspense fallback={<DashboardLoading />}>
-          <DashboardContent />
-        </Suspense>
+        <DashboardProvider>
+          <Suspense fallback={<DashboardLoading />}>
+            <DashboardContent />
+          </Suspense>
+        </DashboardProvider>
       </div>
     </ScrollArea>
   );
