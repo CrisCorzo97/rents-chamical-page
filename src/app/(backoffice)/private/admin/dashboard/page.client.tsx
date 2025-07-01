@@ -117,7 +117,7 @@ export function DashboardContent() {
             <RefreshCw className='h-4 w-4 mr-2' />
             Actualizar
           </Button>
-          <Button variant='outline' size='sm' onClick={handleExport}>
+          <Button variant='outline' size='sm' onClick={handleExport} disabled>
             <Download className='h-4 w-4 mr-2' />
             Exportar
           </Button>

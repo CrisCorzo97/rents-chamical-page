@@ -128,7 +128,7 @@ function DashboardControls({
         )}
 
         {onExport && (
-          <Button onClick={onExport} variant='outline' size='sm'>
+          <Button onClick={onExport} variant='outline' size='sm' disabled>
             <Download className='h-4 w-4 mr-2' />
             Exportar
           </Button>

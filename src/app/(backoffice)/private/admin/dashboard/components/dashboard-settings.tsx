@@ -228,6 +228,7 @@ export function DashboardSettings({
                   size='sm'
                   onClick={onExport}
                   className='flex-1'
+                  disabled
                 >
                   <Download className='h-4 w-4 mr-2' />
                   Exportar
