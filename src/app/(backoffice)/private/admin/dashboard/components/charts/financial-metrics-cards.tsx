@@ -27,7 +27,10 @@ import { getFinancialMetrics } from '../../services/dashboard-metrics.service';
 
 interface MetricCardProps {
   title: string;
-  value: number;
+  value: {
+    type: 'number' | 'percentage' | 'currency';
+    value: number;
+  };
   subtitle?: string;
   icon: React.ReactNode;
   trend?: {
@@ -124,7 +127,11 @@ function MetricCard({
 
       <CardContent className='space-y-2'>
         <div className='text-2xl font-bold'>
-          {formatNumberToCurrency(value)}
+          {value.type === 'currency'
+            ? formatNumberToCurrency(value.value)
+            : value.type === 'percentage'
+              ? `${value.value}%`
+              : value.value}
         </div>
 
         {subtitle && (
@@ -206,7 +213,10 @@ export function FinancialMetricsCards({
       {/* Total Recaudado */}
       <MetricCard
         title='Total Recaudado'
-        value={data.totalCollected}
+        value={{
+          type: 'currency',
+          value: data.totalCollected,
+        }}
         subtitle='Este mes'
         icon={<DollarSign />}
         variant='success'
@@ -220,7 +230,10 @@ export function FinancialMetricsCards({
       {/* Total Pendiente */}
       <MetricCard
         title='Total Pendiente'
-        value={data.totalPending}
+        value={{
+          type: 'currency',
+          value: data.totalPending,
+        }}
         subtitle='Por cobrar'
         icon={<AlertTriangle />}
         variant='warning'
@@ -234,7 +247,10 @@ export function FinancialMetricsCards({
       {/* Total Multas */}
       <MetricCard
         title='Total Multas'
-        value={data.totalPenalties}
+        value={{
+          type: 'currency',
+          value: data.totalPenalties,
+        }}
         subtitle='Impagas'
         icon={<AlertTriangle />}
         variant='destructive'
@@ -243,7 +259,10 @@ export function FinancialMetricsCards({
       {/* Habilitaciones Comerciales */}
       <MetricCard
         title='Habilitaciones'
-        value={data.totalCommercialEnablements}
+        value={{
+          type: 'number',
+          value: data.totalCommercialEnablements,
+        }}
         subtitle='Activas'
         icon={<Building2 />}
       />
@@ -251,7 +270,10 @@ export function FinancialMetricsCards({
       {/* Propiedades */}
       <MetricCard
         title='Propiedades'
-        value={data.totalProperties}
+        value={{
+          type: 'number',
+          value: data.totalProperties,
+        }}
         subtitle='Registradas'
         icon={<Home />}
       />
@@ -259,7 +281,10 @@ export function FinancialMetricsCards({
       {/* Cementerio */}
       <MetricCard
         title='Cementerio'
-        value={data.totalCementery}
+        value={{
+          type: 'number',
+          value: data.totalCementery,
+        }}
         subtitle='Servicios'
         icon={<Landmark />}
       />
