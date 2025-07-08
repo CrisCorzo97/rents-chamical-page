@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
   },
   border: {
-    border: 1,
+    borderWidth: 1,
     borderColor: '#000000',
     padding: 15,
     height: '50%',
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   activitySectionBorder: {
     minHeight: 110,
-    border: 1,
+    borderWidth: 1,
     borderColor: '#000',
     padding: 4,
   },
