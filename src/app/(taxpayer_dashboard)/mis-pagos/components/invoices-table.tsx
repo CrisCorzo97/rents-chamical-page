@@ -22,14 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useCallback, useState, useTransition } from 'react';
+import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/toaster';
 import { TableSkeleton } from '@/components/custom-table/table-skeleton';
 import { InvoiceWithRelations } from '../types/types';
-import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 dayjs.locale(locale);
 dayjs.extend(utc);
 
@@ -65,12 +65,8 @@ export function InvoicesTable({
   const [selectedInvoice, setSelectedInvoice] =
     useState<InvoiceWithRelations | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
-  const [fileToUpload, setFileToUpload] = useState<{
-    invoice?: InvoiceWithRelations;
-    attachment?: File;
-  } | null>(null);
-  const [isUploading, startUploading] = useTransition();
+
+  const { push } = useRouter();
 
   const {
     currentPage,
@@ -83,44 +79,6 @@ export function InvoicesTable({
     handleFilterChange,
     handleSortingChange,
   } = useDataTableURLParams({ defaultLimit: pagination?.limit ?? 8 });
-
-  const handleOpenUploadDialog = (row: InvoiceWithRelations) => {
-    setUploadDialogOpen(true);
-    setFileToUpload((prev) => ({
-      invoice: row,
-      ...prev,
-    }));
-  };
-
-  const handleUploadFile = useCallback(
-    (input?: { file?: File; invoice?: InvoiceWithRelations }) => {
-      startUploading(async () => {
-        if (fileToUpload || input) {
-          try {
-            // const { error } = await uploadAttachment({
-            //   invoice: input?.invoice! ?? fileToUpload?.invoice!,
-            //   attachment: input?.file! ?? fileToUpload?.attachment!,
-            // });
-            // if (error) {
-            //   throw new Error(error);
-            // }
-            // toast.success('Comprobante de pago subido correctamente');
-            // if (!input?.file) {
-            //   setUploadDialogOpen(false);
-            //   setFileToUpload(null);
-            // }
-          } catch (error) {
-            console.error(error);
-            if (error instanceof Error) {
-              toast.error(error.message);
-            }
-            toast.error('Hubo un error al subir el comprobante de pago');
-          }
-        }
-      });
-    },
-    [fileToUpload]
-  );
 
   const renderInvoiceDetails = (record: InvoiceWithRelations) => {
     return (
@@ -390,7 +348,7 @@ export function InvoicesTable({
           {
             label: 'Subir comprobante',
             icon: <Upload className='h-4 w-4' />,
-            onClick: () => handleOpenUploadDialog(row.original),
+            onClick: () => push(`/mis-pagos/nuevo-pago/${row.original.id}`),
             disabled: row.original.attached_receipt !== null,
           },
         ];
