@@ -233,10 +233,7 @@ export const getConceptsToPay = async () => {
   };
 
   try {
-    const lte_payment_due_date =
-      dayjs().month() === 2 || dayjs().month() === 4
-        ? dayjs().add(1, 'month').endOf('month').toDate()
-        : dayjs().endOf('month').toDate();
+    const lte_payment_due_date = dayjs().add(2, 'month').toDate();
 
     const { data: affidavits } = await getAffidavits({
       items_per_page: '100',
@@ -356,10 +353,7 @@ export const getBalance = async () => {
   try {
     const { user } = await getUserAndCommercialEnablement();
 
-    const lte_payment_due_date =
-      dayjs().month() === 2 || dayjs().month() === 4
-        ? dayjs().add(1, 'month').endOf('month').toDate()
-        : dayjs().endOf('month').toDate();
+    const lte_payment_due_date = dayjs().add(2, 'month').toDate();
 
     const affidavits = await dbSupabase.affidavit.findMany({
       where: {
