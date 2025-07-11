@@ -189,7 +189,7 @@ export const getConceptsToPay = async () => {
   try {
     const { user } = await getTaxpayerData();
 
-    const lte_payment_due_date = dayjs().endOf('month').toDate();
+    const lte_payment_due_date = dayjs().add(2, 'month').toDate();
 
     const affidavits = await dbSupabase.affidavit.findMany({
       where: {
