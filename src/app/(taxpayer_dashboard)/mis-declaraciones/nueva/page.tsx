@@ -121,7 +121,7 @@ export default async function NuevaDeclaracionPage({
                 </strong>
                 <ul className='list-disc list-inside ml-4 mb-2'>
                   <li>
-                    Cálculo de Base por Alícuota única <b>(0,5%)</b>
+                    Cálculo de Base por Alícuota única <b>(0,7%)</b>
                   </li>
                 </ul>
                 <strong>Comercios - Servicios - Industrias</strong>
