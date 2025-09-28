@@ -1,27 +1,27 @@
 'use client';
-import Link from 'next/link';
-import { useState, useTransition } from 'react';
-import { z } from 'zod';
-import { toast, Toaster } from 'sonner';
-import { AxiosError } from 'axios';
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   FormItem,
   Input,
   Label,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
 } from '@/components/ui';
+import { AxiosError } from 'axios';
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useTransition } from 'react';
+import { toast, Toaster } from 'sonner';
+import { z } from 'zod';
 import { resetPassword } from '../auth-bo.actions';
 
 const formSchema = z.object({
@@ -225,8 +225,8 @@ export function PasswordRecovery() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Link href='/auth/ingresar' replace>
-              <Button>Iniciar sesión</Button>
+            <Link href='/' replace>
+              <Button>Inicio</Button>
             </Link>
           </DialogFooter>
         </DialogContent>
