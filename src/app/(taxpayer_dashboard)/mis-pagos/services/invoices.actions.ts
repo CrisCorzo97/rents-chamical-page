@@ -1,16 +1,16 @@
 'use server';
 
+import { generateInvoiceCode } from '@/lib/code-generator';
+import { formatName } from '@/lib/formatters';
 import dbSupabase from '@/lib/prisma/prisma';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { Envelope, PaginationParams } from '@/types/envelope';
-import { ConceptToPay, InvoiceWithRelations } from '../types/types';
-import { getTaxpayerData } from '../../lib/get-taxpayer-data';
 import { affidavit_status, invoice, Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
-import { formatName } from '@/lib/formatters';
-import { CalculateInfo } from '../../mis-declaraciones/types/affidavits.types';
-import { generateInvoiceCode } from '@/lib/code-generator';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { getTaxpayerData } from '../../lib/get-taxpayer-data';
+import { CalculateInfo } from '../../mis-declaraciones/types/affidavits.types';
+import { ConceptToPay, InvoiceWithRelations } from '../types/types';
 
 export const getInvoices = async ({
   page = 1,
@@ -289,6 +289,9 @@ export const createInvoice = async (input: {
       where: {
         id: 'commercial_activity',
       },
+      include: {
+        declarable_tax_period: true,
+      },
     });
 
     if (!declarableTax) {
@@ -335,7 +338,17 @@ export const createInvoice = async (input: {
 
     // Calculo los intereses compensatorios
     const interests = affidavits.reduce((acc, affidavit) => {
-      const days = dayjs().diff(dayjs(affidavit.payment_due_date), 'day');
+      const declarableTaxPeriod = declarableTax.declarable_tax_period.find(
+        (period) => period.period === affidavit.period
+      );
+      const paymentDueDate = dayjs(affidavit.payment_due_date).isAfter(
+        dayjs(declarableTaxPeriod?.payment_due_date),
+        'day'
+      )
+        ? dayjs(affidavit.payment_due_date)
+        : dayjs(declarableTaxPeriod?.payment_due_date);
+
+      const days = dayjs().diff(dayjs(paymentDueDate), 'day');
       if (days <= 0) return acc;
       return acc + affidavit.fee_amount * compensatoryInterest * days;
     }, 0);
