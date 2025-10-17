@@ -5,8 +5,8 @@ import dbSupabase from '@/lib/prisma/prisma';
 import { Envelope, PaginationParams } from '@/types/envelope';
 import {
   affidavit,
-  invoice,
   declarable_tax,
+  invoice,
   Prisma,
   receipt,
   tax_penalties,
@@ -338,6 +338,7 @@ export const generateDailyBoxReport = async (date: string) => {
           gte: dayjs(date).startOf('day').toISOString(),
           lte: dayjs(date).endOf('day').toISOString(),
         },
+        status: 'approved',
       },
       orderBy: {
         payment_date: 'asc',
