@@ -333,12 +333,16 @@ export const generateDailyBoxReport = async (date: string) => {
 
     const invoices = await dbSupabase.invoice.findMany({
       where: {
-        payment_date: {
-          not: null,
-          gte: dayjs(date).startOf('day').toISOString(),
-          lte: dayjs(date).endOf('day').toISOString(),
-        },
         status: 'approved',
+        affidavit: {
+          some: {
+            approved_at: {
+              not: null,
+              gte: dayjs(date).startOf('day').toISOString(),
+              lte: dayjs(date).endOf('day').toISOString(),
+            },
+          },
+        },
       },
       orderBy: {
         payment_date: 'asc',
