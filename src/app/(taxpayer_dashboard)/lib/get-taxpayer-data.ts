@@ -1,9 +1,9 @@
 'use server';
+import dbSupabase from '@/lib/prisma/prisma';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { TaxpayerData } from '../types/types';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import dbSupabase from '@/lib/prisma/prisma';
-import { redirect } from 'next/navigation';
 
 export const getTaxpayerData = cache(async (): Promise<TaxpayerData> => {
   try {
@@ -47,10 +47,14 @@ export const getTaxpayerData = cache(async (): Promise<TaxpayerData> => {
       };
 
       c_e_records.forEach((c_e_record) => {
-        if (c_e_record.commercial_activity?.code === '641930') {
-          categories.financial = true;
-        } else {
-          categories.commercial = true;
+        if (c_e_record.commercial_activity) {
+          if (
+            ['641930', '649290'].includes(c_e_record.commercial_activity.code)
+          ) {
+            categories.financial = true;
+          } else {
+            categories.commercial = true;
+          }
         }
       });
 
