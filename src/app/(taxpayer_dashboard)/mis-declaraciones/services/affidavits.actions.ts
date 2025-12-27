@@ -1,25 +1,25 @@
 'use server';
-import { Envelope, PaginationParams } from '@/types/envelope';
-import { getTaxpayerData } from '../../lib/get-taxpayer-data';
+import { formatName } from '@/lib/formatters';
 import { dbSupabase } from '@/lib/prisma/prisma';
+import { getFirstBusinessDay } from '@/lib/providers';
+import { Envelope, PaginationParams } from '@/types/envelope';
 import {
   affidavit,
   affidavit_status,
   declarable_tax_period,
   Prisma,
 } from '@prisma/client';
+import dayjs from 'dayjs';
+import locale from 'dayjs/locale/es';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import utc from 'dayjs/plugin/utc';
+import { revalidatePath } from 'next/cache';
+import { getTaxpayerData } from '../../lib/get-taxpayer-data';
 import {
   AffidavitWithRelations,
   CalculateInfo,
   PeriodToSubmit,
 } from '../types/affidavits.types';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import dayjs from 'dayjs';
-import { getFirstBusinessDay } from '@/lib/providers';
-import { revalidatePath } from 'next/cache';
-import { formatName } from '@/lib/formatters';
-import locale from 'dayjs/locale/es';
-import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(customParseFormat);
 dayjs.locale(locale);
@@ -424,6 +424,10 @@ export const getPeriodsToSubmit = async (year: string) => {
     });
 
     const { commercial_enablements } = await getTaxpayerData();
+
+    console.log('DECLARABLE PERIODS', declarablePeriods);
+    console.log('AFFIDAVITS', affidavits);
+    console.log('COMMERCIAL ENABLEMENTS', commercial_enablements);
 
     const periods = declarablePeriods.map((period) => {
       const isEnabled =
