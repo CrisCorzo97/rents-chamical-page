@@ -419,15 +419,12 @@ export const getPeriodsToSubmit = async (year: string) => {
       filters: {
         period: year,
       },
+      limit: 100,
       sort_by: 'period',
       sort_direction: 'asc',
     });
 
     const { commercial_enablements } = await getTaxpayerData();
-
-    console.log('DECLARABLE PERIODS', declarablePeriods);
-    console.log('AFFIDAVITS', affidavits);
-    console.log('COMMERCIAL ENABLEMENTS', commercial_enablements);
 
     const periods = declarablePeriods.map((period) => {
       const isEnabled =
