@@ -21,6 +21,8 @@ export const getTaxpayerData = cache(async (): Promise<TaxpayerData> => {
       throw new Error('No se pudo obtener el usuario');
     }
 
+    console.log('USER', user);
+
     let commercial_enablements: TaxpayerData['commercial_enablements'] = [];
     let include_both_categories = false;
 
@@ -30,10 +32,8 @@ export const getTaxpayerData = cache(async (): Promise<TaxpayerData> => {
       },
       include: {
         commercial_activity: true,
-        commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity:
-          true,
-        commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
-          true,
+        commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity: true,
+        commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity: true,
       },
       orderBy: {
         registration_date: 'asc',
