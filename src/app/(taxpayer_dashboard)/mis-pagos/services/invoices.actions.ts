@@ -338,7 +338,7 @@ export const createInvoice = async (input: {
 
     // Calculo los intereses compensatorios
     const interests = affidavits.reduce((acc, affidavit) => {
-      if (affidavit.period === '2025-10-01') return acc;
+      if (['2025-09-01', '2025-10-01'].includes(affidavit.period)) return acc;
 
       const declarableTaxPeriod = declarableTax.declarable_tax_period.find(
         (period) => period.period === affidavit.period
