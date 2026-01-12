@@ -1,12 +1,12 @@
 'use server';
 
+import { formatName } from '@/lib/formatters';
 import { dbSupabase } from '@/lib/prisma/prisma';
 import { Envelope } from '@/types/envelope';
+import { declarable_tax, declarable_tax_period } from '@prisma/client';
 import dayjs from 'dayjs';
 import { getTaxpayerData } from '../../lib/get-taxpayer-data';
 import { LicenseData, ObleaValidation } from '../../types/types';
-import { formatName } from '@/lib/formatters';
-import { declarable_tax, declarable_tax_period } from '@prisma/client';
 
 const BIMESTER_DICTIONARY = {
   1: [0, 1],
@@ -122,7 +122,7 @@ export async function validateOblea(): Promise<ObleaValidation> {
 
   const oldestCommercialEnablement = commercial_enablements?.sort((a, b) =>
     dayjs(a.registration_date!).diff(dayjs(b.registration_date!))
-  )[0];
+  )?.[0];
 
   // 1. Determinar fechas relevantes
   const currentDate = dayjs();
@@ -140,7 +140,7 @@ export async function validateOblea(): Promise<ObleaValidation> {
   // 3. Obtener todas las DDJJ aprobadas del año actual
   const affidavits = await dbSupabase.affidavit.findMany({
     where: {
-      tax_id: commercial_enablements?.[0]?.tax_id!,
+      tax_id: commercial_enablements?.[0]?.tax_id ?? '',
       declarable_tax: {
         id: 'commercial_activity',
       },
@@ -228,7 +228,7 @@ export async function validateOblea(): Promise<ObleaValidation> {
     // Verificamos si el último bimestre requerido es posterior a la fecha de registro
     const lastBimesterStart = dayjs()
       .year(currentYear)
-      .month(lastMonths[0])
+      .month(lastMonths?.[0] ?? 0)
       .startOf('month');
 
     if (lastBimesterStart.isAfter(validationStartDate)) {
