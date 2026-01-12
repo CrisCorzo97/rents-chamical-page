@@ -84,9 +84,6 @@ export const getAffidavits = async ({
     const queries: Prisma.affidavitFindManyArgs = {
       where: {
         taxpayer_id: taxpayerData.user.id,
-        period: {
-          contains: dayjs().format('YYYY'),
-        },
       },
       orderBy: {
         created_at: 'desc',
