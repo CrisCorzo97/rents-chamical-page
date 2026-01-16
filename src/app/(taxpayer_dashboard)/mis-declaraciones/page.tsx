@@ -6,15 +6,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import dayjs from 'dayjs';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { AffidavitsTable } from './components/affidavits-table';
+import { CreateAffidavitButton } from './components/create-affidavit-button';
 import {
   getAffidavits,
   getPeriodsToSubmit,
 } from './services/affidavits.actions';
-import Link from 'next/link';
-import { AffidavitsTable } from './components/affidavits-table';
-import { CreateAffidavitButton } from './components/create-affidavit-button';
-import dayjs from 'dayjs';
-import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Mis Declaraciones',
@@ -75,8 +75,15 @@ export default async function MisDeclaracionesPage({
       </Breadcrumb>
 
       <div className='grid grid-cols-1 gap-4 md:grid-cols-12'>
-        <div className='md:col-span-12 2xl:col-span-10 flex justify-end'>
-          <CreateAffidavitButton periods={periods ?? []} />
+        <div className='md:col-span-12 2xl:col-span-10 flex justify-end gap-2'>
+          {/* <PeriodSelector
+            selectedPeriod={
+              period
+                ? dayjs(period as string).format('YYYY')
+                : dayjs().format('YYYY')
+            }
+          /> */}
+          <CreateAffidavitButton initialPeriods={periods ?? []} />
         </div>
         <AffidavitsTable items={affidavits ?? []} pagination={pagination} />
       </div>
