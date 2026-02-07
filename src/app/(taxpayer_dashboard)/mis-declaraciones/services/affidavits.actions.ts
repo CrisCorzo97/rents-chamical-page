@@ -422,11 +422,16 @@ export const getPeriodsToSubmit = async (year: string) => {
     });
 
     const { commercial_enablements } = await getTaxpayerData();
+    console.log({ commercial_enablements });
+
+    if (commercial_enablements.length === 0) {
+      return response;
+    }
 
     const periods = declarablePeriods.map((period) => {
       const isEnabled =
         dayjs(period.period).isAfter(
-          dayjs(commercial_enablements[0]!.registration_date)
+          dayjs(commercial_enablements[0]?.registration_date)
             .startOf('month')
             .subtract(1, 'day')
         ) && dayjs().isAfter(dayjs(period.start_date));
