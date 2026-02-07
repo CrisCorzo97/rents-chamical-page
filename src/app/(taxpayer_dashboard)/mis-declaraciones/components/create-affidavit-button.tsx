@@ -45,7 +45,7 @@ export const CreateAffidavitButton = ({
 
       if (error || !periods) {
         toast.error(
-          error ?? 'Ocurrió un error al consultar los períodos habilitados.'
+          error ?? 'Ocurrió un error al consultar los períodos habilitados.',
         );
         return;
       }
@@ -59,10 +59,17 @@ export const CreateAffidavitButton = ({
     const nextToSubmitPeriod = periods.find((period) => period.nextToSubmit);
 
     if (!nextToSubmitPeriod) {
-      return periods.findLast((period) => period.enabled)?.value ?? '';
+      const lastPeriod = periods.findLast((period) => period.enabled);
+      if (!lastPeriod) {
+        return '';
+      }
+
+      setSelectedPeriod(lastPeriod.value);
+      return lastPeriod.value;
     }
 
-    return nextToSubmitPeriod?.value ?? '';
+    setSelectedPeriod(nextToSubmitPeriod.value);
+    return nextToSubmitPeriod.value;
   }, [periods]);
 
   return (
