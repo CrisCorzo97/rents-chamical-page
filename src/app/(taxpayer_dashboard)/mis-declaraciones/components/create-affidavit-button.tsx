@@ -21,7 +21,8 @@ import dayjs from 'dayjs';
 import locale from 'dayjs/locale/es';
 import utc from 'dayjs/plugin/utc';
 import Link from 'next/link';
-import { useCallback, useMemo, useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
+import { toast, Toaster } from 'sonner';
 import { getPeriodsToSubmit } from '../services/affidavits.actions';
 import { PeriodToSubmit } from '../types/affidavits.types';
 dayjs.locale(locale);
@@ -38,20 +39,21 @@ export const CreateAffidavitButton = ({
 
   const [isFetching, startTransition] = useTransition();
 
-  const fetchPeriods = useCallback(async (year: string) => {
-    const { data: periods } = await getPeriodsToSubmit(year);
-    return periods ?? [];
-  }, []);
+  const handleYearChange = (year: string) => {
+    startTransition(async () => {
+      const { data: periods, error } = await getPeriodsToSubmit(year);
 
-  const handleYearChange = useCallback(
-    async (year: string) => {
-      startTransition(async () => {
-        setPeriods(await fetchPeriods(year));
-      });
-      setYear(year);
-    },
-    [fetchPeriods, startTransition]
-  );
+      if (error || !periods) {
+        toast.error(
+          error ?? 'Ocurrió un error al consultar los períodos habilitados.'
+        );
+        return;
+      }
+
+      setPeriods(periods);
+    });
+    setYear(year);
+  };
 
   const defaultPeriod = useMemo(() => {
     const nextToSubmitPeriod = periods.find((period) => period.nextToSubmit);
@@ -65,6 +67,7 @@ export const CreateAffidavitButton = ({
 
   return (
     <Dialog>
+      <Toaster />
       <DialogTrigger asChild>
         <Button size='sm' className='w-full md:w-fit'>
           Nueva Declaración
