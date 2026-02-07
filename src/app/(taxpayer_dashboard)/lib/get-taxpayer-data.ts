@@ -2,9 +2,10 @@
 import dbSupabase from '@/lib/prisma/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 import { TaxpayerData } from '../types/types';
 
-export const getTaxpayerData = async (): Promise<TaxpayerData> => {
+export const getTaxpayerData = cache(async (): Promise<TaxpayerData> => {
   try {
     const supabase = await createSupabaseServerClient();
 
@@ -64,4 +65,4 @@ export const getTaxpayerData = async (): Promise<TaxpayerData> => {
   } catch (error) {
     redirect('/');
   }
-};
+});
