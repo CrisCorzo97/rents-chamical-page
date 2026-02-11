@@ -2,8 +2,11 @@
 
 import { formatName } from '@/lib/formatters';
 import dbSupabase from '@/lib/prisma/prisma';
+import { affidavit } from '@prisma/client';
 import dayjs from 'dayjs';
 import locale from 'dayjs/locale/es';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 dayjs.locale(locale);
 
 export type LicenseData = {
@@ -63,12 +66,10 @@ export const getCommercialEnablement = async (input: {
       },
       include: {
         commercial_activity: true,
-        commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity:
-          true,
-        commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity:
-          true,
+        commercial_activity_commercial_enablement_second_commercial_activity_idTocommercial_activity: true,
+        commercial_activity_commercial_enablement_third_commercial_activity_idTocommercial_activity: true,
       },
-    }
+    },
   );
 
   return { commercial_enablement };
@@ -93,7 +94,7 @@ const getAffidavits = async (input: {
     requiredPeriods.push(
       dayjs(requiredPeriods[requiredPeriods.length - 1])
         .add(1, 'month')
-        .format('YYYY-MM-DD')
+        .format('YYYY-MM-DD'),
     );
   }
 
@@ -127,27 +128,21 @@ async function validateOblea(input: {
   const currentMonth = currentDate.month() + 1;
   const currentBimester = Math.ceil(currentMonth / 2);
 
-  // Fecha de inicio de validación (1 de enero del año actual o fecha de registro si es posterior)
+  // Fecha de inicio de validación (1 de enero del 2025 o fecha de registro si es posterior)
   const validationStartDate = dayjs(
-    commercialEnablementRegistrationDate
-  ).isAfter(dayjs().startOf('year'))
+    commercialEnablementRegistrationDate,
+  ).isAfter(dayjs('2025-01-01').startOf('year'))
     ? dayjs(commercialEnablementRegistrationDate).startOf('month')
-    : dayjs().startOf('year');
+    : dayjs('2025-01-01').startOf('year');
 
-  // 3. Obtener todas las DDJJ aprobadas del año actual
-  const affidavits = await dbSupabase.affidavit.findMany({
-    where: {
-      tax_id: taxId,
-      declarable_tax: {
-        id: 'commercial_activity',
-      },
-      period: {
-        startsWith: `${currentYear}`,
-      },
-    },
-  });
+  // 3. Obtener todas las DDJJ aprobadas del año actual o también las del año pasado
+  const affidavitsYears =
+    currentBimester === 1 && currentYear > 2025
+      ? [currentYear - 1, currentYear]
+      : [currentYear];
 
-  // 4. Verificar DDJJ requeridas
+  const affidavits: affidavit[] = [];
+
   const missingAffidavits: string[] = [];
   let validBimesterFound = false;
   let validUntil = dayjs()
@@ -156,25 +151,44 @@ async function validateOblea(input: {
     .add(9, 'day')
     .toISOString(); // Inicialización por defecto
 
-  // Iteramos desde el primer bimestre hasta el actual
-  for (let bimester = 1; bimester < currentBimester; bimester++) {
-    const months =
-      BIMESTER_DICTIONARY[bimester as keyof typeof BIMESTER_DICTIONARY];
-
-    if (months.every((month) => month < validationStartDate.month())) {
-      continue;
+  if (affidavitsYears.length > 1) {
+    for (const year of affidavitsYears) {
+      const data = await dbSupabase.affidavit.findMany({
+        where: {
+          tax_id: taxId,
+          declarable_tax: {
+            id: 'commercial_activity',
+          },
+          period: {
+            startsWith: `${year}`,
+          },
+        },
+      });
+      affidavits.push(...data);
     }
 
+    const months = BIMESTER_DICTIONARY[1];
+    const allMonths = Array.from({ length: 12 }).map((_, i) => i + 1);
+
     // Sólo verificamos que estén aprobados los meses a partir de la fecha de registro
-    const hasMonthsApproved = months.map((month) => {
-      if (month < validationStartDate.month()) {
+    const hasMonthsApproved: boolean[] = allMonths.map((month) => {
+      if (
+        dayjs(`${affidavitsYears[0]}-${month}`)
+          .startOf('month')
+          .isBefore(validationStartDate)
+      ) {
         return true;
+      } else {
+        const approvedAff = affidavits.find((aff) => {
+          return (
+            dayjs(aff.period).isSame(
+              dayjs(`${affidavitsYears[0]}-${month}`).startOf('month'),
+            ) && aff.status === 'approved'
+          );
+        });
+
+        return approvedAff !== undefined;
       }
-      const affidavit = affidavits.find((affidavit) => {
-        const periodMonth = dayjs(affidavit.period).month();
-        return periodMonth === month && affidavit.status === 'approved';
-      });
-      return affidavit !== undefined;
     });
 
     if (hasMonthsApproved.every((approved) => approved)) {
@@ -192,31 +206,113 @@ async function validateOblea(input: {
       if (bimesterValidUntil.isAfter(currentDate.add(10, 'day'))) {
         validBimesterFound = true;
         validUntil = bimesterValidUntil.toISOString();
-        break;
       }
     } else {
       // Verificamos qué meses específicos faltan
-      const missingMonths = months.filter((month) => {
+
+      const affPreviousYear = affidavits.filter((aff) =>
+        aff.period.includes(`${affidavitsYears[0]}`),
+      );
+
+      const missingMonths = affPreviousYear
+        .map((aff) => {
+          if (aff.status === 'approved') {
+            return null;
+          }
+          return dayjs(aff.period).month();
+        })
+        .filter((months) => months !== null);
+
+      if (missingMonths.length > 0) {
+        const missingMonthsNames = missingMonths
+          .map((month) =>
+            formatName(
+              `${dayjs().month(month).format('MMMM')} ${affidavitsYears[0]}`,
+            ),
+          )
+          .join(' - ');
+
+        missingAffidavits.push(missingMonthsNames);
+      }
+    }
+  } else {
+    const data = await dbSupabase.affidavit.findMany({
+      where: {
+        tax_id: taxId,
+        declarable_tax: {
+          id: 'commercial_activity',
+        },
+        period: {
+          contains: `${currentYear}`,
+        },
+      },
+    });
+
+    affidavits.push(...data);
+
+    // Iteramos desde el primer bimestre hasta el actual
+    for (let bimester = 1; bimester < currentBimester; bimester++) {
+      const months =
+        BIMESTER_DICTIONARY[bimester as keyof typeof BIMESTER_DICTIONARY];
+
+      if (months.every((month) => month < validationStartDate.month())) {
+        continue;
+      }
+
+      // Sólo verificamos que estén aprobados los meses a partir de la fecha de registro
+      const hasMonthsApproved = months.map((month) => {
+        if (month < validationStartDate.month()) {
+          return true;
+        }
         const affidavit = affidavits.find((affidavit) => {
           const periodMonth = dayjs(affidavit.period).month();
           return periodMonth === month && affidavit.status === 'approved';
         });
-        return affidavit === undefined;
+        return affidavit !== undefined;
       });
 
-      if (missingMonths.length > 0) {
-        const missingMonthsNames = missingMonths
-          .map((month) => formatName(dayjs().month(month).format('MMMM')))
-          .join(' y ');
+      if (hasMonthsApproved.every((approved) => approved)) {
+        // Calculamos la fecha de vigencia para este bimestre
+        const nextBimesterStartDate = dayjs()
+          .year(currentYear)
+          .month(months[1] + 1)
+          .startOf('month');
 
-        missingAffidavits.push(`Bimestre ${bimester} - ${missingMonthsNames}`);
+        const bimesterValidUntil = nextBimesterStartDate
+          .add(3, 'month')
+          .add(9, 'day');
+
+        // Si la vigencia es posterior a la fecha actual + 10 días, este bimestre es válido
+        if (bimesterValidUntil.isAfter(currentDate.add(10, 'day'))) {
+          validBimesterFound = true;
+          validUntil = bimesterValidUntil.toISOString();
+          break;
+        }
+      } else {
+        // Verificamos qué meses específicos faltan
+        const missingMonths = months.filter((month) => {
+          const affidavit = affidavits.find((affidavit) => {
+            const periodMonth = dayjs(affidavit.period).month();
+            return periodMonth === month && affidavit.status === 'approved';
+          });
+          return affidavit === undefined;
+        });
+
+        if (missingMonths.length > 0) {
+          const missingMonthsNames = missingMonths
+            .map((month) => formatName(dayjs().month(month).format('MMMM')))
+            .join(' y ');
+
+          missingAffidavits.push(missingMonthsNames);
+        }
       }
     }
   }
 
   // Si no encontramos ningún bimestre válido, usamos la fecha del último bimestre requerido
   if (!validBimesterFound) {
-    const lastRequiredBimester = currentBimester - 1;
+    const lastRequiredBimester =
+      currentBimester - 1 === 0 ? 6 : currentBimester - 1;
     const lastMonths =
       BIMESTER_DICTIONARY[
         lastRequiredBimester as keyof typeof BIMESTER_DICTIONARY
@@ -284,7 +380,7 @@ export async function generateObleaV2(input: {
 
     if (!validation.canGenerate) {
       response.error = `No se puede generar la oblea. DDJJ faltantes: ${validation.missingAffidavits?.join(
-        ', '
+        ', ',
       )}`;
       return response;
     }
@@ -314,8 +410,8 @@ export async function generateObleaV2(input: {
       address: commercial_enablement
         .map((item) =>
           formatName(
-            `${item.address ?? ''} ${item.address_number ?? ''}`
-          ).trim()
+            `${item.address ?? ''} ${item.address_number ?? ''}`,
+          ).trim(),
         )
         .filter((item) => item !== '')
         .join(' / '),
@@ -357,7 +453,7 @@ export const verifyObleaV2 = async (tax_id: string) => {
     }
 
     const oldestCommercialEnablement = commercial_enablement.sort((a, b) =>
-      dayjs(a.registration_date!).diff(dayjs(b.registration_date!))
+      dayjs(a.registration_date!).diff(dayjs(b.registration_date!)),
     )[0];
 
     const validation = await validateOblea({
@@ -393,8 +489,8 @@ export const verifyObleaV2 = async (tax_id: string) => {
       address: commercial_enablement
         .map((item) =>
           formatName(
-            `${item.address ?? ''} ${item.address_number ?? ''}`
-          ).trim()
+            `${item.address ?? ''} ${item.address_number ?? ''}`,
+          ).trim(),
         )
         .filter((item) => item !== '')
         .join(' / '),
@@ -403,7 +499,7 @@ export const verifyObleaV2 = async (tax_id: string) => {
     if (!validation.canGenerate) {
       response.error = validation.missingAffidavits
         ? `El comercio no está habilitado para operar. DDJJ faltantes: ${validation.missingAffidavits.join(
-            ', '
+            ', ',
           )}`
         : 'El comercio no está habilitado para operar. Oblea no válida.';
     } else {
