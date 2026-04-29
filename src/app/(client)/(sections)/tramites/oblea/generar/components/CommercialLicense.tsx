@@ -1,14 +1,15 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React from 'react';
+import { generateQRCode } from '@/lib/code-generator';
 import {
   Document,
+  Image,
   Page,
+  StyleSheet,
   Text,
   View,
-  StyleSheet,
-  Image,
 } from '@react-pdf/renderer';
-import { generateQRCode } from '@/lib/code-generator';
+import dayjs from 'dayjs';
+import React from 'react';
 import { LicenseData } from '../../oblea.actions';
 
 const styles = StyleSheet.create({
@@ -184,7 +185,7 @@ const CommercialLicense: React.FC<CommercialLicenseProps> = ({
     <Document>
       <Page size='A4' style={styles.page}>
         <View style={styles.border}>
-          <Text style={styles.waterMark}>2025</Text>
+          <Text style={styles.waterMark}>{dayjs().year()}</Text>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
               <Image
