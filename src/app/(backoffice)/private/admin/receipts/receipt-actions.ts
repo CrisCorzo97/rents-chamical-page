@@ -300,11 +300,11 @@ const createNextReceiptCode = async () => {
     );
 
     console.log(
-      `%c${lastReceipts}`,
+      `%c${idOrder.map((id) => id.toString()).join(', ')}`,
       'color: white; background-color: red; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
     );
     console.log(
-      `%c${lastReceipt}`,
+      `%c${lastReceipt?.id ?? 'no last receipt'}`,
       'color: white; background-color: blue; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
     );
 
