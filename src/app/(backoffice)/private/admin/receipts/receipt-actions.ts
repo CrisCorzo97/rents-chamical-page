@@ -212,12 +212,12 @@ export const confirmReceipt = async (input: { data: receipt }) => {
 
       if (!!confirmed && confirmed.data && confirmed.data.length > 0) {
         const years_paid = confirmed.data.map(
-          (r) => (r.other_data as Prisma.JsonObject)!.year_to_pay as number
+          (r) => (r.other_data as Prisma.JsonObject)!.year_to_pay as number,
         );
 
         last_year_paid = Math.max(
           ...years_paid,
-          (other_data as Prisma.JsonObject).year_to_pay as number
+          (other_data as Prisma.JsonObject).year_to_pay as number,
         );
       }
 
@@ -296,7 +296,16 @@ const createNextReceiptCode = async () => {
     const lastReceiptNumber = Math.max(...idOrder.map((id) => +id));
 
     const lastReceipt = lastReceipts.find((r) =>
-      r.id.includes(lastReceiptNumber.toString())
+      r.id.includes(lastReceiptNumber.toString()),
+    );
+
+    console.log(
+      `%c${lastReceipts}`,
+      'color: white; background-color: red; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+    );
+    console.log(
+      `%c${lastReceipt}`,
+      'color: white; background-color: blue; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
     );
 
     if (!lastReceipt) {
